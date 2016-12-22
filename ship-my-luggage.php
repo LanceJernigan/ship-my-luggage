@@ -66,7 +66,17 @@
 
     function sml_valid_order($order_data) {
 
+        global $woocommerce;
+
         $errors = [];
+
+        foreach ($order_data['products'] as $product) {
+
+            $woocommerce->cart->add_to_cart($product['id'], $product['quantity'], 0, [], [
+                'sml_price' => $product['price']
+            ]);
+
+        }
 
         return $errors;
 
@@ -97,5 +107,39 @@
     }
 
     add_action('wp_ajax_sml_order', 'sml_ajax_order');
+
+    /*
+     * sml_before_calculate_totals() - adjust product prices based on item data
+     */
+
+    function sml_before_calculate_totals($cart_object) {
+
+        global $woocommerce;
+
+        $cart = $woocommerce->cart;
+
+        foreach ($cart_object->cart_contents as $product) {
+
+            $product['data']->price = $product['sml_price'];
+
+        }
+
+    }
+
+    add_action('woocommerce_before_calculate_totals', 'sml_before_calculate_totals');
+
+    function _log( $message ) {
+        if( WP_DEBUG === true ){
+            error_log("*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*");
+            foreach (func_get_args() as $arg) {
+                if( is_array( $arg ) || is_object( $arg ) ){
+                    error_log( print_r( $arg, true ) );
+                } else {
+                    error_log( $arg );
+                }
+            }
+            error_log("*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*");
+        }
+    }
 
 ?>

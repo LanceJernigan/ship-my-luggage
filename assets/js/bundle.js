@@ -12695,7 +12695,13 @@ var App = function (_React$Component) {
 
         _this.submit = function () {
 
-            var orderData = 'Ye ye';
+            var orderData = {
+                products: [{
+                    id: 61,
+                    price: 100,
+                    quantity: 1
+                }]
+            };
 
             jQuery.ajax({
                 url: sml.ajax_url,

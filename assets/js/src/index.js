@@ -18,7 +18,15 @@ class App extends React.Component {
 
     submit = () => {
 
-        const orderData = 'Ye ye'
+        const orderData = {
+            products: [
+                {
+                    id: 61,
+                    price: 100,
+                    quantity: 1
+                }
+            ]
+        }
 
         jQuery.ajax({
             url: sml.ajax_url,
