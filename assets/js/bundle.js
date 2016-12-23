@@ -12677,6 +12677,10 @@ var _errors = __webpack_require__(476);
 
 var _errors2 = _interopRequireDefault(_errors);
 
+var _lead = __webpack_require__(478);
+
+var _lead2 = _interopRequireDefault(_lead);
+
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
@@ -12684,6 +12688,13 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
 
 function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
+var style = {
+    width: '100%',
+    maxWidth: '1080px',
+    margin: 'auto',
+    paddingTop: '15px'
+};
 
 var App = function (_React$Component) {
     _inherits(App, _React$Component);
@@ -12741,13 +12752,9 @@ var App = function (_React$Component) {
 
             return _react2.default.createElement(
                 'div',
-                { id: 'sml_wrapper' },
+                { id: 'sml_wrapper', style: style },
                 _react2.default.createElement(_errors2.default, { errors: this.state.errors }),
-                _react2.default.createElement(
-                    'h1',
-                    { onClick: this.submit },
-                    'Submit'
-                )
+                _react2.default.createElement(_lead2.default, null)
             );
         }
     }]);
@@ -29877,6 +29884,228 @@ var Errors = function Errors(_ref) {
 };
 
 exports.default = Errors;
+
+/***/ },
+/* 477 */,
+/* 478 */
+/***/ function(module, exports, __webpack_require__) {
+
+"use strict";
+'use strict';
+
+Object.defineProperty(exports, "__esModule", {
+    value: true
+});
+
+var _react = __webpack_require__(473);
+
+var _react2 = _interopRequireDefault(_react);
+
+var _row = __webpack_require__(480);
+
+var _row2 = _interopRequireDefault(_row);
+
+var _column = __webpack_require__(479);
+
+var _column2 = _interopRequireDefault(_column);
+
+var _card = __webpack_require__(481);
+
+var _card2 = _interopRequireDefault(_card);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+var Lead = function Lead() {
+
+    return _react2.default.createElement(
+        _row2.default,
+        null,
+        _react2.default.createElement(
+            _column2.default,
+            { columns: 3, width: 1, style: { padding: '0px 5px' } },
+            _react2.default.createElement(
+                _card2.default,
+                { className: 'lead_image' },
+                _react2.default.createElement('img', { src: '/wp-content/uploads/2016/12/lead.jpg' })
+            )
+        ),
+        _react2.default.createElement(
+            _column2.default,
+            { columns: 3, width: 2, style: { padding: '0px 5px' } },
+            _react2.default.createElement(
+                _card2.default,
+                { className: 'getting_started' },
+                _react2.default.createElement(
+                    'h3',
+                    null,
+                    'Getting Started'
+                ),
+                _react2.default.createElement(
+                    'div',
+                    { className: 'content' },
+                    _react2.default.createElement(
+                        'p',
+                        null,
+                        'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nunc et orci at odio luctus laoreet eget ac ante. Integer laoreet turpis suscipit luctus tincidunt. Quisque enim augue, consectetur a arcu vel, elementum convallis justo. Phasellus aliquam turpis eu justo luctus, egestas lacinia odio ultrices. Nunc et quam in eros consectetur fringilla. Integer pulvinar, tortor et scelerisque ultricies, ipsum nisl accumsan urna, eu iaculis massa enim vel mauris. Nunc sit amet mauris tincidunt, consectetur urna a, imperdiet ipsum. Donec ut massa vitae orci mattis maximus at at enim. Donec ultricies elit nec hendrerit finibus. In posuere, mauris eget ultricies rhoncus, justo justo tristique ipsum, a ornare diam libero non eros. Mauris consequat maximus massa. Aenean id elit eu nisl accumsan laoreet.'
+                    )
+                ),
+                _react2.default.createElement(
+                    'div',
+                    { className: 'footer' },
+                    _react2.default.createElement(
+                        'div',
+                        { className: 'action' },
+                        _react2.default.createElement(
+                            'p',
+                            null,
+                            'Learn More'
+                        )
+                    ),
+                    _react2.default.createElement(
+                        'div',
+                        { className: 'action' },
+                        _react2.default.createElement(
+                            'p',
+                            null,
+                            'Get Started'
+                        )
+                    )
+                )
+            )
+        )
+    );
+};
+
+exports.default = Lead;
+
+/***/ },
+/* 479 */
+/***/ function(module, exports, __webpack_require__) {
+
+"use strict";
+'use strict';
+
+Object.defineProperty(exports, "__esModule", {
+    value: true
+});
+
+var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
+
+var _react = __webpack_require__(473);
+
+var _react2 = _interopRequireDefault(_react);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+var get_column_percent = function get_column_percent(cols) {
+    return 100 / cols;
+};
+
+var Column = function Column(_ref) {
+    var _ref$columns = _ref.columns,
+        columns = _ref$columns === undefined ? 1 : _ref$columns,
+        _ref$width = _ref.width,
+        width = _ref$width === undefined ? 1 : _ref$width,
+        _ref$children = _ref.children,
+        children = _ref$children === undefined ? null : _ref$children,
+        _ref$style = _ref.style,
+        style = _ref$style === undefined ? {} : _ref$style;
+
+
+    var _width = document.body.clientWidth;
+    var percent = get_column_percent(columns);
+
+    if (percent / 100 * _width < 300) {
+
+        percent = 100;
+    }
+
+    return _react2.default.createElement(
+        'div',
+        { className: 'sml_col', style: _extends({ width: percent * width + '%', display: 'flex' }, style) },
+        children
+    );
+};
+
+exports.default = Column;
+
+/***/ },
+/* 480 */
+/***/ function(module, exports, __webpack_require__) {
+
+"use strict";
+'use strict';
+
+Object.defineProperty(exports, "__esModule", {
+    value: true
+});
+
+var _react = __webpack_require__(473);
+
+var _react2 = _interopRequireDefault(_react);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+var style = {
+    display: 'flex',
+    flexWrap: 'wrap'
+};
+
+var Row = function Row(_ref) {
+    var _ref$children = _ref.children,
+        children = _ref$children === undefined ? null : _ref$children;
+
+
+    return _react2.default.createElement(
+        'div',
+        { className: 'sml_row', style: style },
+        children
+    );
+};
+
+exports.default = Row;
+
+/***/ },
+/* 481 */
+/***/ function(module, exports, __webpack_require__) {
+
+"use strict";
+'use strict';
+
+Object.defineProperty(exports, "__esModule", {
+    value: true
+});
+
+var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
+
+var _react = __webpack_require__(473);
+
+var _react2 = _interopRequireDefault(_react);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+var _style = {
+    boxShadow: '0px 2px 3px rgba(0, 0, 0, .2)',
+    background: '#fafbfc',
+    overflow: 'hidden'
+};
+
+var Card = function Card(_ref) {
+    var children = _ref.children,
+        _ref$className = _ref.className,
+        className = _ref$className === undefined ? '' : _ref$className,
+        _ref$style = _ref.style,
+        style = _ref$style === undefined ? {} : _ref$style;
+
+
+    return _react2.default.createElement(
+        'div',
+        { className: 'sml_card ' + className, style: _extends({}, _style, style) },
+        children
+    );
+};
+
+exports.default = Card;
 
 /***/ }
 /******/ ]);

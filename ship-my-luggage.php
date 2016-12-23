@@ -3,7 +3,7 @@
     /*
      *  Plugin Name:  Ship My Luggage
      *  Description:  Functionality for Ship My Luggage
-     *  Version:      0.0.2
+     *  Version:      0.0.3
      *  Author:       Lance Jernigan
      *  Author URI:   http://www.LanceJernigan.com
      */
@@ -64,11 +64,13 @@
      *     return - boolean - whether the order was successful or not
      */
 
-    function sml_valid_order($order_data) {
+    function sml_place_order($_order_data) {
 
         global $woocommerce;
 
         $errors = [];
+
+        $order_data = apply_filters('pre_place_order');
 
         foreach ($order_data['products'] as $product) {
 
@@ -82,7 +84,7 @@
 
     }
 
-    add_filter('sml_valid_order', 'sml_valid_order', 10, 1);
+    add_filter('sml_place_order', 'sml_place_order', 10, 1);
 
     function sml_ajax_order() {
 
@@ -96,9 +98,9 @@
                 ]
             ]);
 
-        }
+        };
 
-        $errors = apply_filters('sml_valid_order', $order_data);
+        $errors = sml_place_order();
 
         wp_send_json([
             'errors' => $errors

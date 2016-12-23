@@ -2,6 +2,14 @@ import React from 'react'
 import ReactDOM from 'react-dom'
 
 import Errors from './components/errors'
+import Lead from './components/lead'
+
+const style = {
+    width: '100%',
+    maxWidth: '1080px',
+    margin: 'auto',
+    paddingTop: '15px'
+}
 
 class App extends React.Component {
 
@@ -58,11 +66,11 @@ class App extends React.Component {
 
         return (
 
-            <div id="sml_wrapper">
+            <div id="sml_wrapper" style={style}>
 
                 <Errors errors={this.state.errors} />
 
-                <h1 onClick={this.submit}>Submit</h1>
+                <Lead />
 
             </div>
 
