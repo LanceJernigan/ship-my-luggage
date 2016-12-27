@@ -3,6 +3,7 @@ import ReactDOM from 'react-dom'
 
 import Errors from './components/errors'
 import Lead from './components/lead'
+import Order from './components/order'
 
 const style = {
     width: '100%',
@@ -10,6 +11,23 @@ const style = {
     margin: 'auto',
     paddingTop: '15px'
 }
+
+const products = [
+    {
+        title: 'Standard Golf Bag',
+        thumbnail: '/wp-content/uploads/2016/01/small-golf-bag.png',
+        content: '<strong>Max Weight:</strong> 40 lbs / 18 kg <br /><strong>Max Dimensions (in.):</strong> 50x12x10 <br /><strong>Max Dimensions (cm.):</strong> 127x30x25 <br />',
+        starting: 144,
+        quantity: 0
+    },
+    {
+        title: 'Standard Golf Bag',
+        thumbnail: '/wp-content/uploads/2016/01/small-golf-bag.png',
+        content: '<strong>Max Weight:</strong> 40 lbs / 18 kg <br /><strong>Max Dimensions (in.):</strong> 50x12x10 <br /><strong>Max Dimensions (cm.):</strong> 127x30x25 <br />',
+        starting: 144,
+        quantity: 0
+    }
+]
 
 class App extends React.Component {
 
@@ -71,6 +89,8 @@ class App extends React.Component {
                 <Errors errors={this.state.errors} />
 
                 <Lead />
+
+                <Order products={products} />
 
             </div>
 

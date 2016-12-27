@@ -1,15 +1,16 @@
 import React from 'react'
 
-const style = {
+const _style = {
     display: 'flex',
     flexWrap: 'wrap',
+    width: '100%'
 }
 
-const Row = ({children = null}) => {
+const Row = ({className = '', style = {}, children = null}) => {
 
     return (
 
-        <div className="sml_row" style={style}>
+        <div className={'sml_row ' + className} style={{..._style, ...style}}>
 
             {children}
 

@@ -37,3 +37,48 @@
                 background: rgba(0, 0, 0, .05);
                 border-radius: 2px;
             }
+
+.sml_product .header {
+    padding: 10px;
+}
+
+    .sml_product .image {
+        height: 200px;
+        text-align: center;
+        background: rgba(0, 0, 0, .02);
+    }
+
+        .sml_product .image img {
+            height: 200px;
+            padding: 10px;
+            width: auto;
+            margin: auto;
+        }
+
+    .sml_product .content {
+        padding: 10px;
+        background: rgba(0, 0, 0, .05);
+    }
+
+        .sml_product .content div {
+            line-height: 1.4em;
+            color: rgba(0, 0, 0, .7);
+        }
+
+    .sml_product .price {
+        padding: 10px;
+    }
+
+    .sml_product .quantity {
+        padding: 10px;
+        background: #2b9bd2;
+    }
+
+        .sml_product .quantity h3 {
+            color: rgba(255, 255, 255, .8);
+        }
+
+    .sml_product .value h3 {
+        text-align: right;
+        width: 100%;
+    }

@@ -10,7 +10,7 @@ const Lead = () => {
 
         <Row>
 
-            <Column columns={3} width={1} style={{padding: '0px 5px'}}>
+            <Column columns={3} width={1}>
 
                 <Card className="lead_image">
 
@@ -20,7 +20,7 @@ const Lead = () => {
 
             </Column>
 
-            <Column columns={3} width={2} style={{padding: '0px 5px'}}>
+            <Column columns={3} width={2}>
 
                 <Card className="getting_started">
 

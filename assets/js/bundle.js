@@ -12681,6 +12681,10 @@ var _lead = __webpack_require__(478);
 
 var _lead2 = _interopRequireDefault(_lead);
 
+var _order = __webpack_require__(483);
+
+var _order2 = _interopRequireDefault(_order);
+
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
@@ -12695,6 +12699,20 @@ var style = {
     margin: 'auto',
     paddingTop: '15px'
 };
+
+var products = [{
+    title: 'Standard Golf Bag',
+    thumbnail: '/wp-content/uploads/2016/01/small-golf-bag.png',
+    content: '<strong>Max Weight:</strong> 40 lbs / 18 kg <br /><strong>Max Dimensions (in.):</strong> 50x12x10 <br /><strong>Max Dimensions (cm.):</strong> 127x30x25 <br />',
+    starting: 144,
+    quantity: 0
+}, {
+    title: 'Standard Golf Bag',
+    thumbnail: '/wp-content/uploads/2016/01/small-golf-bag.png',
+    content: '<strong>Max Weight:</strong> 40 lbs / 18 kg <br /><strong>Max Dimensions (in.):</strong> 50x12x10 <br /><strong>Max Dimensions (cm.):</strong> 127x30x25 <br />',
+    starting: 144,
+    quantity: 0
+}];
 
 var App = function (_React$Component) {
     _inherits(App, _React$Component);
@@ -12754,7 +12772,8 @@ var App = function (_React$Component) {
                 'div',
                 { id: 'sml_wrapper', style: style },
                 _react2.default.createElement(_errors2.default, { errors: this.state.errors }),
-                _react2.default.createElement(_lead2.default, null)
+                _react2.default.createElement(_lead2.default, null),
+                _react2.default.createElement(_order2.default, { products: products })
             );
         }
     }]);
@@ -29922,7 +29941,7 @@ var Lead = function Lead() {
         null,
         _react2.default.createElement(
             _column2.default,
-            { columns: 3, width: 1, style: { padding: '0px 5px' } },
+            { columns: 3, width: 1 },
             _react2.default.createElement(
                 _card2.default,
                 { className: 'lead_image' },
@@ -29931,7 +29950,7 @@ var Lead = function Lead() {
         ),
         _react2.default.createElement(
             _column2.default,
-            { columns: 3, width: 2, style: { padding: '0px 5px' } },
+            { columns: 3, width: 2 },
             _react2.default.createElement(
                 _card2.default,
                 { className: 'getting_started' },
@@ -30002,10 +30021,14 @@ var get_column_percent = function get_column_percent(cols) {
 };
 
 var Column = function Column(_ref) {
-    var _ref$columns = _ref.columns,
+    var _ref$className = _ref.className,
+        className = _ref$className === undefined ? '' : _ref$className,
+        _ref$columns = _ref.columns,
         columns = _ref$columns === undefined ? 1 : _ref$columns,
         _ref$width = _ref.width,
         width = _ref$width === undefined ? 1 : _ref$width,
+        _ref$minWidth = _ref.minWidth,
+        minWidth = _ref$minWidth === undefined ? 300 : _ref$minWidth,
         _ref$children = _ref.children,
         children = _ref$children === undefined ? null : _ref$children,
         _ref$style = _ref.style,
@@ -30015,14 +30038,14 @@ var Column = function Column(_ref) {
     var _width = document.body.clientWidth;
     var percent = get_column_percent(columns);
 
-    if (percent / 100 * _width < 300) {
+    if (minWidth !== 0 && percent / 100 * _width < minWidth) {
 
         percent = 100;
     }
 
     return _react2.default.createElement(
         'div',
-        { className: 'sml_col', style: _extends({ width: percent * width + '%', display: 'flex' }, style) },
+        { className: 'sml_col ' + className, style: _extends({ width: percent * width + '%', display: 'flex' }, style) },
         children
     );
 };
@@ -30040,25 +30063,32 @@ Object.defineProperty(exports, "__esModule", {
     value: true
 });
 
+var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
+
 var _react = __webpack_require__(473);
 
 var _react2 = _interopRequireDefault(_react);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-var style = {
+var _style = {
     display: 'flex',
-    flexWrap: 'wrap'
+    flexWrap: 'wrap',
+    width: '100%'
 };
 
 var Row = function Row(_ref) {
-    var _ref$children = _ref.children,
+    var _ref$className = _ref.className,
+        className = _ref$className === undefined ? '' : _ref$className,
+        _ref$style = _ref.style,
+        style = _ref$style === undefined ? {} : _ref$style,
+        _ref$children = _ref.children,
         children = _ref$children === undefined ? null : _ref$children;
 
 
     return _react2.default.createElement(
         'div',
-        { className: 'sml_row', style: style },
+        { className: 'sml_row ' + className, style: _extends({}, _style, style) },
         children
     );
 };
@@ -30085,9 +30115,11 @@ var _react2 = _interopRequireDefault(_react);
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 var _style = {
+    width: '100%',
     boxShadow: '0px 2px 3px rgba(0, 0, 0, .2)',
     background: '#fafbfc',
-    overflow: 'hidden'
+    overflow: 'hidden',
+    zIndex: '1'
 };
 
 var Card = function Card(_ref) {
@@ -30106,6 +30138,299 @@ var Card = function Card(_ref) {
 };
 
 exports.default = Card;
+
+/***/ },
+/* 482 */,
+/* 483 */
+/***/ function(module, exports, __webpack_require__) {
+
+"use strict";
+'use strict';
+
+Object.defineProperty(exports, "__esModule", {
+    value: true
+});
+
+var _react = __webpack_require__(473);
+
+var _react2 = _interopRequireDefault(_react);
+
+var _row = __webpack_require__(480);
+
+var _row2 = _interopRequireDefault(_row);
+
+var _column = __webpack_require__(479);
+
+var _column2 = _interopRequireDefault(_column);
+
+var _card = __webpack_require__(481);
+
+var _card2 = _interopRequireDefault(_card);
+
+var _products = __webpack_require__(484);
+
+var _products2 = _interopRequireDefault(_products);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+var Order = function Order(_ref) {
+    var _ref$products = _ref.products,
+        products = _ref$products === undefined ? [] : _ref$products;
+
+
+    return _react2.default.createElement(
+        _row2.default,
+        null,
+        _react2.default.createElement(
+            _row2.default,
+            { style: { paddingTop: '15px' } },
+            _react2.default.createElement(
+                _column2.default,
+                { columns: 1, width: 1 },
+                _react2.default.createElement(
+                    _card2.default,
+                    { style: { background: '#2b9bd2', width: '100%', textAlign: 'right', padding: '10px' } },
+                    _react2.default.createElement(
+                        'h3',
+                        null,
+                        'Total:  $144'
+                    )
+                )
+            )
+        ),
+        _react2.default.createElement(
+            _row2.default,
+            { style: { paddingTop: '10px', alignItems: 'flex-start' } },
+            _react2.default.createElement(
+                _column2.default,
+                { columns: 3, width: 1 },
+                _react2.default.createElement(
+                    _row2.default,
+                    null,
+                    _react2.default.createElement(
+                        _card2.default,
+                        { className: 'getting_started' },
+                        _react2.default.createElement(
+                            'h3',
+                            null,
+                            'Origin'
+                        ),
+                        _react2.default.createElement(
+                            'div',
+                            { className: 'content' },
+                            _react2.default.createElement(
+                                'p',
+                                null,
+                                'Where your shipment will begin.'
+                            )
+                        ),
+                        _react2.default.createElement(
+                            'div',
+                            { className: 'footer', style: { background: '#2b9bd2', padding: '10px' } },
+                            _react2.default.createElement(
+                                'h4',
+                                null,
+                                'Address'
+                            )
+                        )
+                    ),
+                    _react2.default.createElement(
+                        _card2.default,
+                        { className: 'getting_started' },
+                        _react2.default.createElement(
+                            'h3',
+                            null,
+                            'Destination'
+                        ),
+                        _react2.default.createElement(
+                            'div',
+                            { className: 'content' },
+                            _react2.default.createElement(
+                                'p',
+                                null,
+                                'Where your shipment will end.'
+                            )
+                        ),
+                        _react2.default.createElement(
+                            'div',
+                            { className: 'footer', style: { background: '#2b9bd2', padding: '10px' } },
+                            _react2.default.createElement(
+                                'h4',
+                                null,
+                                'Address'
+                            )
+                        )
+                    )
+                )
+            ),
+            _react2.default.createElement(
+                _column2.default,
+                { columns: 3, width: 1, style: { padding: '0px 10px' } },
+                _react2.default.createElement(_products2.default, { products: products })
+            ),
+            _react2.default.createElement(
+                _column2.default,
+                { columns: 3, width: 1 },
+                _react2.default.createElement(
+                    _card2.default,
+                    { className: 'getting_started' },
+                    _react2.default.createElement(
+                        'h3',
+                        null,
+                        'Getting Started'
+                    ),
+                    _react2.default.createElement(
+                        'div',
+                        { className: 'content' },
+                        _react2.default.createElement(
+                            'p',
+                            null,
+                            'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nunc et orci at odio luctus laoreet eget ac ante. Integer laoreet turpis suscipit luctus tincidunt. Quisque enim augue, consectetur a arcu vel, elementum convallis justo. Phasellus aliquam turpis eu justo luctus, egestas lacinia odio ultrices. Nunc et quam in eros consectetur fringilla. Integer pulvinar, tortor et scelerisque ultricies, ipsum nisl accumsan urna, eu iaculis massa enim vel mauris. Nunc sit amet mauris tincidunt, consectetur urna a, imperdiet ipsum. Donec ut massa vitae orci mattis maximus at at enim. Donec ultricies elit nec hendrerit finibus. In posuere, mauris eget ultricies rhoncus, justo justo tristique ipsum, a ornare diam libero non eros. Mauris consequat maximus massa. Aenean id elit eu nisl accumsan laoreet.'
+                        )
+                    ),
+                    _react2.default.createElement(
+                        'div',
+                        { className: 'footer' },
+                        _react2.default.createElement(
+                            'div',
+                            { className: 'action' },
+                            _react2.default.createElement(
+                                'p',
+                                null,
+                                'Learn More'
+                            )
+                        ),
+                        _react2.default.createElement(
+                            'div',
+                            { className: 'action' },
+                            _react2.default.createElement(
+                                'p',
+                                null,
+                                'Get Started'
+                            )
+                        )
+                    )
+                )
+            )
+        )
+    );
+};
+
+exports.default = Order;
+
+/***/ },
+/* 484 */
+/***/ function(module, exports, __webpack_require__) {
+
+"use strict";
+'use strict';
+
+Object.defineProperty(exports, "__esModule", {
+    value: true
+});
+
+var _react = __webpack_require__(473);
+
+var _react2 = _interopRequireDefault(_react);
+
+var _row = __webpack_require__(480);
+
+var _row2 = _interopRequireDefault(_row);
+
+var _column = __webpack_require__(479);
+
+var _column2 = _interopRequireDefault(_column);
+
+var _card = __webpack_require__(481);
+
+var _card2 = _interopRequireDefault(_card);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+var productCard = function productCard(product) {
+
+    return _react2.default.createElement(
+        _card2.default,
+        { className: 'sml_product', style: { marginTop: '1px' } },
+        _react2.default.createElement(
+            _row2.default,
+            { className: 'header' },
+            _react2.default.createElement(
+                'h3',
+                null,
+                product.title
+            )
+        ),
+        _react2.default.createElement(
+            _row2.default,
+            { className: 'image' },
+            _react2.default.createElement('img', { src: product.thumbnail })
+        ),
+        _react2.default.createElement(
+            _row2.default,
+            { className: 'content' },
+            _react2.default.createElement('div', { dangerouslySetInnerHTML: { __html: product.content } })
+        ),
+        _react2.default.createElement(
+            _row2.default,
+            { className: 'price' },
+            _react2.default.createElement(
+                _column2.default,
+                { className: 'label', columns: 2, minWidth: 0 },
+                _react2.default.createElement(
+                    'h3',
+                    null,
+                    'Starting At:'
+                )
+            ),
+            _react2.default.createElement(
+                _column2.default,
+                { className: 'value', columns: 2, minWidth: 0 },
+                _react2.default.createElement(
+                    'h3',
+                    null,
+                    product.starting
+                )
+            )
+        ),
+        _react2.default.createElement(
+            _row2.default,
+            { className: 'quantity' },
+            _react2.default.createElement(
+                _column2.default,
+                { className: 'label', columns: 2, minWidth: 0 },
+                _react2.default.createElement(
+                    'h3',
+                    null,
+                    'Quantity:'
+                )
+            ),
+            _react2.default.createElement(
+                _column2.default,
+                { className: 'value', columns: 2, minWidth: 0 },
+                _react2.default.createElement(
+                    'h3',
+                    null,
+                    product.quantity
+                )
+            )
+        )
+    );
+};
+
+var Products = function Products(_ref) {
+    var _ref$products = _ref.products,
+        products = _ref$products === undefined ? [] : _ref$products;
+
+
+    return _react2.default.createElement(
+        _row2.default,
+        { className: 'sml_products' },
+        products.map(productCard)
+    );
+};
+
+exports.default = Products;
 
 /***/ }
 /******/ ]);
