@@ -1,11 +1,11 @@
 import React from 'react'
 
-const get_column_percent = cols => 100 / cols
+const get_column_percent = (cols, gutter) => (100 / cols) - gutter
 
-const Column = ({className = '', columns = 1, width = 1, minWidth = 300, children = null, style = {}}) => {
+const Column = ({className = '', columns = 1, gutter = 0, width = 1, minWidth = 300, children = null, style = {}}) => {
 
     const _width = document.body.clientWidth
-    let percent = get_column_percent(columns)
+    let percent = get_column_percent(columns, gutter)
 
     if (minWidth !== 0 && (percent / 100) * _width < minWidth) {
 

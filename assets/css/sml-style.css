@@ -8,19 +8,48 @@
     }
 
 .getting_started {
-    padding: 20px;
     position: relative;
 }
 
-    .getting_started .content {
-        margin-top: 20px;
-        margin-bottom: 50px;
+    .sml_card.getting_started .title, .sml_card.getting_started .content {
+        padding: 20px 20px 0px;
+    }
+
+    .sml_card.getting_started .content {
+        padding-bottom: 60px;
+    }
+
+    .getting_started .footer {
+        position: absolute;
+        bottom: 0;
+    }
+
+.sml_card {
+    position: relative;
+    transition: all .3s ease-in-out;
+}
+
+    .sml_card.condensed {
+        margin: 0;
+    }
+
+    .sml_card.expanded {
+        margin: 5px 0;
+    }
+
+    .sml_card .title {
+        padding: 10px;
+    }
+
+        .sml_card.toggle .title {
+            cursor: pointer;
+        }
+
+    .sml_card .content {
+        padding: 0 10px 10px;
     }
 
     .sml_card .footer {
-        position: absolute;
-        bottom: 0px;
-        left: 0px;
         width: 100%;
         background: rgba(0, 0, 0, .05);
         display: flex;
@@ -31,6 +60,7 @@
             padding: 10px 15px;
             transition: background .2s ease-in-out;
             cursor: pointer;
+            text-decoration: none;
         }
 
             .sml_card .footer .action:hover {
@@ -38,47 +68,69 @@
                 border-radius: 2px;
             }
 
-.sml_product .header {
-    padding: 10px;
-}
-
-    .sml_product .image {
-        height: 200px;
-        text-align: center;
-        background: rgba(0, 0, 0, .02);
-    }
-
-        .sml_product .image img {
-            height: 200px;
-            padding: 10px;
-            width: auto;
-            margin: auto;
-        }
-
-    .sml_product .content {
-        padding: 10px;
-        background: rgba(0, 0, 0, .05);
-    }
-
-        .sml_product .content div {
-            line-height: 1.4em;
-            color: rgba(0, 0, 0, .7);
-        }
-
-    .sml_product .price {
-        padding: 10px;
-    }
-
-    .sml_product .quantity {
-        padding: 10px;
-        background: #2b9bd2;
-    }
-
-        .sml_product .quantity h3 {
+        .sml_card.address .footer h4 {
+            font-weight: 100;
             color: rgba(255, 255, 255, .8);
         }
 
-    .sml_product .value h3 {
-        text-align: right;
+    .sml_card .footer input {
         width: 100%;
+        height: 100%;
+        background: transparent;
+        border: none;
+        font-size: 1em;
+        outline: none;
+    }
+
+.sml_product .thumbnail {
+    position: absolute;
+    top: 0px;
+    height: 100%;
+    padding: 10px;
+    transition: all .3s ease-in-out;
+    z-index: -1;
+}
+
+    .sml_product .thumbnail img {
+        transition: all .3s ease-in-out;
+        height: 100%;
+        width: auto;
+        position: absolute;
+        top: 10px;
+        right: 10px;
+        padding: 0;
+        transform: translateX(0)
+    }
+
+    .sml_product.condensed .thumbnail {
+        max-height: 50px;
+    }
+
+    .sml_product.expanded .thumbnail {
+        max-height: 100px;
+    }
+
+        .sml_product.expanded .thumbnail img {
+            top: 50px;
+            right: 50%;
+            transform: translateX(50%)
+        }
+.sml_product .description {
+    padding: 10px;
+    background: rgba(0, 0, 0, .05);
+    transition: all .3s ease-in-out;
+    box-sizing: border-box;
+}
+
+    .sml_product.condensed .description {
+        margin-top: -15px;
+        max-height: 0;
+        overflow: hidden;
+        opacity: 0;
+    }
+
+    .sml_product.expanded .description {
+        margin-top: 100px;
+        max-height: 500px;
+        opacity: 1;
     }

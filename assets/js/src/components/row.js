@@ -3,7 +3,8 @@ import React from 'react'
 const _style = {
     display: 'flex',
     flexWrap: 'wrap',
-    width: '100%'
+    width: '100%',
+    justifyContent: 'space-between'
 }
 
 const Row = ({className = '', style = {}, children = null}) => {

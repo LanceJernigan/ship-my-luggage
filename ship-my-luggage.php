@@ -49,7 +49,8 @@
         wp_enqueue_script('sml_order');
 
         wp_localize_script('sml_order', 'sml', [
-            'ajax_url' => admin_url('admin-ajax.php')
+            'ajax_url' => admin_url('admin-ajax.php'),
+            'products' => get_sml_products()
         ]);
 
         return '<div id="mount"></div>';
@@ -108,8 +109,6 @@
 
     }
 
-    add_action('wp_ajax_sml_order', 'sml_ajax_order');
-
     /*
      * sml_before_calculate_totals() - adjust product prices based on item data
      */
@@ -129,6 +128,45 @@
     }
 
     add_action('woocommerce_before_calculate_totals', 'sml_before_calculate_totals');
+
+    /*
+     * get_sml_products() - Get Ship My Luggage products
+     *
+     *      returns - array - products
+     */
+
+    function get_sml_products() {
+
+        $args = [
+            'post_type' => 'product',
+            'posts_per_page' => -1,
+            'orderby' => 'menu_order title',
+            'order' => 'ASC'
+        ];
+
+        $query = new WP_Query($args);
+
+        return array_map(function($product) {
+
+            return apply_filters('filter_sml_product_data', $product);
+
+        }, $query->get_posts());
+
+    }
+
+    function filter_sml_product_data($product) {
+
+        return [
+            'id' => $product->ID,
+            'title' => $product->post_title,
+            'content' => $product->post_content,
+            'starting' => wc_get_product($product->ID)->get_price(),
+            'thumbnail' => wp_get_attachment_image_src(get_post_thumbnail_id($product->ID), 'single-post-thumbnail')
+        ];
+
+    }
+
+    add_filter('filter_sml_product_data', 'filter_sml_product_data');
 
     function _log( $message ) {
         if( WP_DEBUG === true ){

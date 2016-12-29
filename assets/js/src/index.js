@@ -7,9 +7,9 @@ import Order from './components/order'
 
 const style = {
     width: '100%',
-    maxWidth: '1080px',
     margin: 'auto',
-    paddingTop: '15px'
+    padding: '1% 5px',
+    maxWidth: '1080px'
 }
 
 const products = [
@@ -18,14 +18,16 @@ const products = [
         thumbnail: '/wp-content/uploads/2016/01/small-golf-bag.png',
         content: '<strong>Max Weight:</strong> 40 lbs / 18 kg <br /><strong>Max Dimensions (in.):</strong> 50x12x10 <br /><strong>Max Dimensions (cm.):</strong> 127x30x25 <br />',
         starting: 144,
-        quantity: 0
+        quantity: 0,
+        id: 1
     },
     {
         title: 'Standard Golf Bag',
         thumbnail: '/wp-content/uploads/2016/01/small-golf-bag.png',
         content: '<strong>Max Weight:</strong> 40 lbs / 18 kg <br /><strong>Max Dimensions (in.):</strong> 50x12x10 <br /><strong>Max Dimensions (cm.):</strong> 127x30x25 <br />',
         starting: 144,
-        quantity: 0
+        quantity: 0,
+        id: 2
     }
 ]
 
@@ -36,6 +38,7 @@ class App extends React.Component {
         super(props)
 
         this.state = {
+            lead: true,
             order: {},
             errors: []
         }
@@ -80,6 +83,12 @@ class App extends React.Component {
 
     }
 
+    dismissLead = () => {
+        this.setState({
+            lead: false
+        })
+    }
+
     render() {
 
         return (
@@ -88,9 +97,9 @@ class App extends React.Component {
 
                 <Errors errors={this.state.errors} />
 
-                <Lead />
+                <Lead dismiss={this.dismissLead} active={this.state.lead} />
 
-                <Order products={products} />
+                <Order products={window.sml.products} />
 
             </div>
 

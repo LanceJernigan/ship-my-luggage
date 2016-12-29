@@ -8,55 +8,29 @@ const productCard = product => {
 
     return (
 
-        <Card className='sml_product' style={{marginTop: '1px'}}>
+        <Card className='sml_product' accent='#2b9bd2' title={product.title} content={<p><strong>Starting:</strong> ${product.starting}</p>} style={{marginBottom: '1px'}} toggle={true} key={product.id}>
 
-            <Row className="header">
+            <Row className="thumbnail">
 
-                <h3>{product.title}</h3>
-
-            </Row>
-
-            <Row className="image">
-
-                <img src={product.thumbnail} />
+                <img src={product.thumbnail[0]} />
 
             </Row>
 
-            <Row className="content">
+            <div className="description" dangerouslySetInnerHTML={{__html: product.content}}>
 
-                <div dangerouslySetInnerHTML={{__html: product.content}}>
+            </div>
 
-                </div>
+            <Row className="footer">
 
-            </Row>
+                <Column columns={2}>
 
-            <Row className="price">
-
-                <Column className='label' columns={2} minWidth={0}>
-
-                    <h3>Starting At:</h3>
+                    <p>Quantity:</p>
 
                 </Column>
 
-                <Column className='value' columns={2} minWidth={0}>
+                <Column columns={2}>
 
-                    <h3>{product.starting}</h3>
-
-                </Column>
-
-            </Row>
-
-            <Row className="quantity">
-
-                <Column className='label' columns={2} minWidth={0}>
-
-                    <h3>Quantity:</h3>
-
-                </Column>
-
-                <Column className='value' columns={2} minWidth={0}>
-
-                    <h3>{product.quantity}</h3>
+                    <p>0</p>
 
                 </Column>
 

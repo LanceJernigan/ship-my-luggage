@@ -11,13 +11,31 @@ const Order = ({products = []}) => {
 
         <Row>
 
-            <Row style={{paddingTop: '15px'}}>
+            <Row style={{padding: '15px 0'}}>
 
-                <Column columns={1} width={1}>
+                <Column style={{paddingTop: '.4%', paddingBottom: '2px'}} columns={2} width={1} gutter={.2}>
 
-                    <Card style={{background: '#2b9bd2', width: '100%', textAlign: 'right', padding: '10px'}}>
+                        <Card accent='#2b9bd2' title="Origin" content={<p>Where your shipment will begin.</p>}>
 
-                        <h3>Total:  $144</h3>
+                            <div className="footer" style={{background: 'rgba(0, 0, 0, .05)', padding: '10px'}}>
+
+                                <input type="text" placeholder="Address" />
+
+                            </div>
+
+                        </Card>
+
+                </Column>
+
+                <Column style={{paddingTop: '.4%', paddingBottom: '2px'}} columns={2} width={1} gutter={.2}>
+
+                    <Card accent='#2b9bd2' title="Destination" content={<p>Where your shipment will end.</p>}>
+
+                        <div className="footer" style={{background: 'rgba(0, 0, 0, .05)', padding: '10px'}}>
+
+                            <input type="text" placeholder="Address" />
+
+                        </div>
 
                     </Card>
 
@@ -25,69 +43,17 @@ const Order = ({products = []}) => {
 
             </Row>
 
-            <Row style={{paddingTop: '10px', alignItems: 'flex-start'}}>
+            <Row style={{paddingTop: '.3%', alignItems: 'flex-start'}}>
 
-                <Column columns={3} width={1}>
-
-                    <Row>
-
-                        <Card className="getting_started">
-
-                            <h3>Origin</h3>
-
-                            <div className="content">
-
-                                <p>Where your shipment will begin.</p>
-
-                            </div>
-
-                            <div className="footer" style={{background: '#2b9bd2', padding: '10px'}}>
-
-                                <h4>Address</h4>
-
-                            </div>
-
-                        </Card>
-
-                        <Card className="getting_started">
-
-                            <h3>Destination</h3>
-
-                            <div className="content">
-
-                                <p>Where your shipment will end.</p>
-
-                            </div>
-
-                            <div className="footer" style={{background: '#2b9bd2', padding: '10px'}}>
-
-                                <h4>Address</h4>
-
-                            </div>
-
-                        </Card>
-
-                    </Row>
-
-                </Column>
-
-                <Column columns={3} width={1} style={{padding: '0px 10px'}}>
+                <Column columns={2} width={1} gutter={.2}>
 
                     <Products products={products} />
 
                 </Column>
 
-                <Column columns={3} width={1}>
+                <Column columns={2} width={1}  gutter={.3}>
 
-                    <Card className="getting_started">
-
-                        <h3>Getting Started</h3>
-
-                        <div className="content">
-
-                            <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nunc et orci at odio luctus laoreet eget ac ante. Integer laoreet turpis suscipit luctus tincidunt. Quisque enim augue, consectetur a arcu vel, elementum convallis justo. Phasellus aliquam turpis eu justo luctus, egestas lacinia odio ultrices. Nunc et quam in eros consectetur fringilla. Integer pulvinar, tortor et scelerisque ultricies, ipsum nisl accumsan urna, eu iaculis massa enim vel mauris. Nunc sit amet mauris tincidunt, consectetur urna a, imperdiet ipsum. Donec ut massa vitae orci mattis maximus at at enim. Donec ultricies elit nec hendrerit finibus. In posuere, mauris eget ultricies rhoncus, justo justo tristique ipsum, a ornare diam libero non eros. Mauris consequat maximus massa. Aenean id elit eu nisl accumsan laoreet.</p>
-
-                        </div>
+                    <Card title="Lorem Ipsum" content={<p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nunc et orci at odio luctus laoreet eget ac ante. Integer laoreet turpis suscipit luctus tincidunt. Quisque enim augue, consectetur a arcu vel, elementum convallis justo. Phasellus aliquam turpis eu justo luctus, egestas lacinia odio ultrices. Nunc et quam in eros consectetur fringilla. Integer pulvinar, tortor et scelerisque ultricies, ipsum nisl accumsan urna, eu iaculis massa enim vel mauris. Nunc sit amet mauris tincidunt, consectetur urna a, imperdiet ipsum. Donec ut massa vitae orci mattis maximus at at enim. Donec ultricies elit nec hendrerit finibus. In posuere, mauris eget ultricies rhoncus, justo justo tristique ipsum, a ornare diam libero non eros. Mauris consequat maximus massa. Aenean id elit eu nisl accumsan laoreet.</p>}>
 
                         <div className="footer">
 
