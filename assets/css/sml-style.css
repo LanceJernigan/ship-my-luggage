@@ -1,3 +1,23 @@
+#sml_wrapper {
+    width: 100%;
+    max-width: 1080px;
+    margin: auto;
+    padding: 1% 5px;
+}
+
+    .sml_card.sml_page .title {
+        padding: 20px 20px 0px;
+    }
+
+    .sml_card.sml_page .content {
+        padding: 20px;
+    }
+
+        .sml_card.sml_page .content p {
+            line-height: 1.2em;
+            padding-bottom: 15px;
+        }
+
 .lead_image {
     max-height: 300px;
 }
@@ -25,6 +45,11 @@
     }
 
 .sml_card {
+    width: 100%;
+    box-shadow: 0px 2px 3px rgba(0, 0, 0, .2);
+    background: #fafbfc;
+    overflow: hidden;
+    z-index: 1;
     position: relative;
     transition: all .3s ease-in-out;
 }

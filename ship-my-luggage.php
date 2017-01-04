@@ -32,7 +32,7 @@
 
     function sml_enqueue() {
 
-        wp_register_style('sml_order', untrailingslashit(plugin_dir_url(__FILE__)) . '/assets/css/sml-style.css');
+        wp_enqueue_style('sml_order', untrailingslashit(plugin_dir_url(__FILE__)) . '/assets/css/sml-style.css');
         wp_register_script('sml_order', untrailingslashit(plugin_dir_url(__FILE__)) . '/assets/js/bundle.js');
 
     }
@@ -47,7 +47,6 @@
 
     function sml_order() {
 
-        wp_enqueue_style('sml_order');
         wp_enqueue_script('sml_order');
 
         wp_localize_script('sml_order', 'sml', [

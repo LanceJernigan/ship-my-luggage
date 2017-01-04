@@ -6,13 +6,6 @@ import Lead from './components/lead'
 import Order from './components/order'
 import Checkout from './components/checkout'
 
-const style = {
-    width: '100%',
-    margin: 'auto',
-    padding: '1% 5px',
-    maxWidth: '1080px'
-}
-
 class App extends React.Component {
 
     constructor(props) {
@@ -192,7 +185,7 @@ class App extends React.Component {
 
         return (
 
-            <div id="sml_wrapper" style={style}>
+            <div id="sml_wrapper">
 
                 <Errors errors={this.state.errors} />
 

@@ -6282,13 +6282,7 @@ function _possibleConstructorReturn(self, call) { if (!self) { throw new Referen
 
 function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
-var _style = {
-    width: '100%',
-    boxShadow: '0px 2px 3px rgba(0, 0, 0, .2)',
-    background: '#fafbfc',
-    overflow: 'hidden',
-    zIndex: '1'
-};
+var _style = {};
 
 var Title = function Title(_ref) {
     var title = _ref.title,
@@ -12951,13 +12945,6 @@ function _possibleConstructorReturn(self, call) { if (!self) { throw new Referen
 
 function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
-var style = {
-    width: '100%',
-    margin: 'auto',
-    padding: '1% 5px',
-    maxWidth: '1080px'
-};
-
 var App = function (_React$Component) {
     _inherits(App, _React$Component);
 
@@ -13010,7 +12997,7 @@ var App = function (_React$Component) {
 
             return _react2.default.createElement(
                 'div',
-                { id: 'sml_wrapper', style: style },
+                { id: 'sml_wrapper' },
                 _react2.default.createElement(_errors2.default, { errors: this.state.errors }),
                 _react2.default.createElement(_lead2.default, { dismiss: this.dismissLead, active: this.state.lead }),
                 this.state.checkout.active ? _react2.default.createElement(_checkout2.default, { checkout: this.state.checkout, updateCheckout: this.updateCheckout }) : _react2.default.createElement(_order2.default, { updateAddress: this.updateAddress, validateAddresses: this.validateAddresses, updateQuantity: this.updateQuantity, submit: this.submit, addresses: this.state.order.addresses, products: this.state.order.products, date: this.state.order.date })
