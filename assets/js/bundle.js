@@ -13013,7 +13013,7 @@ var App = function (_React$Component) {
                 { id: 'sml_wrapper', style: style },
                 _react2.default.createElement(_errors2.default, { errors: this.state.errors }),
                 _react2.default.createElement(_lead2.default, { dismiss: this.dismissLead, active: this.state.lead }),
-                this.state.checkout.active ? _react2.default.createElement(_checkout2.default, { checkout: this.state.checkout, updateCheckout: this.updateCheckout }) : _react2.default.createElement(_order2.default, { updateAddress: this.updateAddress, updateQuantity: this.updateQuantity, submit: this.submit, addresses: this.state.order.addresses, products: this.state.order.products, date: this.state.order.date })
+                this.state.checkout.active ? _react2.default.createElement(_checkout2.default, { checkout: this.state.checkout, updateCheckout: this.updateCheckout }) : _react2.default.createElement(_order2.default, { updateAddress: this.updateAddress, validateAddresses: this.validateAddresses, updateQuantity: this.updateQuantity, submit: this.submit, addresses: this.state.order.addresses, products: this.state.order.products, date: this.state.order.date })
             );
         }
     }]);
@@ -13033,6 +13033,30 @@ var _initialiseProps = function _initialiseProps() {
                 }))
             })
         });
+    };
+
+    this.validateAddresses = function () {
+
+        var addresses = Object.assign(_this2.state.order.addresses);
+        var validated = Object.keys(addresses).filter(function (key) {
+            return addresses[key].val.length > 0;
+        }).length === 2;
+
+        if (validated) _this2.getProductPrices();
+    };
+
+    this.getProductPrices = function () {
+
+        _this2.setState(_extends({}, _this2.state, {
+            order: _extends({}, _this2.state.order, {
+                products: _this2.state.order.products.map(function (product, i) {
+
+                    if (!product.hasOwnProperty('price')) product.price = (product.starting * parseFloat('1.' + i)).toFixed(2);
+
+                    return product;
+                })
+            })
+        }));
     };
 
     this.updateQuantity = function (productId, quantity) {
@@ -13057,11 +13081,14 @@ var _initialiseProps = function _initialiseProps() {
             },
             name: function name(props) {
                 return _extends({}, _this2.state.checkout.name, _defineProperty({}, props.name, props.value));
+            },
+            default: function _default(props) {
+                return props.value;
             }
         };
 
         _this2.setState(_extends({}, _this2.state, {
-            checkout: _extends({}, _this2.state.checkout, _defineProperty({}, props.type, actions[props.type](props)))
+            checkout: _extends({}, _this2.state.checkout, _defineProperty({}, props.type, actions.hasOwnProperty(props.type) ? actions[props.type](props) : actions.default(props)))
         }));
     };
 
@@ -13230,7 +13257,7 @@ var Lead = function Lead(_ref) {
 
     return _react2.default.createElement(
         _row2.default,
-        { style: document.body.clientWidth < 600 ? { padding: '3px 0' } : { padding: '25px 0' } },
+        { style: document.body.clientWidth < 600 ? { padding: '3px 0 10px' } : { padding: '25px 0' } },
         _react2.default.createElement(
             _column2.default,
             { columns: 3, width: 1 },
@@ -13324,6 +13351,7 @@ var Order = function Order(_ref) {
         _ref$products = _ref.products,
         products = _ref$products === undefined ? [] : _ref$products,
         updateAddress = _ref.updateAddress,
+        validateAddresses = _ref.validateAddresses,
         updateQuantity = _ref.updateQuantity,
         submit = _ref.submit;
 
@@ -13333,13 +13361,13 @@ var Order = function Order(_ref) {
         null,
         _react2.default.createElement(
             _row2.default,
-            { style: { padding: '15px 0' } },
+            { style: { paddingTop: '15px' } },
             _react2.default.createElement(
                 _column2.default,
                 { columns: 2, width: 1, gutter: .2 },
                 _react2.default.createElement(
                     _card2.default,
-                    { accent: '#2b9bd2', title: 'Origin', content: _react2.default.createElement(
+                    { accent: '#2b9bd2', style: { marginBottom: '1px' }, title: 'Origin', content: _react2.default.createElement(
                             'p',
                             null,
                             'Where your shipment will begin.'
@@ -13349,7 +13377,7 @@ var Order = function Order(_ref) {
                         { className: 'footer', style: { background: 'rgba(0, 0, 0, .05)', padding: '10px' } },
                         _react2.default.createElement('input', { type: 'text', value: addresses.origin.val, placeholder: 'Address', onChange: function onChange(e) {
                                 return updateAddress('origin', e.currentTarget.value);
-                            } })
+                            }, onBlur: validateAddresses })
                     )
                 )
             ),
@@ -13368,22 +13396,22 @@ var Order = function Order(_ref) {
                         { className: 'footer', style: { background: 'rgba(0, 0, 0, .05)', padding: '10px' } },
                         _react2.default.createElement('input', { type: 'text', value: addresses.destination.val, placeholder: 'Address', onChange: function onChange(e) {
                                 return updateAddress('destination', e.currentTarget.value);
-                            } })
+                            }, onBlur: validateAddresses })
                     )
                 )
             )
         ),
         _react2.default.createElement(
             _row2.default,
-            { style: { paddingTop: '.3%', alignItems: 'flex-start' } },
+            { style: { alignItems: 'flex-start' } },
             _react2.default.createElement(
                 _column2.default,
-                { columns: 2, width: 1, gutter: .2 },
+                { style: { marginTop: '10px' }, columns: 2, width: 1, gutter: .2 },
                 _react2.default.createElement(_products2.default, { updateQuantity: updateQuantity, products: products })
             ),
             _react2.default.createElement(
                 _column2.default,
-                { columns: 2, width: 1, gutter: .3 },
+                { style: { marginTop: '10px' }, columns: 2, width: 1, gutter: .3 },
                 _react2.default.createElement(
                     _card2.default,
                     { accent: '#2b9bd2', title: 'Delivery Date', style: { marginBottom: '1px' } },
@@ -30630,20 +30658,18 @@ var Checkout = function Checkout(_ref) {
         updateCheckout = _ref.updateCheckout;
 
 
-    console.log(checkout);
-
     return _react2.default.createElement(
         _row2.default,
         null,
         _react2.default.createElement(
             _row2.default,
-            { style: { padding: '2px 0', alignItems: 'flex-start' } },
+            { style: { alignItems: 'flex-start' } },
             _react2.default.createElement(
                 _column2.default,
                 { columns: 2, width: 1, gutter: .2 },
                 _react2.default.createElement(
                     _card2.default,
-                    { accent: '#2b9bd2', title: 'First Name' },
+                    { accent: '#2b9bd2', style: { marginBottom: '1px' }, title: 'First Name' },
                     _react2.default.createElement(
                         'div',
                         { className: 'footer', style: { background: 'rgba(0, 0, 0, .05)', padding: '10px' } },
@@ -30658,7 +30684,7 @@ var Checkout = function Checkout(_ref) {
                 { columns: 2, width: 1, gutter: .2 },
                 _react2.default.createElement(
                     _card2.default,
-                    { accent: '#2b9bd2', title: 'Last Name' },
+                    { accent: '#2b9bd2', style: { marginBottom: '1px' }, title: 'Last Name' },
                     _react2.default.createElement(
                         'div',
                         { className: 'footer', style: { background: 'rgba(0, 0, 0, .05)', padding: '10px' } },
@@ -30671,13 +30697,13 @@ var Checkout = function Checkout(_ref) {
         ),
         _react2.default.createElement(
             _row2.default,
-            { style: { padding: '2px 0', alignItems: 'flex-start' } },
+            { style: { alignItems: 'flex-start' } },
             _react2.default.createElement(
                 _column2.default,
                 { columns: 2, width: 1, gutter: .2 },
                 _react2.default.createElement(
                     _card2.default,
-                    { accent: '#2b9bd2', title: 'Email' },
+                    { accent: '#2b9bd2', style: { marginBottom: '1px' }, title: 'Email' },
                     _react2.default.createElement(
                         'div',
                         { className: 'footer', style: { background: 'rgba(0, 0, 0, .05)', padding: '10px' } },
@@ -30692,12 +30718,114 @@ var Checkout = function Checkout(_ref) {
                 { columns: 2, width: 1, gutter: .2 },
                 _react2.default.createElement(
                     _card2.default,
-                    { accent: '#2b9bd2', title: 'Phone' },
+                    { accent: '#2b9bd2', style: { marginBottom: '1px' }, title: 'Phone' },
                     _react2.default.createElement(
                         'div',
                         { className: 'footer', style: { background: 'rgba(0, 0, 0, .05)', padding: '10px' } },
                         _react2.default.createElement('input', { type: 'text', value: checkout.phone, placeholder: 'Phone', onChange: function onChange(e) {
                                 return updateCheckout({ type: 'phone', value: e.currentTarget.value });
+                            } })
+                    )
+                )
+            )
+        ),
+        _react2.default.createElement(
+            _row2.default,
+            { style: { alignItems: 'flex-start' } },
+            _react2.default.createElement(
+                _column2.default,
+                { columns: 2, width: 1, gutter: .2 },
+                _react2.default.createElement(
+                    _card2.default,
+                    { accent: '#2b9bd2', style: { marginBottom: '1px' }, title: 'Address' },
+                    _react2.default.createElement(
+                        'div',
+                        { className: 'footer', style: { background: 'rgba(0, 0, 0, .05)', padding: '10px' } },
+                        _react2.default.createElement('input', { type: 'text', value: checkout.address.line1, placeholder: 'Address', onChange: function onChange(e) {
+                                return updateCheckout({ type: 'address', line: 1, value: e.currentTarget.value });
+                            } })
+                    )
+                )
+            ),
+            _react2.default.createElement(
+                _column2.default,
+                { columns: 2, width: 1, gutter: .2 },
+                _react2.default.createElement(
+                    _card2.default,
+                    { accent: '#2b9bd2', style: { marginBottom: '1px' }, title: 'Apartment, suite, unit, etc.' },
+                    _react2.default.createElement(
+                        'div',
+                        { className: 'footer', style: { background: 'rgba(0, 0, 0, .05)', padding: '10px' } },
+                        _react2.default.createElement('input', { type: 'text', value: checkout.address.line2, placeholder: 'Apartment, suite, unit, etc', onChange: function onChange(e) {
+                                return updateCheckout({ type: 'address', line: 2, value: e.currentTarget.value });
+                            } })
+                    )
+                )
+            )
+        ),
+        _react2.default.createElement(
+            _row2.default,
+            { style: { alignItems: 'flex-start' } },
+            _react2.default.createElement(
+                _column2.default,
+                { columns: 2, width: 1, gutter: .2 },
+                _react2.default.createElement(
+                    _card2.default,
+                    { accent: '#2b9bd2', style: { marginBottom: '1px' }, title: 'Country' },
+                    _react2.default.createElement(
+                        'div',
+                        { className: 'footer', style: { background: 'rgba(0, 0, 0, .05)', padding: '10px' } },
+                        _react2.default.createElement('input', { type: 'text', value: checkout.country, placeholder: 'Country', onChange: function onChange(e) {
+                                return updateCheckout({ type: 'country', value: e.currentTarget.value });
+                            } })
+                    )
+                )
+            ),
+            _react2.default.createElement(
+                _column2.default,
+                { columns: 2, width: 1, gutter: .2 },
+                _react2.default.createElement(
+                    _card2.default,
+                    { accent: '#2b9bd2', style: { marginBottom: '1px' }, title: 'City' },
+                    _react2.default.createElement(
+                        'div',
+                        { className: 'footer', style: { background: 'rgba(0, 0, 0, .05)', padding: '10px' } },
+                        _react2.default.createElement('input', { type: 'text', value: checkout.city, placeholder: 'City', onChange: function onChange(e) {
+                                return updateCheckout({ type: 'city', value: e.currentTarget.value });
+                            } })
+                    )
+                )
+            )
+        ),
+        _react2.default.createElement(
+            _row2.default,
+            { style: { alignItems: 'flex-start' } },
+            _react2.default.createElement(
+                _column2.default,
+                { columns: 2, width: 1, gutter: .2 },
+                _react2.default.createElement(
+                    _card2.default,
+                    { accent: '#2b9bd2', style: { marginBottom: '1px' }, title: 'State' },
+                    _react2.default.createElement(
+                        'div',
+                        { className: 'footer', style: { background: 'rgba(0, 0, 0, .05)', padding: '10px' } },
+                        _react2.default.createElement('input', { type: 'text', value: checkout.state, placeholder: 'State', onChange: function onChange(e) {
+                                return updateCheckout({ type: 'state', value: e.currentTarget.value });
+                            } })
+                    )
+                )
+            ),
+            _react2.default.createElement(
+                _column2.default,
+                { columns: 2, width: 1, gutter: .2 },
+                _react2.default.createElement(
+                    _card2.default,
+                    { accent: '#2b9bd2', style: { marginBottom: '1px' }, title: 'Zip' },
+                    _react2.default.createElement(
+                        'div',
+                        { className: 'footer', style: { background: 'rgba(0, 0, 0, .05)', padding: '10px' } },
+                        _react2.default.createElement('input', { type: 'text', value: checkout.zip, placeholder: 'Zip', onChange: function onChange(e) {
+                                return updateCheckout({ type: 'zip', value: e.currentTarget.value });
                             } })
                     )
                 )

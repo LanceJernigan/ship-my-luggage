@@ -6,21 +6,21 @@ import Content from './content'
 import Card from './card'
 import Products from './products'
 
-const Order = ({addresses = {origin: {val: ''}, destination: {val: ''}}, date = new Date(), products = [], updateAddress, updateQuantity, submit}) => {
+const Order = ({addresses = {origin: {val: ''}, destination: {val: ''}}, date = new Date(), products = [], updateAddress, validateAddresses, updateQuantity, submit}) => {
 
     return (
 
         <Row>
 
-            <Row style={{padding: '15px 0'}}>
+            <Row style={{paddingTop: '15px'}}>
 
                 <Column columns={2} width={1} gutter={.2}>
 
-                        <Card accent='#2b9bd2' title="Origin" content={<p>Where your shipment will begin.</p>}>
+                        <Card accent='#2b9bd2' style={{marginBottom: '1px'}} title="Origin" content={<p>Where your shipment will begin.</p>}>
 
                             <div className="footer" style={{background: 'rgba(0, 0, 0, .05)', padding: '10px'}}>
 
-                                <input type="text" value={addresses.origin.val} placeholder="Address" onChange={e => updateAddress('origin', e.currentTarget.value)} />
+                                <input type="text" value={addresses.origin.val} placeholder="Address" onChange={e => updateAddress('origin', e.currentTarget.value)} onBlur={validateAddresses} />
 
                             </div>
 
@@ -34,7 +34,7 @@ const Order = ({addresses = {origin: {val: ''}, destination: {val: ''}}, date = 
 
                         <div className="footer" style={{background: 'rgba(0, 0, 0, .05)', padding: '10px'}}>
 
-                            <input type="text" value={addresses.destination.val} placeholder="Address" onChange={e => updateAddress('destination', e.currentTarget.value)} />
+                            <input type="text" value={addresses.destination.val} placeholder="Address" onChange={e => updateAddress('destination', e.currentTarget.value)} onBlur={validateAddresses} />
 
                         </div>
 
@@ -44,15 +44,15 @@ const Order = ({addresses = {origin: {val: ''}, destination: {val: ''}}, date = 
 
             </Row>
 
-            <Row style={{paddingTop: '.3%', alignItems: 'flex-start'}}>
+            <Row style={{alignItems: 'flex-start'}}>
 
-                <Column columns={2} width={1} gutter={.2}>
+                <Column style={{marginTop: '10px'}} columns={2} width={1} gutter={.2}>
 
                     <Products updateQuantity={updateQuantity} products={products} />
 
                 </Column>
 
-                <Column columns={2} width={1} gutter={.3}>
+                <Column style={{marginTop: '10px'}} columns={2} width={1} gutter={.3}>
 
                     <Card accent='#2b9bd2' title="Delivery Date" style={{marginBottom: '1px'}}>
 

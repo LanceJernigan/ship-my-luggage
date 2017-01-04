@@ -79,9 +79,13 @@
 
         foreach ($order_data['products'] as $product) {
 
-            $woocommerce->cart->add_to_cart($product['id'], $product['quantity'], 0, [], [
-                'sml_price' => $product['price']
-            ]);
+            if (isset($product['id']) && isset($product['quantity']) && isset($product['price'])) {
+
+                $woocommerce->cart->add_to_cart($product['id'], $product['quantity'], 0, [], [
+                    'sml_price' => $product['price']
+                ]);
+
+            }
 
         }
 

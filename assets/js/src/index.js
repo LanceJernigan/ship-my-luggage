@@ -72,6 +72,35 @@ class App extends React.Component {
 
     }
 
+    validateAddresses = () => {
+
+        const addresses = Object.assign(this.state.order.addresses)
+        const validated = Object.keys(addresses).filter( key => addresses[key].val.length > 0).length === 2
+
+        if (validated)
+            this.getProductPrices()
+    }
+
+
+    getProductPrices = () => {
+
+        this.setState({
+            ...this.state,
+            order: {
+                ...this.state.order,
+                products: this.state.order.products.map( (product, i) => {
+
+                    if (! product.hasOwnProperty('price'))
+                        product.price = (product.starting * parseFloat('1.' + i)).toFixed(2)
+
+                    return product
+
+                })
+            }
+        })
+
+    }
+
     updateQuantity = (productId, quantity) => {
 
         this.setState({
@@ -104,6 +133,9 @@ class App extends React.Component {
                     ...this.state.checkout.name,
                     [props.name]: props.value
                 }
+            },
+            default: props => {
+                return props.value
             }
         }
 
@@ -111,7 +143,7 @@ class App extends React.Component {
             ...this.state,
             checkout: {
                 ...this.state.checkout,
-                [props.type]: actions[props.type](props)
+                [props.type]: actions.hasOwnProperty(props.type) ? actions[props.type](props) : actions.default(props)
             }
         })
 
@@ -166,7 +198,7 @@ class App extends React.Component {
 
                 <Lead dismiss={this.dismissLead} active={this.state.lead} />
 
-                {this.state.checkout.active ? <Checkout checkout={this.state.checkout} updateCheckout={this.updateCheckout} /> : <Order updateAddress={this.updateAddress} updateQuantity={this.updateQuantity} submit={this.submit} addresses={this.state.order.addresses} products={this.state.order.products} date={this.state.order.date} />}
+                {this.state.checkout.active ? <Checkout checkout={this.state.checkout} updateCheckout={this.updateCheckout} /> : <Order updateAddress={this.updateAddress} validateAddresses={this.validateAddresses} updateQuantity={this.updateQuantity} submit={this.submit} addresses={this.state.order.addresses} products={this.state.order.products} date={this.state.order.date} />}
 
             </div>
 
