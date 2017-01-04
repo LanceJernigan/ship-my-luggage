@@ -6305,6 +6305,15 @@ var Content = function Content(_ref2) {
     ) : null;
 };
 
+var Footer = function Footer(_ref3) {
+    var footer = _ref3.footer;
+    return footer ? _react2.default.createElement(
+        _row2.default,
+        { className: 'footer' },
+        footer
+    ) : null;
+};
+
 var slugger = function slugger(str) {
     return str.replace(' ', '_').toLowerCase();
 };
@@ -6341,26 +6350,37 @@ var Card = function (_React$Component) {
                 style = this.props.style || {},
                 children = this.props.children || null,
                 toggle = this.props.toggle || false,
-                accent = this.props.accent || false;
+                accent = this.props.accent || false,
+                footer = this.props.footer || false,
+                onClick = this.props.onClick || false;
+
+            var actions = {
+                toggle: this.toggleActive
+            };
 
             return _react2.default.createElement(
                 'div',
-                { onClick: toggle ? this.toggleActive : false, className: 'sml_card ' + slugger(title) + (toggle ? this.state.active ? ' toggle expanded' : 'toggle condensed' : '') + ' ' + className, style: _extends({}, _style, style) },
+                { className: 'sml_card ' + slugger(title) + (this.state.active ? ' expanded' : ' condensed') + ' ' + className, style: _extends({}, _style, style) },
                 _react2.default.createElement(
-                    Title,
-                    { title: title },
+                    'div',
+                    { className: 'tap-target', onClick: actions.hasOwnProperty(onClick) ? actions[onClick] : onClick },
                     _react2.default.createElement(
-                        _row2.default,
-                        { className: 'title' },
+                        Title,
+                        { title: title },
                         _react2.default.createElement(
-                            'h4',
-                            { style: accent && accent.length ? { color: accent } : {} },
-                            title
+                            _row2.default,
+                            { className: 'title' },
+                            _react2.default.createElement(
+                                'h4',
+                                { style: accent && accent.length ? { color: accent } : {} },
+                                title
+                            )
                         )
-                    )
+                    ),
+                    _react2.default.createElement(Content, { content: content }),
+                    children
                 ),
-                _react2.default.createElement(Content, { content: content }),
-                children
+                _react2.default.createElement(Footer, { footer: footer })
             );
         }
     }]);
@@ -6420,7 +6440,7 @@ var Column = function Column(_ref) {
 
     return _react2.default.createElement(
         'div',
-        { className: 'sml_col ' + className, style: _extends({ width: percent * width + '%', display: 'flex' }, style) },
+        { className: 'sml_col ' + className, style: _extends({ width: percent * width + '%', display: 'flex', flexWrap: 'wrap' }, style) },
         children
     );
 };
@@ -12893,6 +12913,8 @@ module.exports = g;
 "use strict";
 'use strict';
 
+var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
+
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
 var _react = __webpack_require__(45);
@@ -12915,7 +12937,13 @@ var _order = __webpack_require__(201);
 
 var _order2 = _interopRequireDefault(_order);
 
+var _checkout = __webpack_require__(484);
+
+var _checkout2 = _interopRequireDefault(_checkout);
+
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
@@ -12930,22 +12958,6 @@ var style = {
     maxWidth: '1080px'
 };
 
-var products = [{
-    title: 'Standard Golf Bag',
-    thumbnail: '/wp-content/uploads/2016/01/small-golf-bag.png',
-    content: '<strong>Max Weight:</strong> 40 lbs / 18 kg <br /><strong>Max Dimensions (in.):</strong> 50x12x10 <br /><strong>Max Dimensions (cm.):</strong> 127x30x25 <br />',
-    starting: 144,
-    quantity: 0,
-    id: 1
-}, {
-    title: 'Standard Golf Bag',
-    thumbnail: '/wp-content/uploads/2016/01/small-golf-bag.png',
-    content: '<strong>Max Weight:</strong> 40 lbs / 18 kg <br /><strong>Max Dimensions (in.):</strong> 50x12x10 <br /><strong>Max Dimensions (cm.):</strong> 127x30x25 <br />',
-    starting: 144,
-    quantity: 0,
-    id: 2
-}];
-
 var App = function (_React$Component) {
     _inherits(App, _React$Component);
 
@@ -12954,49 +12966,38 @@ var App = function (_React$Component) {
 
         var _this = _possibleConstructorReturn(this, (App.__proto__ || Object.getPrototypeOf(App)).call(this, props));
 
-        _this.submit = function () {
-
-            var orderData = {
-                products: [{
-                    id: 61,
-                    price: 100,
-                    quantity: 1
-                }]
-            };
-
-            jQuery.ajax({
-                url: sml.ajax_url,
-                type: 'post',
-                data: {
-                    action: 'sml_order',
-                    orderData: orderData
-                },
-                success: function success(_ref) {
-                    var errors = _ref.errors;
-
-
-                    _this.setState({ errors: errors });
-
-                    if (errors.length) {
-
-                        console.log(errors);
-                    } else {
-
-                        console.log('success');
-                    }
-                }
-            });
-        };
-
-        _this.dismissLead = function () {
-            _this.setState({
-                lead: false
-            });
-        };
+        _initialiseProps.call(_this);
 
         _this.state = {
             lead: true,
-            order: {},
+            order: {
+                date: new Date(),
+                addresses: {
+                    origin: {
+                        val: '5800 Central Avenue Pike, Knoxville, TN, 37912'
+                    },
+                    destination: {
+                        val: '1630 Downtown West Blvd Suite 116, Knoxville, TN, 37919'
+                    }
+                },
+                products: window.sml.products.map(function (product) {
+
+                    if (!product.hasOwnProperty('quantity')) product.quantity = 0;
+
+                    return product;
+                })
+            },
+            checkout: Object.assign({
+                active: false,
+                address: {
+                    line1: '',
+                    line2: ''
+                },
+                name: {
+                    first: '',
+                    last: ''
+                }
+            }, window.sml.checkout),
             errors: []
         };
 
@@ -13012,13 +13013,94 @@ var App = function (_React$Component) {
                 { id: 'sml_wrapper', style: style },
                 _react2.default.createElement(_errors2.default, { errors: this.state.errors }),
                 _react2.default.createElement(_lead2.default, { dismiss: this.dismissLead, active: this.state.lead }),
-                _react2.default.createElement(_order2.default, { products: window.sml.products })
+                this.state.checkout.active ? _react2.default.createElement(_checkout2.default, { checkout: this.state.checkout, updateCheckout: this.updateCheckout }) : _react2.default.createElement(_order2.default, { updateAddress: this.updateAddress, updateQuantity: this.updateQuantity, submit: this.submit, addresses: this.state.order.addresses, products: this.state.order.products, date: this.state.order.date })
             );
         }
     }]);
 
     return App;
 }(_react2.default.Component);
+
+var _initialiseProps = function _initialiseProps() {
+    var _this2 = this;
+
+    this.updateAddress = function (target, value) {
+
+        _this2.setState({
+            order: _extends({}, _this2.state.order, {
+                addresses: _extends({}, _this2.state.order.addresses, _defineProperty({}, target, {
+                    val: value
+                }))
+            })
+        });
+    };
+
+    this.updateQuantity = function (productId, quantity) {
+
+        _this2.setState({
+            order: _extends({}, _this2.state.order, {
+                products: _this2.state.order.products.map(function (product) {
+
+                    if (product.id === productId) product.quantity = quantity;
+
+                    return product;
+                })
+            })
+        });
+    };
+
+    this.updateCheckout = function (props) {
+
+        var actions = {
+            address: function address(props) {
+                return _extends({}, _this2.state.checkout.address, _defineProperty({}, 'line' + props.line, props.value));
+            },
+            name: function name(props) {
+                return _extends({}, _this2.state.checkout.name, _defineProperty({}, props.name, props.value));
+            }
+        };
+
+        _this2.setState(_extends({}, _this2.state, {
+            checkout: _extends({}, _this2.state.checkout, _defineProperty({}, props.type, actions[props.type](props)))
+        }));
+    };
+
+    this.submit = function () {
+
+        var orderData = _this2.state.order;
+
+        jQuery.ajax({
+            url: sml.ajax_url,
+            type: 'post',
+            data: {
+                action: 'sml_order',
+                orderData: orderData
+            },
+            success: function success(_ref) {
+                var errors = _ref.errors;
+
+
+                if (errors && errors.length) {
+
+                    _this2.setState({ errors: errors });
+                } else {
+
+                    _this2.setState({
+                        checkout: _extends({}, _this2.state.checkout, {
+                            active: true
+                        })
+                    });
+                }
+            }
+        });
+    };
+
+    this.dismissLead = function () {
+        _this2.setState({
+            lead: false
+        });
+    };
+};
 
 _reactDom2.default.render(_react2.default.createElement(App, null), document.getElementById('mount'));
 
@@ -13148,7 +13230,7 @@ var Lead = function Lead(_ref) {
 
     return _react2.default.createElement(
         _row2.default,
-        null,
+        { style: document.body.clientWidth < 600 ? { padding: '3px 0' } : { padding: '25px 0' } },
         _react2.default.createElement(
             _column2.default,
             { columns: 3, width: 1 },
@@ -13166,14 +13248,14 @@ var Lead = function Lead(_ref) {
                 { title: 'Getting Started', content: _react2.default.createElement(
                         'p',
                         null,
-                        'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nunc et orci at odio luctus laoreet eget ac ante. Integer laoreet turpis suscipit luctus tincidunt. Quisque enim augue, consectetur a arcu vel, elementum convallis justo. Phasellus aliquam turpis eu justo luctus, egestas lacinia odio ultrices. Nunc et quam in eros consectetur fringilla. Integer pulvinar, tortor et scelerisque ultricies, ipsum nisl accumsan urna, eu iaculis massa enim vel mauris. Nunc sit amet mauris tincidunt, consectetur urna a, imperdiet ipsum. Donec ut massa vitae orci mattis maximus at at enim. Donec ultricies elit nec hendrerit finibus. In posuere, mauris eget ultricies rhoncus, justo justo tristique ipsum, a ornare diam libero non eros. Mauris consequat maximus massa. Aenean id elit eu nisl accumsan laoreet.'
+                        window.sml.gettingStarted.post_excerpt
                     ) },
                 _react2.default.createElement(
                     'div',
                     { className: 'footer' },
                     _react2.default.createElement(
                         'a',
-                        { className: 'action', href: '/learn-more' },
+                        { className: 'action', href: window.sml.gettingStarted.guid },
                         _react2.default.createElement(
                             'p',
                             null,
@@ -13220,6 +13302,10 @@ var _column = __webpack_require__(93);
 
 var _column2 = _interopRequireDefault(_column);
 
+var _content = __webpack_require__(483);
+
+var _content2 = _interopRequireDefault(_content);
+
 var _card = __webpack_require__(92);
 
 var _card2 = _interopRequireDefault(_card);
@@ -13231,8 +13317,15 @@ var _products2 = _interopRequireDefault(_products);
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 var Order = function Order(_ref) {
-    var _ref$products = _ref.products,
-        products = _ref$products === undefined ? [] : _ref$products;
+    var _ref$addresses = _ref.addresses,
+        addresses = _ref$addresses === undefined ? { origin: { val: '' }, destination: { val: '' } } : _ref$addresses,
+        _ref$date = _ref.date,
+        date = _ref$date === undefined ? new Date() : _ref$date,
+        _ref$products = _ref.products,
+        products = _ref$products === undefined ? [] : _ref$products,
+        updateAddress = _ref.updateAddress,
+        updateQuantity = _ref.updateQuantity,
+        submit = _ref.submit;
 
 
     return _react2.default.createElement(
@@ -13243,7 +13336,7 @@ var Order = function Order(_ref) {
             { style: { padding: '15px 0' } },
             _react2.default.createElement(
                 _column2.default,
-                { style: { paddingTop: '.4%', paddingBottom: '2px' }, columns: 2, width: 1, gutter: .2 },
+                { columns: 2, width: 1, gutter: .2 },
                 _react2.default.createElement(
                     _card2.default,
                     { accent: '#2b9bd2', title: 'Origin', content: _react2.default.createElement(
@@ -13254,13 +13347,15 @@ var Order = function Order(_ref) {
                     _react2.default.createElement(
                         'div',
                         { className: 'footer', style: { background: 'rgba(0, 0, 0, .05)', padding: '10px' } },
-                        _react2.default.createElement('input', { type: 'text', placeholder: 'Address' })
+                        _react2.default.createElement('input', { type: 'text', value: addresses.origin.val, placeholder: 'Address', onChange: function onChange(e) {
+                                return updateAddress('origin', e.currentTarget.value);
+                            } })
                     )
                 )
             ),
             _react2.default.createElement(
                 _column2.default,
-                { style: { paddingTop: '.4%', paddingBottom: '2px' }, columns: 2, width: 1, gutter: .2 },
+                { columns: 2, width: 1, gutter: .2 },
                 _react2.default.createElement(
                     _card2.default,
                     { accent: '#2b9bd2', title: 'Destination', content: _react2.default.createElement(
@@ -13271,7 +13366,9 @@ var Order = function Order(_ref) {
                     _react2.default.createElement(
                         'div',
                         { className: 'footer', style: { background: 'rgba(0, 0, 0, .05)', padding: '10px' } },
-                        _react2.default.createElement('input', { type: 'text', placeholder: 'Address' })
+                        _react2.default.createElement('input', { type: 'text', value: addresses.destination.val, placeholder: 'Address', onChange: function onChange(e) {
+                                return updateAddress('destination', e.currentTarget.value);
+                            } })
                     )
                 )
             )
@@ -13282,41 +13379,32 @@ var Order = function Order(_ref) {
             _react2.default.createElement(
                 _column2.default,
                 { columns: 2, width: 1, gutter: .2 },
-                _react2.default.createElement(_products2.default, { products: products })
+                _react2.default.createElement(_products2.default, { updateQuantity: updateQuantity, products: products })
             ),
             _react2.default.createElement(
                 _column2.default,
                 { columns: 2, width: 1, gutter: .3 },
                 _react2.default.createElement(
                     _card2.default,
-                    { title: 'Lorem Ipsum', content: _react2.default.createElement(
+                    { accent: '#2b9bd2', title: 'Delivery Date', style: { marginBottom: '1px' } },
+                    _react2.default.createElement(
+                        _content2.default,
+                        null,
+                        _react2.default.createElement(
                             'p',
                             null,
-                            'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nunc et orci at odio luctus laoreet eget ac ante. Integer laoreet turpis suscipit luctus tincidunt. Quisque enim augue, consectetur a arcu vel, elementum convallis justo. Phasellus aliquam turpis eu justo luctus, egestas lacinia odio ultrices. Nunc et quam in eros consectetur fringilla. Integer pulvinar, tortor et scelerisque ultricies, ipsum nisl accumsan urna, eu iaculis massa enim vel mauris. Nunc sit amet mauris tincidunt, consectetur urna a, imperdiet ipsum. Donec ut massa vitae orci mattis maximus at at enim. Donec ultricies elit nec hendrerit finibus. In posuere, mauris eget ultricies rhoncus, justo justo tristique ipsum, a ornare diam libero non eros. Mauris consequat maximus massa. Aenean id elit eu nisl accumsan laoreet.'
-                        ) },
+                            'When your shipment will be delivered.'
+                        )
+                    ),
                     _react2.default.createElement(
                         'div',
-                        { className: 'footer' },
-                        _react2.default.createElement(
-                            'div',
-                            { className: 'action' },
-                            _react2.default.createElement(
-                                'p',
-                                null,
-                                'Learn More'
-                            )
-                        ),
-                        _react2.default.createElement(
-                            'div',
-                            { className: 'action' },
-                            _react2.default.createElement(
-                                'p',
-                                null,
-                                'Get Started'
-                            )
-                        )
+                        { className: 'footer', style: { background: 'rgba(0, 0, 0, .05)', padding: '10px' } },
+                        _react2.default.createElement('input', { type: 'text', placeholder: 'Date', value: date.toDateString(), onChange: function onChange(e) {
+                                return updateAddress('origin', e.currentTarget.value);
+                            } })
                     )
-                )
+                ),
+                _react2.default.createElement(_card2.default, { onClick: submit, accent: '#fff', title: 'Continue', className: 'checkout', style: { background: '#2b9bd2', marginTop: '10px' } })
             )
         )
     );
@@ -13353,61 +13441,99 @@ var _card2 = _interopRequireDefault(_card);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-var productCard = function productCard(product) {
+var Footer = function Footer(_ref) {
+    var product = _ref.product,
+        updateQuantity = _ref.updateQuantity;
+
 
     return _react2.default.createElement(
-        _card2.default,
-        { className: 'sml_product', accent: '#2b9bd2', title: product.title, content: _react2.default.createElement(
+        _row2.default,
+        null,
+        _react2.default.createElement(
+            _column2.default,
+            { columns: 12, width: 10, minWidth: 0 },
+            _react2.default.createElement(
                 'p',
                 null,
                 _react2.default.createElement(
                     'strong',
                     null,
-                    'Starting:'
-                ),
-                ' $',
-                product.starting
-            ), style: { marginBottom: '1px' }, toggle: true, key: product.id },
-        _react2.default.createElement(
-            _row2.default,
-            { className: 'thumbnail' },
-            _react2.default.createElement('img', { src: product.thumbnail[0] })
-        ),
-        _react2.default.createElement('div', { className: 'description', dangerouslySetInnerHTML: { __html: product.content } }),
-        _react2.default.createElement(
-            _row2.default,
-            { className: 'footer' },
-            _react2.default.createElement(
-                _column2.default,
-                { columns: 2 },
-                _react2.default.createElement(
-                    'p',
-                    null,
                     'Quantity:'
                 )
+            )
+        ),
+        _react2.default.createElement(
+            _column2.default,
+            { columns: 12, width: 1, minWidth: 0 },
+            _react2.default.createElement(
+                'p',
+                null,
+                product.quantity
+            )
+        ),
+        _react2.default.createElement(
+            _column2.default,
+            { columns: 12, width: 1, minWidth: 0 },
+            _react2.default.createElement(
+                'p',
+                { onClick: function onClick(e) {
+                        return updateQuantity(product.id, product.quantity + 1);
+                    } },
+                '+'
             ),
             _react2.default.createElement(
-                _column2.default,
-                { columns: 2 },
-                _react2.default.createElement(
-                    'p',
-                    null,
-                    '0'
-                )
+                'p',
+                { onClick: function onClick(e) {
+                        return updateQuantity(product.id, product.quantity > 0 ? product.quantity - 1 : product.quantity);
+                    } },
+                '-'
             )
         )
     );
 };
 
-var Products = function Products(_ref) {
-    var _ref$products = _ref.products,
-        products = _ref$products === undefined ? [] : _ref$products;
+var Products = function Products(_ref2) {
+    var _ref2$products = _ref2.products,
+        products = _ref2$products === undefined ? [] : _ref2$products,
+        updateQuantity = _ref2.updateQuantity;
 
 
     return _react2.default.createElement(
         _row2.default,
         { className: 'sml_products' },
-        products.map(productCard)
+        products.map(function (product) {
+
+            return _react2.default.createElement(
+                _card2.default,
+                { className: 'sml_product', accent: '#2b9bd2', title: product.title, content: product.price ? _react2.default.createElement(
+                        'p',
+                        null,
+                        _react2.default.createElement(
+                            'strong',
+                            null,
+                            'Price:'
+                        ),
+                        ' $',
+                        product.price
+                    ) : _react2.default.createElement(
+                        'p',
+                        null,
+                        _react2.default.createElement(
+                            'strong',
+                            null,
+                            'Starting:'
+                        ),
+                        ' $',
+                        product.starting
+                    ), footer: _react2.default.createElement(Footer, { updateQuantity: updateQuantity, product: product }), style: { marginBottom: '1px' }, onClick: 'toggle', key: product.id },
+                _react2.default.createElement(
+                    _row2.default,
+                    { className: 'thumbnail' },
+                    _react2.default.createElement('img', { src: product.thumbnail[0] })
+                ),
+                _react2.default.createElement('div', { className: 'description', dangerouslySetInnerHTML: { __html: product.content } })
+            );
+        })
     );
 };
 
@@ -30436,6 +30562,151 @@ module.exports = traverseAllChildren;
 __webpack_require__(198);
 module.exports = __webpack_require__(197);
 
+
+/***/ },
+/* 483 */
+/***/ function(module, exports, __webpack_require__) {
+
+"use strict";
+'use strict';
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+
+var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
+
+var _react = __webpack_require__(45);
+
+var _react2 = _interopRequireDefault(_react);
+
+var _row = __webpack_require__(74);
+
+var _row2 = _interopRequireDefault(_row);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+var Content = function Content(props) {
+  return _react2.default.createElement(_row2.default, _extends({}, props, { className: 'content' + (props.className ? ' ' + props.className : '') }));
+};
+
+exports.default = Content;
+
+/***/ },
+/* 484 */
+/***/ function(module, exports, __webpack_require__) {
+
+"use strict";
+'use strict';
+
+Object.defineProperty(exports, "__esModule", {
+    value: true
+});
+
+var _react = __webpack_require__(45);
+
+var _react2 = _interopRequireDefault(_react);
+
+var _row = __webpack_require__(74);
+
+var _row2 = _interopRequireDefault(_row);
+
+var _column = __webpack_require__(93);
+
+var _column2 = _interopRequireDefault(_column);
+
+var _content = __webpack_require__(483);
+
+var _content2 = _interopRequireDefault(_content);
+
+var _card = __webpack_require__(92);
+
+var _card2 = _interopRequireDefault(_card);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+var Checkout = function Checkout(_ref) {
+    var checkout = _ref.checkout,
+        updateCheckout = _ref.updateCheckout;
+
+
+    console.log(checkout);
+
+    return _react2.default.createElement(
+        _row2.default,
+        null,
+        _react2.default.createElement(
+            _row2.default,
+            { style: { padding: '2px 0', alignItems: 'flex-start' } },
+            _react2.default.createElement(
+                _column2.default,
+                { columns: 2, width: 1, gutter: .2 },
+                _react2.default.createElement(
+                    _card2.default,
+                    { accent: '#2b9bd2', title: 'First Name' },
+                    _react2.default.createElement(
+                        'div',
+                        { className: 'footer', style: { background: 'rgba(0, 0, 0, .05)', padding: '10px' } },
+                        _react2.default.createElement('input', { type: 'text', value: checkout.name.first, placeholder: 'First Name', onChange: function onChange(e) {
+                                return updateCheckout({ type: 'name', name: 'first', value: e.currentTarget.value });
+                            } })
+                    )
+                )
+            ),
+            _react2.default.createElement(
+                _column2.default,
+                { columns: 2, width: 1, gutter: .2 },
+                _react2.default.createElement(
+                    _card2.default,
+                    { accent: '#2b9bd2', title: 'Last Name' },
+                    _react2.default.createElement(
+                        'div',
+                        { className: 'footer', style: { background: 'rgba(0, 0, 0, .05)', padding: '10px' } },
+                        _react2.default.createElement('input', { type: 'text', value: checkout.name.last, placeholder: 'Last Name', onChange: function onChange(e) {
+                                return updateCheckout({ type: 'name', name: 'last', value: e.currentTarget.value });
+                            } })
+                    )
+                )
+            )
+        ),
+        _react2.default.createElement(
+            _row2.default,
+            { style: { padding: '2px 0', alignItems: 'flex-start' } },
+            _react2.default.createElement(
+                _column2.default,
+                { columns: 2, width: 1, gutter: .2 },
+                _react2.default.createElement(
+                    _card2.default,
+                    { accent: '#2b9bd2', title: 'Email' },
+                    _react2.default.createElement(
+                        'div',
+                        { className: 'footer', style: { background: 'rgba(0, 0, 0, .05)', padding: '10px' } },
+                        _react2.default.createElement('input', { type: 'text', value: checkout.email, placeholder: 'Email', onChange: function onChange(e) {
+                                return updateCheckout({ type: 'email', value: e.currentTarget.value });
+                            } })
+                    )
+                )
+            ),
+            _react2.default.createElement(
+                _column2.default,
+                { columns: 2, width: 1, gutter: .2 },
+                _react2.default.createElement(
+                    _card2.default,
+                    { accent: '#2b9bd2', title: 'Phone' },
+                    _react2.default.createElement(
+                        'div',
+                        { className: 'footer', style: { background: 'rgba(0, 0, 0, .05)', padding: '10px' } },
+                        _react2.default.createElement('input', { type: 'text', value: checkout.phone, placeholder: 'Phone', onChange: function onChange(e) {
+                                return updateCheckout({ type: 'phone', value: e.currentTarget.value });
+                            } })
+                    )
+                )
+            )
+        )
+    );
+};
+
+exports.default = Checkout;
 
 /***/ }
 /******/ ]);

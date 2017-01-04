@@ -20,6 +20,8 @@
 
         add_shortcode('sml_order', 'sml_order');
 
+        add_post_type_support('page', 'excerpt');
+
     }
 
     add_action('plugins_loaded', 'sml_init');
@@ -50,7 +52,9 @@
 
         wp_localize_script('sml_order', 'sml', [
             'ajax_url' => admin_url('admin-ajax.php'),
-            'products' => get_sml_products()
+            'products' => get_sml_products(),
+            'gettingStarted' => get_page_by_title('Getting Started'),
+            'checkout' => get_sml_checkout_defaults()
         ]);
 
         return '<div id="mount"></div>';
@@ -71,7 +75,7 @@
 
         $errors = [];
 
-        $order_data = apply_filters('pre_place_order');
+        $order_data = apply_filters('pre_place_order', $_order_data);
 
         foreach ($order_data['products'] as $product) {
 
@@ -87,6 +91,10 @@
 
     add_filter('sml_place_order', 'sml_place_order', 10, 1);
 
+    /*
+     * sml_ajax_order - Ajax request from frontend
+     */
+
     function sml_ajax_order() {
 
         $order_data = isset($_POST['orderData']) ? $_POST['orderData'] : false;
@@ -101,13 +109,16 @@
 
         };
 
-        $errors = sml_place_order();
+        $errors = sml_place_order($order_data);
 
         wp_send_json([
             'errors' => $errors
         ]);
 
     }
+
+    add_action('wp_ajax_sml_order', 'sml_ajax_order');
+    add_action('wp_ajax_nopriv_sml_order', 'sml_ajax_order');
 
     /*
      * sml_before_calculate_totals() - adjust product prices based on item data
@@ -151,6 +162,34 @@
             return apply_filters('filter_sml_product_data', $product);
 
         }, $query->get_posts());
+
+    }
+
+    /*
+     * get_sml_checkout_defaults() - Get user default values for checkout
+     *
+     *      returns - array - user default values
+     */
+
+    function get_sml_checkout_defaults() {
+
+        $user_id = get_current_user_id();
+
+        if (! $user_id)
+            return [];
+
+        return [
+            'address' => [
+                'line1' => '5800 Central Avenue Pike',
+                'line2' => 'Apt 5402'
+            ],
+            'name' => [
+                'first' => 'Lance',
+                'last' => 'Jernigan'
+            ],
+            'email' => 'lance.t.jernigan@gmail.com',
+            'phone' => '8653041322'
+        ];
 
     }
 

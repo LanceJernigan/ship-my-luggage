@@ -4,6 +4,7 @@ import ReactDOM from 'react-dom'
 import Errors from './components/errors'
 import Lead from './components/lead'
 import Order from './components/order'
+import Checkout from './components/checkout'
 
 const style = {
     width: '100%',
@@ -11,25 +12,6 @@ const style = {
     padding: '1% 5px',
     maxWidth: '1080px'
 }
-
-const products = [
-    {
-        title: 'Standard Golf Bag',
-        thumbnail: '/wp-content/uploads/2016/01/small-golf-bag.png',
-        content: '<strong>Max Weight:</strong> 40 lbs / 18 kg <br /><strong>Max Dimensions (in.):</strong> 50x12x10 <br /><strong>Max Dimensions (cm.):</strong> 127x30x25 <br />',
-        starting: 144,
-        quantity: 0,
-        id: 1
-    },
-    {
-        title: 'Standard Golf Bag',
-        thumbnail: '/wp-content/uploads/2016/01/small-golf-bag.png',
-        content: '<strong>Max Weight:</strong> 40 lbs / 18 kg <br /><strong>Max Dimensions (in.):</strong> 50x12x10 <br /><strong>Max Dimensions (cm.):</strong> 127x30x25 <br />',
-        starting: 144,
-        quantity: 0,
-        id: 2
-    }
-]
 
 class App extends React.Component {
 
@@ -39,23 +21,105 @@ class App extends React.Component {
 
         this.state = {
             lead: true,
-            order: {},
+            order: {
+                date: new Date(),
+                addresses: {
+                    origin: {
+                        val: '5800 Central Avenue Pike, Knoxville, TN, 37912'
+                    },
+                    destination: {
+                        val: '1630 Downtown West Blvd Suite 116, Knoxville, TN, 37919'
+                    }
+                },
+                products: window.sml.products.map( product => {
+
+                    if (! product.hasOwnProperty('quantity'))
+                        product.quantity = 0
+
+                    return product
+
+                })
+            },
+            checkout: Object.assign({
+                active: false,
+                address: {
+                    line1: '',
+                    line2: ''
+                },
+                name: {
+                    first: '',
+                    last: ''
+                },
+            }, window.sml.checkout),
             errors: []
         }
 
     }
 
+    updateAddress = (target, value) => {
+
+        this.setState({
+            order: {
+                ...this.state.order,
+                addresses: {
+                    ...this.state.order.addresses,
+                    [target]: {
+                        val: value
+                    }
+                }
+            }
+        })
+
+    }
+
+    updateQuantity = (productId, quantity) => {
+
+        this.setState({
+            order: {
+                ...this.state.order,
+                products: this.state.order.products.map( product => {
+
+                    if (product.id === productId)
+                        product.quantity = quantity
+
+                    return product
+
+                })
+            }
+        })
+
+    }
+
+    updateCheckout = props => {
+
+        const actions = {
+            address: props => {
+                return {
+                    ...this.state.checkout.address,
+                    ['line' + props.line]: props.value
+                }
+            },
+            name: props => {
+                return {
+                    ...this.state.checkout.name,
+                    [props.name]: props.value
+                }
+            }
+        }
+
+        this.setState({
+            ...this.state,
+            checkout: {
+                ...this.state.checkout,
+                [props.type]: actions[props.type](props)
+            }
+        })
+
+    }
+
     submit = () => {
 
-        const orderData = {
-            products: [
-                {
-                    id: 61,
-                    price: 100,
-                    quantity: 1
-                }
-            ]
-        }
+        const orderData = this.state.order
 
         jQuery.ajax({
             url: sml.ajax_url,
@@ -66,15 +130,18 @@ class App extends React.Component {
             },
             success: ({errors}) => {
 
-                this.setState({errors: errors})
+                if (errors && errors.length) {
 
-                if (errors.length) {
-
-                    console.log(errors)
+                    this.setState({errors: errors})
 
                 } else {
 
-                    console.log('success')
+                    this.setState({
+                        checkout: {
+                            ...this.state.checkout,
+                            active: true
+                        }
+                    })
 
                 }
 
@@ -99,7 +166,7 @@ class App extends React.Component {
 
                 <Lead dismiss={this.dismissLead} active={this.state.lead} />
 
-                <Order products={window.sml.products} />
+                {this.state.checkout.active ? <Checkout checkout={this.state.checkout} updateCheckout={this.updateCheckout} /> : <Order updateAddress={this.updateAddress} updateQuantity={this.updateQuantity} submit={this.submit} addresses={this.state.order.addresses} products={this.state.order.products} date={this.state.order.date} />}
 
             </div>
 

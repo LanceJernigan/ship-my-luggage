@@ -11,7 +11,7 @@ const Lead = ({dismiss, active = true}) => {
 
     return (
 
-        <Row>
+        <Row style={document.body.clientWidth < 600 ? {padding: '3px 0'} : {padding: '25px 0'}}>
 
             <Column columns={3} width={1}>
 
@@ -25,11 +25,11 @@ const Lead = ({dismiss, active = true}) => {
 
             <Column columns={3} width={2}>
 
-                <Card title="Getting Started" content={<p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nunc et orci at odio luctus laoreet eget ac ante. Integer laoreet turpis suscipit luctus tincidunt. Quisque enim augue, consectetur a arcu vel, elementum convallis justo. Phasellus aliquam turpis eu justo luctus, egestas lacinia odio ultrices. Nunc et quam in eros consectetur fringilla. Integer pulvinar, tortor et scelerisque ultricies, ipsum nisl accumsan urna, eu iaculis massa enim vel mauris. Nunc sit amet mauris tincidunt, consectetur urna a, imperdiet ipsum. Donec ut massa vitae orci mattis maximus at at enim. Donec ultricies elit nec hendrerit finibus. In posuere, mauris eget ultricies rhoncus, justo justo tristique ipsum, a ornare diam libero non eros. Mauris consequat maximus massa. Aenean id elit eu nisl accumsan laoreet.</p>}>
+                <Card title="Getting Started" content={<p>{window.sml.gettingStarted.post_excerpt}</p>}>
 
                     <div className="footer">
 
-                        <a className="action" href="/learn-more">
+                        <a className="action" href={window.sml.gettingStarted.guid}>
 
                             <p>Learn More</p>
 

@@ -15,7 +15,7 @@ const Column = ({className = '', columns = 1, gutter = 0, width = 1, minWidth = 
 
     return (
 
-        <div className={'sml_col ' + className} style={{width: percent * width + '%', display: 'flex', ...style}}>
+        <div className={'sml_col ' + className} style={{width: percent * width + '%', display: 'flex', flexWrap: 'wrap', ...style}}>
 
             {children}
 

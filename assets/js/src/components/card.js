@@ -14,6 +14,8 @@ const Title = ({title, children}) => title.length > 0 ? children : null
 
 const Content = ({content}) => content ? <Row className="content">{content}</Row> : null
 
+const Footer = ({footer}) => footer ? <Row className="footer">{footer}</Row> : null
+
 const slugger = str => str.replace(' ', '_').toLowerCase()
 
 class Card extends React.Component {
@@ -44,25 +46,37 @@ class Card extends React.Component {
               style = this.props.style || {},
               children = this.props.children || null,
               toggle = this.props.toggle || false,
-              accent = this.props.accent || false
+              accent = this.props.accent || false,
+              footer = this.props.footer || false,
+              onClick = this.props.onClick || false
+
+        const actions = {
+            toggle: this.toggleActive
+        }
 
         return (
 
-            <div onClick={toggle ? this.toggleActive : false} className={'sml_card ' + slugger(title) + (toggle ? (this.state.active ? ' toggle expanded' : 'toggle condensed') : '') + ' ' + className} style={{..._style, ...style}}>
+            <div className={'sml_card ' + slugger(title) + (this.state.active ? ' expanded' : ' condensed') + ' ' + className} style={{..._style, ...style}}>
 
-                <Title title={title}>
+                <div className="tap-target" onClick={actions.hasOwnProperty(onClick) ? actions[onClick] : onClick}>
 
-                    <Row className="title">
+                    <Title title={title}>
 
-                        <h4 style={accent && accent.length ? {color: accent} : {}}>{title}</h4>
+                        <Row className="title">
 
-                    </Row>
+                            <h4 style={accent && accent.length ? {color: accent} : {}}>{title}</h4>
 
-                </Title>
+                        </Row>
 
-                <Content content={content} />
+                    </Title>
 
-                {children}
+                    <Content content={content} />
+
+                    {children}
+
+                </div>
+
+                <Footer footer={footer} />
 
             </div>
 

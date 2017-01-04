@@ -53,6 +53,7 @@
         width: 100%;
         background: rgba(0, 0, 0, .05);
         display: flex;
+        flex-wrap: wrap;
         padding: 5px;
     }
 
@@ -134,3 +135,8 @@
         max-height: 500px;
         opacity: 1;
     }
+
+.sml_card.checkout h4 {
+    text-align: center;
+    width: 100%;
+}
