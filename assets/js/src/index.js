@@ -84,7 +84,7 @@ class App extends React.Component {
                 products: this.state.order.products.map( (product, i) => {
 
                     if (! product.hasOwnProperty('price'))
-                        product.price = (product.starting * parseFloat('1.' + i)).toFixed(2)
+                        product.price = Math.round(product.starting * parseFloat('1.' + i))
 
                     return product
 
@@ -142,13 +142,17 @@ class App extends React.Component {
 
     }
 
+    processCheckout = () => {
+
+
+
+    }
+
     submit = () => {
 
         const orderData = this.state.order
 
-        jQuery.ajax({
-            url: sml.ajax_url,
-            type: 'post',
+        this.sml_ajax({
             data: {
                 action: 'sml_order',
                 orderData: orderData
@@ -175,6 +179,38 @@ class App extends React.Component {
 
     }
 
+    processCheckout = () => {
+
+        this.sml_ajax({
+            data: {
+                action: 'sml_checkout',
+            },
+            success: ({errors}) => {
+
+                if (errors && errors.length) {
+
+                    this.setState({errors: errors})
+
+                } else {
+
+                    console.log('Made it')
+
+                }
+
+            }
+        })
+
+    }
+
+    sml_ajax = (props) => {
+
+        jQuery.ajax(Object.assign({
+            url: sml.ajax_url,
+            type: 'post'
+        }, {...props}))
+
+    }
+
     dismissLead = () => {
         this.setState({
             lead: false
@@ -191,7 +227,7 @@ class App extends React.Component {
 
                 <Lead dismiss={this.dismissLead} active={this.state.lead} />
 
-                {this.state.checkout.active ? <Checkout checkout={this.state.checkout} updateCheckout={this.updateCheckout} /> : <Order updateAddress={this.updateAddress} validateAddresses={this.validateAddresses} updateQuantity={this.updateQuantity} submit={this.submit} addresses={this.state.order.addresses} products={this.state.order.products} date={this.state.order.date} />}
+                {this.state.checkout.active ? <Checkout checkout={this.state.checkout} updateCheckout={this.updateCheckout} processCheckout={this.processCheckout} /> : <Order updateAddress={this.updateAddress} validateAddresses={this.validateAddresses} updateQuantity={this.updateQuantity} submit={this.submit} addresses={this.state.order.addresses} products={this.state.order.products} date={this.state.order.date} />}
 
             </div>
 

@@ -30,7 +30,7 @@ const Order = ({addresses = {origin: {val: ''}, destination: {val: ''}}, date = 
 
                 <Column columns={2} width={1} gutter={.2}>
 
-                    <Card accent='#2b9bd2' title="Destination" content={<p>Where your shipment will end.</p>}>
+                    <Card accent='#2b9bd2' style={{marginBottom: '1px'}} title="Destination" content={<p>Where your shipment will end.</p>}>
 
                         <div className="footer" style={{background: 'rgba(0, 0, 0, .05)', padding: '10px'}}>
 
@@ -70,7 +70,7 @@ const Order = ({addresses = {origin: {val: ''}, destination: {val: ''}}, date = 
 
                     </Card>
 
-                    <Card onClick={submit} accent='#fff' title="Continue" className="checkout" style={{background: '#2b9bd2', marginTop: '10px'}}>
+                    <Card onClick={submit} accent='#fff' title="Continue" className="sml_center" style={{background: '#2b9bd2', marginTop: '10px'}}>
 
                     </Card>
 

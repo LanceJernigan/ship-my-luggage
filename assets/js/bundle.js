@@ -13000,7 +13000,7 @@ var App = function (_React$Component) {
                 { id: 'sml_wrapper' },
                 _react2.default.createElement(_errors2.default, { errors: this.state.errors }),
                 _react2.default.createElement(_lead2.default, { dismiss: this.dismissLead, active: this.state.lead }),
-                this.state.checkout.active ? _react2.default.createElement(_checkout2.default, { checkout: this.state.checkout, updateCheckout: this.updateCheckout }) : _react2.default.createElement(_order2.default, { updateAddress: this.updateAddress, validateAddresses: this.validateAddresses, updateQuantity: this.updateQuantity, submit: this.submit, addresses: this.state.order.addresses, products: this.state.order.products, date: this.state.order.date })
+                this.state.checkout.active ? _react2.default.createElement(_checkout2.default, { checkout: this.state.checkout, updateCheckout: this.updateCheckout, processCheckout: this.processCheckout }) : _react2.default.createElement(_order2.default, { updateAddress: this.updateAddress, validateAddresses: this.validateAddresses, updateQuantity: this.updateQuantity, submit: this.submit, addresses: this.state.order.addresses, products: this.state.order.products, date: this.state.order.date })
             );
         }
     }]);
@@ -13038,7 +13038,7 @@ var _initialiseProps = function _initialiseProps() {
             order: _extends({}, _this2.state.order, {
                 products: _this2.state.order.products.map(function (product, i) {
 
-                    if (!product.hasOwnProperty('price')) product.price = (product.starting * parseFloat('1.' + i)).toFixed(2);
+                    if (!product.hasOwnProperty('price')) product.price = Math.round(product.starting * parseFloat('1.' + i));
 
                     return product;
                 })
@@ -13079,13 +13079,13 @@ var _initialiseProps = function _initialiseProps() {
         }));
     };
 
+    this.processCheckout = function () {};
+
     this.submit = function () {
 
         var orderData = _this2.state.order;
 
-        jQuery.ajax({
-            url: sml.ajax_url,
-            type: 'post',
+        _this2.sml_ajax({
             data: {
                 action: 'sml_order',
                 orderData: orderData
@@ -13107,6 +13107,35 @@ var _initialiseProps = function _initialiseProps() {
                 }
             }
         });
+    };
+
+    this.processCheckout = function () {
+
+        _this2.sml_ajax({
+            data: {
+                action: 'sml_checkout'
+            },
+            success: function success(_ref2) {
+                var errors = _ref2.errors;
+
+
+                if (errors && errors.length) {
+
+                    _this2.setState({ errors: errors });
+                } else {
+
+                    console.log('Made it');
+                }
+            }
+        });
+    };
+
+    this.sml_ajax = function (props) {
+
+        jQuery.ajax(Object.assign({
+            url: sml.ajax_url,
+            type: 'post'
+        }, _extends({}, props)));
     };
 
     this.dismissLead = function () {
@@ -13373,7 +13402,7 @@ var Order = function Order(_ref) {
                 { columns: 2, width: 1, gutter: .2 },
                 _react2.default.createElement(
                     _card2.default,
-                    { accent: '#2b9bd2', title: 'Destination', content: _react2.default.createElement(
+                    { accent: '#2b9bd2', style: { marginBottom: '1px' }, title: 'Destination', content: _react2.default.createElement(
                             'p',
                             null,
                             'Where your shipment will end.'
@@ -13419,7 +13448,7 @@ var Order = function Order(_ref) {
                             } })
                     )
                 ),
-                _react2.default.createElement(_card2.default, { onClick: submit, accent: '#fff', title: 'Continue', className: 'checkout', style: { background: '#2b9bd2', marginTop: '10px' } })
+                _react2.default.createElement(_card2.default, { onClick: submit, accent: '#fff', title: 'Continue', className: 'sml_center', style: { background: '#2b9bd2', marginTop: '10px' } })
             )
         )
     );
@@ -30642,7 +30671,8 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 
 var Checkout = function Checkout(_ref) {
     var checkout = _ref.checkout,
-        updateCheckout = _ref.updateCheckout;
+        updateCheckout = _ref.updateCheckout,
+        processCheckout = _ref.processCheckout;
 
 
     return _react2.default.createElement(
@@ -30816,6 +30846,15 @@ var Checkout = function Checkout(_ref) {
                             } })
                     )
                 )
+            )
+        ),
+        _react2.default.createElement(
+            _row2.default,
+            { style: { alignItems: 'flex-start' } },
+            _react2.default.createElement(
+                _column2.default,
+                null,
+                _react2.default.createElement(_card2.default, { onClick: processCheckout, accent: '#fff', title: 'Checkout', className: 'sml_center', style: { background: '#2b9bd2', marginTop: '10px' } })
             )
         )
     );

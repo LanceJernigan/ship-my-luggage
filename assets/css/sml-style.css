@@ -165,3 +165,8 @@
     text-align: center;
     width: 100%;
 }
+
+.sml_center p, .sml_center h1, .sml_center h2, .sml_center h3, .sml_center h4, .sml_center h5, .sml_center h6 {
+    text-align: center !important;
+    width: 100%;
+}

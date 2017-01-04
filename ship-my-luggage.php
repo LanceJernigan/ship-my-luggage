@@ -76,6 +76,8 @@
 
         $order_data = apply_filters('pre_place_order', $_order_data);
 
+        $woocommerce->cart->empty_cart();
+
         foreach ($order_data['products'] as $product) {
 
             if (isset($product['id']) && isset($product['quantity']) && isset($product['price'])) {
@@ -95,7 +97,7 @@
     add_filter('sml_place_order', 'sml_place_order', 10, 1);
 
     /*
-     * sml_ajax_order - Ajax request from frontend
+     * sml_ajax_order - Ajax order data from frontend
      */
 
     function sml_ajax_order() {
@@ -122,6 +124,23 @@
 
     add_action('wp_ajax_sml_order', 'sml_ajax_order');
     add_action('wp_ajax_nopriv_sml_order', 'sml_ajax_order');
+
+    /*
+     * sml_ajax_checkout - Ajax checkout data from frontend
+     */
+
+    function sml_ajax_checkout() {
+
+        _log('made it');
+
+        wp_send_json([
+            'errors' => []
+        ]);
+
+    }
+
+    add_action('wp_ajax_sml_checkout', 'sml_ajax_checkout');
+    add_action('wp_ajax_nopriv_sml_checkout', 'sml_ajax_checkout');
 
     /*
      * sml_before_calculate_totals() - adjust product prices based on item data

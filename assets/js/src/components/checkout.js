@@ -5,7 +5,7 @@ import Column from './column'
 import Content from './content'
 import Card from './card'
 
-const Checkout = ({checkout, updateCheckout}) => {
+const Checkout = ({checkout, updateCheckout, processCheckout}) => {
 
     return (
 
@@ -164,6 +164,18 @@ const Checkout = ({checkout, updateCheckout}) => {
                             <input type="text" value={checkout.zip} placeholder="Zip" onChange={e => updateCheckout({type: 'zip', value: e.currentTarget.value})} />
 
                         </div>
+
+                    </Card>
+
+                </Column>
+
+            </Row>
+
+            <Row style={{alignItems: 'flex-start'}}>
+
+                <Column>
+
+                    <Card onClick={processCheckout} accent='#fff' title="Checkout" className="sml_center" style={{background: '#2b9bd2', marginTop: '10px'}}>
 
                     </Card>
 
