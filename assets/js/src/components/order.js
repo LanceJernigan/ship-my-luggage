@@ -5,8 +5,50 @@ import Column from './column'
 import Content from './content'
 import Card from './card'
 import Products from './products'
+import DeliveryOptions from './deliveryOptions'
 
-const Order = ({addresses = {origin: {val: ''}, destination: {val: ''}}, date = new Date(), products = [], updateAddress, validateAddresses, updateQuantity, submit}) => {
+const Quickpay = ({checkout, processCheckout}) => {
+
+    const inValid = Object.keys(checkout.fields).filter( key => {
+
+        const field = checkout.fields[key]
+
+        if (! field.hasOwnProperty() || field.required === false)
+            return false
+
+        return field.value.length === 0
+
+    }).length > 0
+
+    if (! inValid && window.sml.isLoggedIn === 'true') {
+
+        return (
+
+            <Card onClick={processCheckout} accent='#fff' title="Quick Pay" className="sml_center" style={{background: '#76b110', marginTop: '10px'}}>
+
+            </Card>
+
+        )
+
+    }
+
+    return null
+
+}
+
+const Continue = ({onClick}) => {
+
+    return (
+
+        <Card onClick={onClick} accent='#fff' title="Continue" className="sml_center" style={{background: '#2b9bd2', marginTop: '10px'}}>
+
+        </Card>
+
+    )
+
+}
+
+const Order = ({addresses = {origin: {val: ''}, destination: {val: ''}}, date = new Date(), checkout = {}, products = [], deliveryType = 'FEDEX_GROUND', updateAddress, validateAddresses, updateQuantity, submit, processCheckout, calculateTotal, updateDelivery}) => {
 
     return (
 
@@ -70,9 +112,11 @@ const Order = ({addresses = {origin: {val: ''}, destination: {val: ''}}, date = 
 
                     </Card>
 
-                    <Card onClick={submit} accent='#fff' title="Continue" className="sml_center" style={{background: '#2b9bd2', marginTop: '10px'}}>
+                    <DeliveryOptions products={products} calculateTotal={calculateTotal} deliveryType={deliveryType} updateDelivery={updateDelivery} />
 
-                    </Card>
+                    <Continue onClick={submit} />
+
+                    <Quickpay checkout={checkout} processCheckout={processCheckout} />
 
                 </Column>
 

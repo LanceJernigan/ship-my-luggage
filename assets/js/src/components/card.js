@@ -52,7 +52,7 @@ class Card extends React.Component {
 
         return (
 
-            <div className={'sml_card ' + slugger(title) + (this.state.active ? ' expanded' : ' condensed') + ' ' + className} style={{..._style, ...style}}>
+            <div className={'sml_card ' + slugger(title) + (this.state.active ? ' toggle expanded' : ' toggle condensed') + ' ' + className} style={{..._style, ...style}}>
 
                 <div className="tap-target" onClick={actions.hasOwnProperty(onClick) ? actions[onClick] : onClick}>
 

@@ -11,7 +11,7 @@ const Lead = ({dismiss, active = true}) => {
 
     return (
 
-        <Row style={document.body.clientWidth < 600 ? {padding: '3px 0 10px'} : {padding: '25px 0'}}>
+        <Row className='sml_lead' style={document.body.clientWidth < 600 ? {padding: '3px 0 10px'} : {padding: '25px 0'}}>
 
             <Column columns={3} width={1}>
 

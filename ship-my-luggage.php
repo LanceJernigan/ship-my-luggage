@@ -53,7 +53,8 @@
             'ajax_url' => admin_url('admin-ajax.php'),
             'products' => get_sml_products(),
             'gettingStarted' => get_page_by_title('Getting Started'),
-            'checkout' => get_sml_checkout_defaults()
+            'checkout' => get_sml_checkout_defaults(),
+            'isLoggedIn' => is_user_logged_in() ? 'true' : 'false'
         ]);
 
         return '<div id="mount"></div>';
@@ -80,10 +81,16 @@
 
         foreach ($order_data['products'] as $product) {
 
-            if (isset($product['id']) && isset($product['quantity']) && isset($product['price'])) {
+            if (isset($product['id']) && isset($product['quantity']) && isset($product['rates'])) {
+
+                $rate = array_values(array_filter($product['rates'], function($rate) {
+
+                    return $rate['selected'] === 'true';
+
+                }));
 
                 $woocommerce->cart->add_to_cart($product['id'], $product['quantity'], 0, [], [
-                    'sml_price' => $product['price']
+                    'sml_price' => $rate['price']
                 ]);
 
             }
@@ -95,6 +102,38 @@
     }
 
     add_filter('sml_place_order', 'sml_place_order', 10, 1);
+
+    /*
+     * sml_ajax_product_pricing - Ajax pricing for products based on user input
+     */
+
+    function sml_ajax_product_pricing() {
+
+        $products = isset($_POST['products']) ? $_POST['products'] : false;
+        $addresses = isset($_POST['addresses']) ? $_POST['addresses'] : false;
+
+        if ($products === false || $addresses === false) {
+
+            _log($products, $addresses);
+
+            wp_send_json([
+                'errors' => [
+                    'There was an error, please try again and notify us if the problem persists.'
+                ]
+            ]);
+
+        };
+
+        $rates = sml_request_rates($products, $addresses);
+
+        wp_send_json([
+            'rates' => $rates
+        ]);
+
+    }
+
+    add_action('wp_ajax_sml_product_pricing', 'sml_ajax_product_pricing');
+    add_action('wp_ajax_nopriv_sml_product_pricing', 'sml_ajax_product_pricing');
 
     /*
      * sml_ajax_order - Ajax order data from frontend
@@ -131,10 +170,73 @@
 
     function sml_ajax_checkout() {
 
-        _log('made it');
+        $_checkout = isset($_POST['checkout']) ? $_POST['checkout'] : false;
+        $_order = isset($_POST['order']) ? $_POST['order'] : false;
+
+        if ($_checkout === false || $_order === false) {
+
+            wp_send_json([
+                'errors' => [
+                    'There was an error, please try again and notify us if the problem persists.'
+                ]
+            ]);
+
+        }
+
+        $errors = [];
+        $current_user = wp_get_current_user();
+
+        if (! ($current_user instanceof WP_User)) {
+
+            // create user
+
+        }
+
+        global $woocommerce;
+
+        $cart = $woocommerce->cart;
+        $order = wc_create_order(['customer_id' => $current_user->ID]);
+
+        foreach ($cart->cart_contents as $key => $_product) {
+
+            $product = $_product['data'];
+            $product->price = $_product['sml_price'];
+
+            $order->add_product($product, $_product['quantity']);
+
+        }
+
+        $billing = [
+            'first_name' => $_checkout['name']['first'],
+            'last_name' => $_checkout['name']['last'],
+            'email' => $_checkout['email'],
+            'phone' => $_checkout['phone'],
+            'address_1' => $_checkout['address']['line1'],
+            'address_2' => $_checkout['address']['line2'],
+            'city' => $_checkout['city'],
+            'state' => $_checkout['state'],
+            'postcode' => $_checkout['zip'],
+            'country' => $_checkout['country'],
+        ];
+
+        update_post_meta($order->id, 'origin', $_order['addresses']['origin']['val']);
+        update_post_meta($order->id, 'destination', $_order['addresses']['destination']['val']);
+
+        $order->set_address($billing, 'billing');
+
+        $order->calculate_totals();
+
+        $available_gateways = WC()->payment_gateways->get_available_payment_gateways();
+        $result = $available_gateways[ 'cheque' ]->process_payment( $order->id );
+
+        if ($result['result'] === 'fail') {
+
+            $errors[] = 'There was an error processing your card.  Please try again and contact us if the problem persists.';
+
+        }
 
         wp_send_json([
-            'errors' => []
+            'errors' => $errors
         ]);
 
     }
@@ -201,33 +303,178 @@
             return [];
 
         return [
-            'address' => [
-                'line1' => '5800 Central Avenue Pike',
-                'line2' => 'Apt 5402'
-            ],
-            'name' => [
-                'first' => 'Lance',
-                'last' => 'Jernigan'
-            ],
+            'first_name' => 'Lance',
+            'last_name' => 'Jernigan',
             'email' => 'lance.t.jernigan@gmail.com',
-            'phone' => '8653041322'
+            'phone' => '8653041322',
+            'address_1' => '5800 Central Avenue Pike',
+            'address_2' => 'Apt 5402',
+            'city' => 'Knoxville',
+            'state' => 'Tennessee',
+            'postcode' => '37912',
+            'country' => 'United States',
         ];
 
     }
 
     function filter_sml_product_data($product) {
 
+        $product_meta = get_post_meta($product->ID);
+
         return [
             'id' => $product->ID,
             'title' => $product->post_title,
             'content' => $product->post_content,
             'starting' => wc_get_product($product->ID)->get_price(),
-            'thumbnail' => wp_get_attachment_image_src(get_post_thumbnail_id($product->ID), 'single-post-thumbnail')
+            'thumbnail' => wp_get_attachment_image_src(get_post_thumbnail_id($product->ID), 'single-post-thumbnail'),
+            'dimensions' => [
+                'width' => $product_meta['_width'][0],
+                'height' => $product_meta['_height'][0],
+                'length' => $product_meta['_length'][0],
+                'weight' => $product_meta['_weight'][0],
+            ]
         ];
 
     }
 
     add_filter('filter_sml_product_data', 'filter_sml_product_data');
+
+    function sml_request_rates($products, $addresses) {
+
+        return array_map(function($product)use($addresses) {
+
+            return sml_request_rate($product, $addresses);
+
+        }, $products);
+
+    }
+
+    function sml_request_rate($product, $addresses) {
+
+        require_once(untrailingslashit(plugin_dir_path(__FILE__)) . '/lib/fedex/fedex-common.php5');
+
+        $wsdl = untrailingslashit(plugin_dir_path(__FILE__)) . '/lib/fedex/RateService_v20.wsdl';
+
+        $client = new SoapClient($wsdl, ['trace' => 1]);
+
+        $request['WebAuthenticationDetail'] = [
+            'UserCredential' => [
+                'Key' => getProperty('key'),                //  Need to have field on Backend
+                'Password' => getProperty('password')       //  Need to have field on Backend
+            ]
+        ];
+
+        $request['ClientDetail'] = [
+            'AccountNumber' => getProperty('shipaccount'),  //  Need to have field on Backend
+            'MeterNumber' => getProperty('meter')           //  Need to have field on Backend
+        ];
+
+        $request['TransactionDetail'] = [
+            'CustomerTransactionId' => 'xxx'
+        ];
+
+        $request['Version'] = [
+            'ServiceId' => 'crs',
+            'Major' => '20',
+            'Intermediate' => '0',
+            'Minor' => '0'
+        ];
+
+        $request['ReturnTransitAndCommit'] = true;
+        $request['VariableOptionsServiceOptionType'] = 'SATURDAY_DELIVERY';
+
+        $request['RequestedShipment'] = [
+            'Shipper' => [
+                'Address' => [
+                    'StreetLines' => [
+                        $addresses['origin']['address_1'],
+                        $addresses['origin']['address_2']
+                    ],
+                    'City' => $addresses['origin']['city'],
+                    'State' => $addresses['origin']['state'],
+                    'PostalCode' => $addresses['origin']['postcode'],
+                    'CountryCode' => $addresses['origin']['countryCode']
+                ]
+            ],
+            'Recipient' => [
+                'Address' => [
+                    'StreetLines' => [
+                        $addresses['destination']['address_1'],
+                        $addresses['destination']['address_2']
+                    ],
+                    'City' => $addresses['destination']['city'],
+                    'State' => $addresses['destination']['state'],
+                    'PostalCode' => $addresses['destination']['postcode'],
+                    'CountryCode' => $addresses['destination']['countryCode']
+                ]
+            ],
+            'PackageCount' => 1,
+            'RequestedPackageLineItems' => [
+                'GroupPackageCount' => 1,
+                'Weight' => [
+                    'Value' => $product['dimensions']['weight'],
+                    'Units' => 'LB'
+                ],
+                'Dimensions' => [
+                    'Length' => $product['dimensions']['length'],
+                    'Width' => $product['dimensions']['width'],
+                    'Height' => $product['dimensions']['height'],
+                    'Units' => 'IN'
+                ]
+            ]
+        ];
+
+        $request['FreightShipmentDetail'] = [
+            'Role' => 'SHIPPER'
+        ];
+
+        try {
+
+            $response = $client->getRates($request);
+
+            if ($response->HighestSeverity !== 'ERROR') {
+
+                return apply_filters('sml_product_rate', $response->RateReplyDetails);
+
+            }
+
+        } catch (SoapFault $exception) {
+
+            _log($exception, $client);
+
+        }
+
+    }
+
+    /*
+     *  sml_product_rate_filter() - Filter rates returned from FedEx
+     */
+
+    function sml_product_rate_filter($_rates) {
+
+        $rates = [];
+
+        $types = [
+
+        ];
+
+        foreach ($_rates as $rate) {
+
+            $rates[$rate->ServiceType] = [
+                'delivery' => isset($rate->DeliveryTimestamp) ? $rate->DeliveryTimestamp : null,
+                'type' => $rate->ServiceType,
+                'title' => isset($types[$rate->ServiceType]) ? $types[$rate->ServiceType] : $rate->ServiceType,
+                'price' => $rate->RatedShipmentDetails->RatedPackages->PackageRateDetail->NetFedExCharge->Amount
+            ];
+
+        }
+
+        return $rates;
+
+    }
+
+
+    add_filter('sml_product_rate', 'sml_product_rate_filter', 10, 1);
 
     function _log( $message ) {
         if( WP_DEBUG === true ){
