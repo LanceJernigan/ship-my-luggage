@@ -4,15 +4,9 @@ import Row from './row'
 import Column from './column'
 import Card from './card'
 
-const Content = ({product}) => {
+const Content = ({product, deliveryType}) => {
 
-    const lowest = product.hasOwnProperty('rates') && Object.keys(product.rates).length ? Object.keys(product.rates).reduce( (low, key) => {
-
-        const rate = product.rates[key]
-
-        return low === 0 || parseFloat(rate.price) < parseFloat(low) ? parseFloat(rate.price).toFixed(2) : low
-
-    }, 0) : parseFloat(product.starting).toFixed(2)
+    const {price} = product.hasOwnProperty('rates') && product.rates.hasOwnProperty(deliveryType) ? product.rates[deliveryType] : product
 
     return (
 
@@ -20,7 +14,7 @@ const Content = ({product}) => {
 
             <Column>
 
-                <p><strong>{product.price ? 'Price:' : 'Starting:'}</strong> ${lowest}</p>
+                <p><strong>{product.price ? 'Price:' : 'Starting:'}</strong> ${Math.round(price)}</p>
 
             </Column>
 
@@ -61,7 +55,7 @@ const Footer = ({product, updateQuantity}) => {
 
 }
 
-const Products = ({products = [], updateQuantity}) => {
+const Products = ({products = [], updateQuantity, deliveryType}) => {
 
     return (
 
@@ -71,7 +65,7 @@ const Products = ({products = [], updateQuantity}) => {
 
                 return (
 
-                    <Card className='sml_product' accent='#2b9bd2' title={product.title} content={<Content product={product} />} footer={<Footer updateQuantity={updateQuantity} product={product} />} style={{marginBottom: '1px'}} onClick={'toggle'} key={product.id}>
+                    <Card className='sml_product' accent='#2b9bd2' title={product.title} content={<Content product={product} deliveryType={deliveryType} />} footer={<Footer updateQuantity={updateQuantity} product={product} />} style={{marginBottom: '1px'}} onClick={'toggle'} key={product.id}>
 
                         <Row className="thumbnail">
 

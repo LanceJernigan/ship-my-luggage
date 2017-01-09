@@ -63,9 +63,9 @@ const DeliveryOptions = ({products, calculateTotal, updateDelivery, deliveryType
 
                                 </Column>
 
-                                <Column columns={6} width={1} minWidth={0} style={{background: (rate.type === deliveryType ? '#2b9bd2' : 'rgba(0, 0, 0, .05)'), display: 'flex', alignItems: 'center', justifyContent: 'center'}}>
+                                <Column columns={6} width={1} minWidth={0} className='delivery_option--price' style={{background: (rate.type === deliveryType ? '#2b9bd2' : 'rgba(0, 0, 0, .05)'), display: 'flex', alignItems: 'center', justifyContent: 'center'}}>
 
-                                    <h3 onClick={() => updateDelivery(rate.type)}>{calculateTotal(rate.type)}</h3>
+                                    <h4 onClick={() => updateDelivery(rate.type)}>${calculateTotal(rate.type)}</h4>
 
                                 </Column>
 

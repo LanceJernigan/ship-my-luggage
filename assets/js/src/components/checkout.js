@@ -19,7 +19,7 @@ const Checkout = ({checkout, updateCheckout, processCheckout}) => {
 
                         <div className="footer" style={{background: 'rgba(0, 0, 0, .05)', padding: '10px'}}>
 
-                            <input type="text" value={checkout.fields.first_name.value} placeholder="First Name" onChange={e => updateCheckout({type: 'name', name: 'first', value: e.currentTarget.value})} />
+                            <input type="text" value={checkout.fields.first_name.value} placeholder="First Name" onChange={e => updateCheckout({type: 'first_name', value: e.currentTarget.value})} />
 
                         </div>
 

@@ -208,13 +208,21 @@
     transition: max-height .3s ease-in-out;
 }
 
-.delivery_options.expanded .delivery_option.deactive {
-    max-height: 100px;
-    overflow: hidden;
-}
+    .delivery_options.expanded .delivery_option.deactive {
+        max-height: 100px;
+        overflow: hidden;
+    }
 
-.delivery_options.condensed .delivery_option.deactive {
-    max-height: 0px;
-    overflow: hidden;
-    border: none !important;
-}
+    .delivery_options.condensed .delivery_option.deactive {
+        max-height: 0px;
+        overflow: hidden;
+        border: none !important;
+    }
+
+    .delivery_options .delivery_option.active .delivery_option--price h4 {
+        color: #fff;
+    }
+
+    .delivery_options .delivery_option .delivery_option--price {
+        transition: all .2s ease-in-out;
+    }

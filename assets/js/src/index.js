@@ -52,7 +52,8 @@ class App extends React.Component {
             },
             displayTotal: false,
             checkout: this.prePopulateDefaults('checkout'),
-            errors: []
+            errors: [],
+            quickPay: false
         }
 
     }
@@ -130,6 +131,14 @@ class App extends React.Component {
             const key = Object.keys(prePopulate)[k]
             const val = prePopulate[key]
 
+            if (key === '_active') {
+
+                defaults.active = val === 'true'
+
+                continue
+
+            }
+
             defaults.fields[key].value = val
 
         }
@@ -172,6 +181,12 @@ class App extends React.Component {
 
         console.time('ProductRates')
 
+        this.setState({
+            ...this.state,
+            rates: false,
+            fetching: true
+        })
+
         this.sml_ajax({
             data: {
                 action: 'sml_product_pricing',
@@ -182,6 +197,8 @@ class App extends React.Component {
 
                 this.setState({
                     ...this.state,
+                    fetching: false,
+                    rates: true,
                     order: {
                         ...this.state.order,
                         products: this.state.order.products.map( (product, i) => {
@@ -239,22 +256,20 @@ class App extends React.Component {
 
     calculateTotal = (delivery = 'FEDEX_GROUND') => {
 
-        return this.state.order.products.reduce( (tot, product) => {
+        return Math.round(this.state.order.products.reduce( (tot, product) => {
 
-            const price = product.hasOwnProperty('rates') ? product.rates[delivery].price : product.starting
+            const price = product.hasOwnProperty('rates') ? product.rates[delivery].price : product.price
             const quantity = product.quantity
 
             tot += parseFloat(price) * quantity
 
             return tot
 
-        }, 0).toFixed(2)
+        }, 0))
 
     }
 
     updateDelivery = (delivery) => {
-
-        console.log(delivery)
 
         this.setState({
             ...this.state,
@@ -264,9 +279,13 @@ class App extends React.Component {
             }
         })
 
+        setTimeout(this.updateTotal, 0)
+
     }
 
     updateCheckout = props => {
+
+        console.log(props)
 
         const actions = {
             address: props => {
@@ -290,7 +309,13 @@ class App extends React.Component {
             ...this.state,
             checkout: {
                 ...this.state.checkout,
-                [props.type]: actions.hasOwnProperty(props.type) ? actions[props.type](props) : actions.default(props)
+                fields: {
+                    ...this.state.checkout.fields,
+                    [props.type]: {
+                        ...this.state.checkout.fields[props.type],
+                        value: props.value
+                    }
+                }
             }
         })
 
@@ -298,15 +323,12 @@ class App extends React.Component {
 
     submit = () => {
 
-        const orderData = this.state.order
-        const hasPricing = this.state.order.products.filter( product => product.hasOwnProperty('rates')).length > 0
-
         window.history.pushState(this.state, null, 'checkout')
 
         this.sml_ajax({
             data: {
                 action: 'sml_order',
-                orderData: orderData
+                order: this.state.order
             },
             success: ({errors}) => {
 
@@ -316,17 +338,35 @@ class App extends React.Component {
 
                 } else {
 
-                    this.setState({
-                        checkout: {
-                            ...this.state.checkout,
-                            active: true
-                        }
-                    })
+                    if(this.state.quickPay === true) {
 
+                        this.processCheckout()
+
+                    } else {
+
+                        this.setState({
+                            checkout: {
+                                ...this.state.checkout,
+                                active: true
+                            }
+                        })
+
+                    }
                 }
 
             }
         })
+
+    }
+
+    quickPay = () => {
+
+        this.setState({
+            ...this.state,
+            quickPay: true
+        })
+
+        setTimeout(this.submit, 0)
 
     }
 
@@ -423,7 +463,7 @@ class App extends React.Component {
 
                 <Lead dismiss={this.dismissLead} active={this.state.lead} />
 
-                {this.state.checkout.active ? <Checkout checkout={this.state.checkout} updateCheckout={this.updateCheckout} processCheckout={this.processCheckout} /> : <Order updateAddress={this.updateAddress} validateAddresses={this.validateAddresses} updateQuantity={this.updateQuantity} processCheckout={this.processCheckout} submit={this.submit} addresses={this.state.order.addresses} products={this.state.order.products} date={this.state.order.date} checkout={this.state.checkout} calculateTotal={this.calculateTotal} updateDelivery={this.updateDelivery} deliveryType={this.state.order.delivery} />}
+                {this.state.checkout.active ? <Checkout checkout={this.state.checkout} updateCheckout={this.updateCheckout} processCheckout={this.processCheckout} /> : <Order updateAddress={this.updateAddress} validateAddresses={this.validateAddresses} updateQuantity={this.updateQuantity} processCheckout={this.processCheckout} submit={this.submit} addresses={this.state.order.addresses} products={this.state.order.products} date={this.state.order.date} checkout={this.state.checkout} calculateTotal={this.calculateTotal} updateDelivery={this.updateDelivery} deliveryType={this.state.order.delivery} quickPay={this.quickPay} fetching={this.state.fetching} rates={this.state.rates} />}
 
             </div>
 

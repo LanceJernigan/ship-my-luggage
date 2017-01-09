@@ -7,7 +7,19 @@ import Card from './card'
 import Products from './products'
 import DeliveryOptions from './deliveryOptions'
 
-const Quickpay = ({checkout, processCheckout}) => {
+const AfterCalc = ({fetching, rates, children}) => {
+
+    if (! fetching && rates) {
+
+        return children
+
+    }
+
+    return null
+
+}
+
+const Quickpay = ({checkout, quickPay}) => {
 
     const inValid = Object.keys(checkout.fields).filter( key => {
 
@@ -24,7 +36,7 @@ const Quickpay = ({checkout, processCheckout}) => {
 
         return (
 
-            <Card onClick={processCheckout} accent='#fff' title="Quick Pay" className="sml_center" style={{background: '#76b110', marginTop: '10px'}}>
+            <Card onClick={quickPay} accent='#fff' title="Quick Pay" className="sml_center" style={{background: '#76b110', marginTop: '10px'}}>
 
             </Card>
 
@@ -48,7 +60,7 @@ const Continue = ({onClick}) => {
 
 }
 
-const Order = ({addresses = {origin: {val: ''}, destination: {val: ''}}, date = new Date(), checkout = {}, products = [], deliveryType = 'FEDEX_GROUND', updateAddress, validateAddresses, updateQuantity, submit, processCheckout, calculateTotal, updateDelivery}) => {
+const Order = ({addresses = {origin: {val: ''}, destination: {val: ''}}, date = new Date(), checkout = {}, products = [], deliveryType = 'FEDEX_GROUND', updateAddress, validateAddresses, updateQuantity, submit, processCheckout, quickPay, calculateTotal, updateDelivery, fetching = false, rates = false}) => {
 
     return (
 
@@ -90,7 +102,7 @@ const Order = ({addresses = {origin: {val: ''}, destination: {val: ''}}, date = 
 
                 <Column style={{marginTop: '10px'}} columns={2} width={1} gutter={.2}>
 
-                    <Products updateQuantity={updateQuantity} products={products} />
+                    <Products updateQuantity={updateQuantity} products={products} deliveryType={deliveryType} />
 
                 </Column>
 
@@ -112,11 +124,15 @@ const Order = ({addresses = {origin: {val: ''}, destination: {val: ''}}, date = 
 
                     </Card>
 
-                    <DeliveryOptions products={products} calculateTotal={calculateTotal} deliveryType={deliveryType} updateDelivery={updateDelivery} />
+                    <AfterCalc fetching={fetching} rates={rates}>
 
-                    <Continue onClick={submit} />
+                        <DeliveryOptions products={products} calculateTotal={calculateTotal} deliveryType={deliveryType} updateDelivery={updateDelivery} />
 
-                    <Quickpay checkout={checkout} processCheckout={processCheckout} />
+                        <Continue onClick={submit} />
+
+                        <Quickpay checkout={checkout} quickPay={quickPay} />
+
+                    </AfterCalc>
 
                 </Column>
 

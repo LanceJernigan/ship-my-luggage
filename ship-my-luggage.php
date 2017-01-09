@@ -27,6 +27,22 @@
     add_action('plugins_loaded', 'sml_init');
 
     /*
+     *  sml_redirect() - function for redirecting ship my luggage requests
+     */
+
+    function sml_redirect() {
+
+        if (is_page('checkout')) {
+
+            wp_redirect(site_url('/?checkout=true'));
+
+        }
+
+    }
+
+    add_action('template_redirect', 'sml_redirect');
+
+    /*
      * sml_enqueue() - Register Ship My Luggage scripts/styles for future use
      */
 
@@ -69,25 +85,21 @@
      *     return - boolean - whether the order was successful or not
      */
 
-    function sml_place_order($_order_data) {
+    function sml_place_order($_order) {
 
         global $woocommerce;
 
         $errors = [];
 
-        $order_data = apply_filters('pre_place_order', $_order_data);
+        $order = apply_filters('pre_place_order', $_order);
 
         $woocommerce->cart->empty_cart();
 
-        foreach ($order_data['products'] as $product) {
+        foreach ($order['products'] as $product) {
 
             if (isset($product['id']) && isset($product['quantity']) && isset($product['rates'])) {
 
-                $rate = array_values(array_filter($product['rates'], function($rate) {
-
-                    return $rate['selected'] === 'true';
-
-                }));
+                $rate = $product['rates'][$order['delivery']];
 
                 $woocommerce->cart->add_to_cart($product['id'], $product['quantity'], 0, [], [
                     'sml_price' => $rate['price']
@@ -114,8 +126,6 @@
 
         if ($products === false || $addresses === false) {
 
-            _log($products, $addresses);
-
             wp_send_json([
                 'errors' => [
                     'There was an error, please try again and notify us if the problem persists.'
@@ -141,9 +151,9 @@
 
     function sml_ajax_order() {
 
-        $order_data = isset($_POST['orderData']) ? $_POST['orderData'] : false;
+        $order = isset($_POST['order']) ? $_POST['order'] : false;
 
-        if ($order_data === false) {
+        if ($order === false) {
 
             wp_send_json([
                 'errors' => [
@@ -153,7 +163,7 @@
 
         };
 
-        $errors = sml_place_order($order_data);
+        $errors = sml_place_order($order);
 
         wp_send_json([
             'errors' => $errors
@@ -172,6 +182,8 @@
 
         $_checkout = isset($_POST['checkout']) ? $_POST['checkout'] : false;
         $_order = isset($_POST['order']) ? $_POST['order'] : false;
+
+        _log($_checkout, $_order);
 
         if ($_checkout === false || $_order === false) {
 
@@ -207,17 +219,19 @@
         }
 
         $billing = [
-            'first_name' => $_checkout['name']['first'],
-            'last_name' => $_checkout['name']['last'],
-            'email' => $_checkout['email'],
-            'phone' => $_checkout['phone'],
-            'address_1' => $_checkout['address']['line1'],
-            'address_2' => $_checkout['address']['line2'],
-            'city' => $_checkout['city'],
-            'state' => $_checkout['state'],
-            'postcode' => $_checkout['zip'],
-            'country' => $_checkout['country'],
+            'first_name' => $_checkout['fields']['first_name'],
+            'last_name' => $_checkout['fields']['last_name'],
+            'email' => $_checkout['fields']['email'],
+            'phone' => $_checkout['fields']['phone'],
+            'address_1' => $_checkout['fields']['address_1'],
+            'address_2' => $_checkout['fields']['address_2'],
+            'city' => $_checkout['fields']['city'],
+            'state' => $_checkout['fields']['state'],
+            'postcode' => $_checkout['fields']['postcode'],
+            'country' => $_checkout['fields']['country'],
         ];
+
+        _log($billing);
 
         update_post_meta($order->id, 'origin', $_order['addresses']['origin']['val']);
         update_post_meta($order->id, 'destination', $_order['addresses']['destination']['val']);
@@ -302,6 +316,8 @@
         if (! $user_id)
             return [];
 
+        _log($_GET);
+
         return [
             'first_name' => 'Lance',
             'last_name' => 'Jernigan',
@@ -313,6 +329,7 @@
             'state' => 'Tennessee',
             'postcode' => '37912',
             'country' => 'United States',
+            '_active' => isset($_GET['checkout']) && $_GET['checkout'] === 'true' ? 'true' : 'false'
         ];
 
     }
@@ -325,7 +342,7 @@
             'id' => $product->ID,
             'title' => $product->post_title,
             'content' => $product->post_content,
-            'starting' => wc_get_product($product->ID)->get_price(),
+            'price' => wc_get_product($product->ID)->get_price(),
             'thumbnail' => wp_get_attachment_image_src(get_post_thumbnail_id($product->ID), 'single-post-thumbnail'),
             'dimensions' => [
                 'width' => $product_meta['_width'][0],
@@ -455,7 +472,13 @@
         $rates = [];
 
         $types = [
-
+            'FIRST_OVERNIGHT' => 'First Overnight',
+            'PRIORITY_OVERNIGHT' => 'Priority Overnight',
+            'STANDARD_OVERNIGHT' => 'Standard Overnight',
+            'FEDEX_2_DAY_AM' => 'Fedex 2 Day AM',
+            'FEDEX_2_DAY' => 'Fedex 2 Day',
+            'FEDEX_EXPRESS_SAVER' => 'Fedex Express Saver',
+            'FEDEX_GROUND' => 'Fedex Ground'
         ];
 
         foreach ($_rates as $rate) {
