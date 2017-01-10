@@ -99,7 +99,7 @@
                 position: relative;
             }
 
-            .sml_card.toggle > .tap-target > .title h4::after {
+            .sml_card.toggle > .tap-target > .title h4::after, .sml_card.toggle > .tap-target > .title h4::before {
                 content: ' ';
                 position: absolute;
                 top: 7px;
@@ -109,16 +109,41 @@
                 width: 5px;
                 border-left: solid 1px rgba(0, 0, 0, .7);
                 border-bottom: solid 1px rgba(0, 0, 0, .7);
-                transition: transform .3s ease-in-out;
+                transition: all .3s ease-in-out;
             }
 
-                .sml_card.toggle.condensed .title h4::after {
+                .sml_card.toggle > .tap-target > .title h4::before {
+                    top: 10px;
+                }
+
+                .sml_card.toggle > .tap-target > .title h4::after {
+                    top: 7px;
+                }
+
+                .sml_card.toggle .title h4::before {
+                    transform: rotate(135deg);
+                }
+
+                .sml_card.toggle .title h4::after {
                     transform: rotate(-45deg);
                 }
 
-                .sml_card.toggle.expanded .title h4::after {
-                    transform: rotate(135deg);
-                }
+                    .sml_card.toggle.expanded .title h4::before {
+                        opacity: 1;
+                    }
+
+                    .sml_card.toggle.condensed .title h4::before {
+                        opacity: 0;
+                    }
+
+                    .sml_card.toggle.expanded .title h4::after {
+                        opacity: 0;
+                    }
+
+                    .sml_card.toggle.condensed .title h4::after {
+                        opacity: 1;
+                    }
+
     .sml_card .content {
         padding: 0 10px 10px;
     }
