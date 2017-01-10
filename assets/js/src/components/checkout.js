@@ -33,7 +33,7 @@ const Checkout = ({checkout, updateCheckout, processCheckout}) => {
 
                         <div className="footer" style={{background: 'rgba(0, 0, 0, .05)', padding: '10px'}}>
 
-                            <input type="text" value={checkout.fields.last_name.value} placeholder="Last Name" onChange={e => updateCheckout({type: 'name', name: 'last', value: e.currentTarget.value})} />
+                            <input type="text" value={checkout.fields.last_name.value} placeholder="Last Name" onChange={e => updateCheckout({type: 'last_name', value: e.currentTarget.value})} />
 
                         </div>
 
@@ -83,7 +83,7 @@ const Checkout = ({checkout, updateCheckout, processCheckout}) => {
 
                         <div className="footer" style={{background: 'rgba(0, 0, 0, .05)', padding: '10px'}}>
 
-                            <input type="text" value={checkout.fields.address_1.value} placeholder="Address" onChange={e => updateCheckout({type: 'address', line: 1, value: e.currentTarget.value})} />
+                            <input type="text" value={checkout.fields.address_1.value} placeholder="Address" onChange={e => updateCheckout({type: 'address_1', value: e.currentTarget.value})} />
 
                         </div>
 
@@ -97,7 +97,7 @@ const Checkout = ({checkout, updateCheckout, processCheckout}) => {
 
                         <div className="footer" style={{background: 'rgba(0, 0, 0, .05)', padding: '10px'}}>
 
-                            <input type="text" value={checkout.fields.address_2.value} placeholder="Apartment, suite, unit, etc" onChange={e => updateCheckout({type: 'address', line: 2, value: e.currentTarget.value})} />
+                            <input type="text" value={checkout.fields.address_2.value} placeholder="Apartment, suite, unit, etc" onChange={e => updateCheckout({type: 'address_2', value: e.currentTarget.value})} />
 
                         </div>
 
@@ -161,7 +161,7 @@ const Checkout = ({checkout, updateCheckout, processCheckout}) => {
 
                         <div className="footer" style={{background: 'rgba(0, 0, 0, .05)', padding: '10px'}}>
 
-                            <input type="text" value={checkout.fields.postcode.value} placeholder="Postcode" onChange={e => updateCheckout({type: 'zip', value: e.currentTarget.value})} />
+                            <input type="text" value={checkout.fields.postcode.value} placeholder="Postcode" onChange={e => updateCheckout({type: 'postcode', value: e.currentTarget.value})} />
 
                         </div>
 

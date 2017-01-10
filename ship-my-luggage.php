@@ -196,11 +196,33 @@
         $errors = [];
         $current_user = wp_get_current_user();
 
-        if (! ($current_user instanceof WP_User)) {
+        if (! ($current_user instanceof WP_User) || $current_user->ID === 0) {
 
-            // create user
+            $email = $_checkout['fields']['email']['value'];
+
+            if (email_exists($email)) {
+
+                wp_send_json([
+                    'errors' => [
+                        'It appears as though you already have an account, please log into your account to continue.'
+                    ]
+                ]);
+
+            } else {
+
+                $username = $_checkout['fields']['first_name']['value'] . $_checkout['fields']['last_name']['value'];
+                $password = wp_generate_password($length = 12, true);
+                $user_id = wp_create_user($username, $password, $email);
+
+                wp_set_auth_cookie($user_id);
+
+                $current_user = get_user_by('ID', $user_id);
+
+            }
 
         }
+
+        _log($current_user);
 
         global $woocommerce;
 
