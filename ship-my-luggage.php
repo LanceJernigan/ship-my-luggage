@@ -183,8 +183,6 @@
         $_checkout = isset($_POST['checkout']) ? $_POST['checkout'] : false;
         $_order = isset($_POST['order']) ? $_POST['order'] : false;
 
-        _log($_checkout, $_order);
-
         if ($_checkout === false || $_order === false) {
 
             wp_send_json([
@@ -219,21 +217,20 @@
         }
 
         $billing = [
-            'first_name' => $_checkout['fields']['first_name'],
-            'last_name' => $_checkout['fields']['last_name'],
-            'email' => $_checkout['fields']['email'],
-            'phone' => $_checkout['fields']['phone'],
-            'address_1' => $_checkout['fields']['address_1'],
-            'address_2' => $_checkout['fields']['address_2'],
-            'city' => $_checkout['fields']['city'],
-            'state' => $_checkout['fields']['state'],
-            'postcode' => $_checkout['fields']['postcode'],
-            'country' => $_checkout['fields']['country'],
+            'first_name' => $_checkout['fields']['first_name']['value'],
+            'last_name' => $_checkout['fields']['last_name']['value'],
+            'email' => $_checkout['fields']['email']['value'],
+            'phone' => $_checkout['fields']['phone']['value'],
+            'address_1' => $_checkout['fields']['address_1']['value'],
+            'address_2' => $_checkout['fields']['address_2']['value'],
+            'city' => $_checkout['fields']['city']['value'],
+            'state' => $_checkout['fields']['state']['value'],
+            'postcode' => $_checkout['fields']['postcode']['value'],
+            'country' => $_checkout['fields']['country']['value'],
         ];
 
-        _log($billing);
-
         update_post_meta($order->id, 'origin', $_order['addresses']['origin']['val']);
+        update_post_meta($order->id, 'destination', $_order['addresses']['destination']['val']);
         update_post_meta($order->id, 'destination', $_order['addresses']['destination']['val']);
 
         $order->set_address($billing, 'billing');
@@ -315,8 +312,6 @@
 
         if (! $user_id)
             return [];
-
-        _log($_GET);
 
         return [
             'first_name' => 'Lance',

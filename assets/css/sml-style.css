@@ -95,6 +95,30 @@
             cursor: pointer;
         }
 
+            .sml_card.toggle .title h4 {
+                position: relative;
+            }
+
+            .sml_card.toggle > .tap-target > .title h4::after {
+                content: ' ';
+                position: absolute;
+                top: 7px;
+                right: -12px;
+                display: block;
+                height: 5px;
+                width: 5px;
+                border-left: solid 1px rgba(0, 0, 0, .7);
+                border-bottom: solid 1px rgba(0, 0, 0, .7);
+                transition: transform .3s ease-in-out;
+            }
+
+                .sml_card.toggle.condensed .title h4::after {
+                    transform: rotate(-45deg);
+                }
+
+                .sml_card.toggle.expanded .title h4::after {
+                    transform: rotate(135deg);
+                }
     .sml_card .content {
         padding: 0 10px 10px;
     }

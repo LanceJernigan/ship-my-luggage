@@ -7,11 +7,21 @@ import Card from './card'
 import Products from './products'
 import DeliveryOptions from './deliveryOptions'
 
+import Autocomplete from 'react-google-autocomplete'
+
 const AfterCalc = ({fetching, rates, children}) => {
 
     if (! fetching && rates) {
 
-        return children
+        return (
+
+            <div>
+
+                {children}
+
+            </div>
+
+        )
 
     }
 
@@ -60,7 +70,7 @@ const Continue = ({onClick}) => {
 
 }
 
-const Order = ({addresses = {origin: {val: ''}, destination: {val: ''}}, date = new Date(), checkout = {}, products = [], deliveryType = 'FEDEX_GROUND', updateAddress, validateAddresses, updateQuantity, submit, processCheckout, quickPay, calculateTotal, updateDelivery, fetching = false, rates = false}) => {
+const Order = ({addresses = {origin: {val: ''}, destination: {val: ''}}, date = new Date(), checkout = {}, products = [], deliveryType = 'FEDEX_GROUND', updateAddress, validateAddresses, updateQuantity, submit, quickPay, calculateTotal, updateDelivery, fetching = false, rates = false}) => {
 
     return (
 

@@ -30,7 +30,7 @@ const Footer = ({product, updateQuantity}) => {
 
         <Row>
 
-            <Column columns={12} width={10} minWidth={0}>
+            <Column columns={12} width={9} minWidth={0}>
 
                 <p><strong>Quantity:</strong></p>
 
@@ -42,10 +42,10 @@ const Footer = ({product, updateQuantity}) => {
 
             </Column>
 
-            <Column columns={12} width={1} minWidth={0}>
+            <Column columns={12} width={2} minWidth={0}>
 
-                <p onClick={e => updateQuantity(product.id, (product.quantity + 1))}>+</p>
                 <p onClick={e => updateQuantity(product.id, (product.quantity > 0 ? product.quantity - 1 : product.quantity))}>-</p>
+                <p onClick={e => updateQuantity(product.id, (product.quantity + 1))}>+</p>
 
             </Column>
 
@@ -65,7 +65,7 @@ const Products = ({products = [], updateQuantity, deliveryType}) => {
 
                 return (
 
-                    <Card className='sml_product' accent='#2b9bd2' title={product.title} content={<Content product={product} deliveryType={deliveryType} />} footer={<Footer updateQuantity={updateQuantity} product={product} />} style={{marginBottom: '1px'}} onClick={'toggle'} key={product.id}>
+                    <Card className='sml_product' accent='#2b9bd2' title={product.title} content={<Content product={product} deliveryType={deliveryType} />} footer={<Footer updateQuantity={updateQuantity} product={product} />} style={{marginBottom: '1px'}} onClick={'toggle'} toggle="toggle" key={product.id}>
 
                         <Row className="thumbnail">
 

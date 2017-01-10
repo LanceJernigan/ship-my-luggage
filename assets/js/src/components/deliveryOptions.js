@@ -5,6 +5,16 @@ import Card from './card'
 import Column from './column'
 import Content from './content'
 
+const timeString = date => {
+
+    const hours = date.getHours() % 12
+    const minutes = date.getMinutes()
+    const meridiem = date.getHours() < 12 ? 'am' : 'pm'
+
+    return (hours < 10 ? '0' + hours : hours) + ':' + (minutes < 10 ? '0' + minutes : minutes) + ' ' + meridiem
+
+}
+
 const DateLine = ({rate = {}}) => {
 
     if (rate.delivery !== null) {
@@ -15,7 +25,7 @@ const DateLine = ({rate = {}}) => {
 
             <Content>
 
-                <p><strong>{date.toDateString()}</strong> - {date.toTimeString()}</p>
+                <p><strong>{date.toDateString()}</strong> - {timeString(date)}</p>
 
             </Content>
 
@@ -35,7 +45,7 @@ const DeliveryOptions = ({products, calculateTotal, updateDelivery, deliveryType
 
         return (
 
-            <Card accent='#2b9bd2' title='Delivery Options' onClick="toggle" style={{marginTop: '10px'}}>
+            <Card accent='#2b9bd2' title='Delivery Options' onClick="toggle" style={{marginTop: '10px'}} toggle='toggle' active={true}>
 
                 <Content>
 
