@@ -9,7 +9,7 @@ const Checkout = ({checkout, updateCheckout, processCheckout}) => {
 
     return (
 
-        <Row>
+        <Row style={{marginTop: '35px'}}>
 
             <Row style={{alignItems: 'flex-start'}}>
 

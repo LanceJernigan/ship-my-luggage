@@ -6,7 +6,7 @@ import Card from './card'
 
 const Content = ({product, deliveryType}) => {
 
-    const {price} = product.hasOwnProperty('rates') && product.rates.hasOwnProperty(deliveryType) ? product.rates[deliveryType] : product
+    const {price} = product.hasOwnProperty('rates') && Object.keys(product.rates).length > 0 && product.rates.hasOwnProperty(deliveryType) ? product.rates[deliveryType] : product
 
     return (
 

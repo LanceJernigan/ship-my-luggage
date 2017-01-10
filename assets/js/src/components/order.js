@@ -23,6 +23,16 @@ const AfterCalc = ({fetching, rates, children}) => {
 
         )
 
+    } else if (fetching) {
+
+        return (
+
+            <Card accent='#fff' title="Calculating..." className="sml_center" style={{background: '#2b9bd2', marginTop: '10px'}}>
+
+            </Card>
+
+        )
+
     }
 
     return null

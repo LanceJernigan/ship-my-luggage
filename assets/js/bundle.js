@@ -12994,7 +12994,7 @@ var App = function (_React$Component) {
                 date: new Date(),
                 addresses: {
                     origin: {
-                        val: '5800 Central Avenue Pike, Knoxville, TN, 37912',
+                        val: '',
                         address_1: '5800 Central Avenue Pike',
                         address_2: 'Apt 5402',
                         city: 'Knoxville',
@@ -13004,7 +13004,7 @@ var App = function (_React$Component) {
                         countryCode: 'US'
                     },
                     destination: {
-                        val: '1630 Downtown West Blvd Suite 116, Knoxville, TN, 37919',
+                        val: '',
                         address_1: '1630 Downtown West Blvd',
                         address_2: 'Suite 116',
                         city: 'Knoxville',
@@ -13146,9 +13146,9 @@ var _initialiseProps = function _initialiseProps() {
 
             _this2.setState({
                 order: _extends({}, _this2.state.order, {
-                    addresses: _extends({}, _this2.state.order.addresses, _defineProperty({}, target, {
+                    addresses: _extends({}, _this2.state.order.addresses, _defineProperty({}, target, _extends({}, _this2.state.order.addresses[target], {
                         val: value
-                    }))
+                    })))
                 })
             });
         }
@@ -13165,8 +13165,6 @@ var _initialiseProps = function _initialiseProps() {
     };
 
     this.requestProductRates = function () {
-
-        console.time('ProductRates');
 
         _this2.setState(_extends({}, _this2.state, {
             rates: false,
@@ -13197,8 +13195,6 @@ var _initialiseProps = function _initialiseProps() {
                 }));
 
                 setTimeout(_this2.updateTotal, 0);
-
-                console.timeEnd('ProductRates');
             }
         });
     };
@@ -13471,7 +13467,7 @@ var Checkout = function Checkout(_ref) {
 
     return _react2.default.createElement(
         _row2.default,
-        null,
+        { style: { marginTop: '35px' } },
         _react2.default.createElement(
             _row2.default,
             { style: { alignItems: 'flex-start' } },
@@ -14008,6 +14004,9 @@ var AfterCalc = function AfterCalc(_ref) {
             null,
             children
         );
+    } else if (fetching) {
+
+        return _react2.default.createElement(_card2.default, { accent: '#fff', title: 'Calculating...', className: 'sml_center', style: { background: '#2b9bd2', marginTop: '10px' } });
     }
 
     return null;
@@ -14189,7 +14188,7 @@ var Content = function Content(_ref) {
     var product = _ref.product,
         deliveryType = _ref.deliveryType;
 
-    var _ref2 = product.hasOwnProperty('rates') && product.rates.hasOwnProperty(deliveryType) ? product.rates[deliveryType] : product,
+    var _ref2 = product.hasOwnProperty('rates') && Object.keys(product.rates).length > 0 && product.rates.hasOwnProperty(deliveryType) ? product.rates[deliveryType] : product,
         price = _ref2.price;
 
     return _react2.default.createElement(

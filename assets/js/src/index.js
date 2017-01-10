@@ -19,7 +19,7 @@ class App extends React.Component {
                 date: new Date(),
                 addresses: {
                     origin: {
-                        val: '5800 Central Avenue Pike, Knoxville, TN, 37912',
+                        val: '',
                         address_1: '5800 Central Avenue Pike',
                         address_2: 'Apt 5402',
                         city: 'Knoxville',
@@ -29,7 +29,7 @@ class App extends React.Component {
                         countryCode: 'US'
                     },
                     destination: {
-                        val: '1630 Downtown West Blvd Suite 116, Knoxville, TN, 37919',
+                        val: '',
                         address_1: '1630 Downtown West Blvd',
                         address_2: 'Suite 116',
                         city: 'Knoxville',
@@ -159,6 +159,7 @@ class App extends React.Component {
                     addresses: {
                         ...this.state.order.addresses,
                         [target]: {
+                            ...this.state.order.addresses[target],
                             val: value
                         }
                     }
@@ -180,8 +181,6 @@ class App extends React.Component {
 
 
     requestProductRates = () => {
-
-        console.time('ProductRates')
 
         this.setState({
             ...this.state,
@@ -214,8 +213,6 @@ class App extends React.Component {
                 })
 
                 setTimeout(this.updateTotal, 0)
-
-                console.timeEnd('ProductRates')
 
             }
         })
