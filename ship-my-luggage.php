@@ -256,6 +256,12 @@
             'country' => $_checkout['fields']['country']['value'],
         ];
 
+        if (isset($_checkout['update_billing']) && $_checkout['update_billing'] === true) {
+
+            do_action('sml_update_user_billing', $current_user->ID, $billing);
+
+        }
+
         update_post_meta($order->id, 'origin', $_order['addresses']['origin']['val']);
         update_post_meta($order->id, 'destination', $_order['addresses']['destination']['val']);
 
@@ -354,6 +360,19 @@
     function get_sml_checkout_defaults() {
 
         $user_id = get_current_user_id();
+        $billing = [
+            'first_name' => '',
+            'last_name' => '',
+            'email' => '',
+            'phone' => '',
+            'address_1' => '',
+            'address_2' => '',
+            'city' => '',
+            'state' => '',
+            'postcode' => '',
+            'country' => '',
+            '_active' => isset($_GET['checkout']) && $_GET['checkout'] === 'true' ? 'true' : 'false'
+        ];
 
         if (! $user_id)
             return [];
@@ -361,21 +380,33 @@
         $user = get_user_by('ID', $user_id);
         $user_meta = get_user_meta($user_id);
 
-        _log($user_meta);
+        foreach($billing as $key => $val) {
 
-        return [
-            'first_name' => 'Lance',
-            'last_name' => 'Jernigan',
-            'email' => 'lance.t.jernigan@gmail.com',
-            'phone' => '8653041322',
-            'address_1' => '5800 Central Avenue Pike',
-            'address_2' => 'Apt 5402',
-            'city' => 'Knoxville',
-            'state' => 'Tennessee',
-            'postcode' => '37912',
-            'country' => 'United States',
-            '_active' => isset($_GET['checkout']) && $_GET['checkout'] === 'true' ? 'true' : 'false'
-        ];
+            $value = get_user_meta($user_id, $key, true);
+
+            if (count($value) > 0) {
+
+                $billing[$key] = $value;
+
+            }
+
+        }
+
+//        return [
+//            'first_name' => 'Lance',
+//            'last_name' => 'Jernigan',
+//            'email' => 'lance.t.jernigan@gmail.com',
+//            'phone' => '8653041322',
+//            'address_1' => '5800 Central Avenue Pike',
+//            'address_2' => 'Apt 5402',
+//            'city' => 'Knoxville',
+//            'state' => 'Tennessee',
+//            'postcode' => '37912',
+//            'country' => 'United States',
+//            '_active' => isset($_GET['checkout']) && $_GET['checkout'] === 'true' ? 'true' : 'false'
+//        ];
+
+        return $billing;
 
     }
 
