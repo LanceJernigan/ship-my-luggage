@@ -212,7 +212,14 @@
 
                 $username = $_checkout['fields']['first_name']['value'] . $_checkout['fields']['last_name']['value'];
                 $password = wp_generate_password($length = 12, true);
-                $user_id = wp_create_user($username, $password, $email);
+                $user_id = wp_create_user($username, $password, $email);\
+
+                do_action('sml_new_user', $user_id, [
+                    'first_name' => $_checkout['fields']['first_name']['value'],
+                    'last_name' => $_checkout['fields']['last_name']['value'],
+                    'phone' => $_checkout['fields']['phone']['value'],
+                    'email' => $_checkout['fields']['email']['value']
+                ]);
 
                 wp_set_auth_cookie($user_id);
 
@@ -221,8 +228,6 @@
             }
 
         }
-
-        _log($current_user);
 
         global $woocommerce;
 
@@ -253,7 +258,6 @@
 
         update_post_meta($order->id, 'origin', $_order['addresses']['origin']['val']);
         update_post_meta($order->id, 'destination', $_order['addresses']['destination']['val']);
-        update_post_meta($order->id, 'destination', $_order['addresses']['destination']['val']);
 
         $order->set_address($billing, 'billing');
 
@@ -276,6 +280,25 @@
 
     add_action('wp_ajax_sml_checkout', 'sml_ajax_checkout');
     add_action('wp_ajax_nopriv_sml_checkout', 'sml_ajax_checkout');
+
+    /*
+     *  sml_new_user() - Input new user meta into database
+     *
+     *      args - $user_id - id of user
+     *             $user_data - array of user data
+     */
+
+    function sml_new_user($user_id, $user_meta) {
+
+        foreach ($user_meta as $key => $val) {
+
+            update_user_meta($user_id, $key, $val);
+
+        }
+
+    }
+
+    add_action('sml_new_user', 'sml_new_user', 10, 2);
 
     /*
      * sml_before_calculate_totals() - adjust product prices based on item data
@@ -334,6 +357,11 @@
 
         if (! $user_id)
             return [];
+
+        $user = get_user_by('ID', $user_id);
+        $user_meta = get_user_meta($user_id);
+
+        _log($user_meta);
 
         return [
             'first_name' => 'Lance',
