@@ -17,7 +17,7 @@ const Checkout = ({checkout, updateCheckout, processCheckout}) => {
 
                     <Card accent='#2b9bd2' style={{marginBottom: '1px'}} title="First Name">
 
-                        <div className="footer" style={{background: 'rgba(0, 0, 0, .05)', padding: '10px'}}>
+                        <div className="footer" style={{background: 'rgba(0, 0, 0, .05)'}}>
 
                             <input type="text" value={checkout.fields.first_name.value} placeholder="First Name" onChange={e => updateCheckout({type: 'first_name', value: e.currentTarget.value})} />
 
@@ -31,7 +31,7 @@ const Checkout = ({checkout, updateCheckout, processCheckout}) => {
 
                     <Card accent='#2b9bd2' style={{marginBottom: '1px'}} title="Last Name">
 
-                        <div className="footer" style={{background: 'rgba(0, 0, 0, .05)', padding: '10px'}}>
+                        <div className="footer" style={{background: 'rgba(0, 0, 0, .05)'}}>
 
                             <input type="text" value={checkout.fields.last_name.value} placeholder="Last Name" onChange={e => updateCheckout({type: 'last_name', value: e.currentTarget.value})} />
 
@@ -49,7 +49,7 @@ const Checkout = ({checkout, updateCheckout, processCheckout}) => {
 
                     <Card accent='#2b9bd2' style={{marginBottom: '1px'}} title="Email">
 
-                        <div className="footer" style={{background: 'rgba(0, 0, 0, .05)', padding: '10px'}}>
+                        <div className="footer" style={{background: 'rgba(0, 0, 0, .05)'}}>
 
                             <input type="text" value={checkout.fields.email.value} placeholder="Email" onChange={e => updateCheckout({type: 'email', value: e.currentTarget.value})} />
 
@@ -63,7 +63,7 @@ const Checkout = ({checkout, updateCheckout, processCheckout}) => {
 
                     <Card accent='#2b9bd2' style={{marginBottom: '1px'}} title="Phone">
 
-                        <div className="footer" style={{background: 'rgba(0, 0, 0, .05)', padding: '10px'}}>
+                        <div className="footer" style={{background: 'rgba(0, 0, 0, .05)'}}>
 
                             <input type="text" value={checkout.fields.phone.value} placeholder="Phone" onChange={e => updateCheckout({type: 'phone', value: e.currentTarget.value})} />
 
@@ -81,7 +81,7 @@ const Checkout = ({checkout, updateCheckout, processCheckout}) => {
 
                     <Card accent='#2b9bd2' style={{marginBottom: '1px'}} title="Address">
 
-                        <div className="footer" style={{background: 'rgba(0, 0, 0, .05)', padding: '10px'}}>
+                        <div className="footer" style={{background: 'rgba(0, 0, 0, .05)'}}>
 
                             <input type="text" value={checkout.fields.address_1.value} placeholder="Address" onChange={e => updateCheckout({type: 'address_1', value: e.currentTarget.value})} />
 
@@ -95,7 +95,7 @@ const Checkout = ({checkout, updateCheckout, processCheckout}) => {
 
                     <Card accent='#2b9bd2' style={{marginBottom: '1px'}} title="Apartment, suite, unit, etc.">
 
-                        <div className="footer" style={{background: 'rgba(0, 0, 0, .05)', padding: '10px'}}>
+                        <div className="footer" style={{background: 'rgba(0, 0, 0, .05)'}}>
 
                             <input type="text" value={checkout.fields.address_2.value} placeholder="Apartment, suite, unit, etc" onChange={e => updateCheckout({type: 'address_2', value: e.currentTarget.value})} />
 
@@ -113,7 +113,7 @@ const Checkout = ({checkout, updateCheckout, processCheckout}) => {
 
                     <Card accent='#2b9bd2' style={{marginBottom: '1px'}} title="Country">
 
-                        <div className="footer" style={{background: 'rgba(0, 0, 0, .05)', padding: '10px'}}>
+                        <div className="footer" style={{background: 'rgba(0, 0, 0, .05)'}}>
 
                             <input type="text" value={checkout.fields.country.value} placeholder="Country" onChange={e => updateCheckout({type: 'country', value: e.currentTarget.value})} />
 
@@ -127,7 +127,7 @@ const Checkout = ({checkout, updateCheckout, processCheckout}) => {
 
                     <Card accent='#2b9bd2' style={{marginBottom: '1px'}} title="City">
 
-                        <div className="footer" style={{background: 'rgba(0, 0, 0, .05)', padding: '10px'}}>
+                        <div className="footer" style={{background: 'rgba(0, 0, 0, .05)'}}>
 
                             <input type="text" value={checkout.fields.city.value} placeholder="City" onChange={e => updateCheckout({type: 'city', value: e.currentTarget.value})} />
 
@@ -145,7 +145,7 @@ const Checkout = ({checkout, updateCheckout, processCheckout}) => {
 
                     <Card accent='#2b9bd2' style={{marginBottom: '1px'}} title="State">
 
-                        <div className="footer" style={{background: 'rgba(0, 0, 0, .05)', padding: '10px'}}>
+                        <div className="footer" style={{background: 'rgba(0, 0, 0, .05)'}}>
 
                             <input type="text" value={checkout.fields.state.value} placeholder="State" onChange={e => updateCheckout({type: 'state', value: e.currentTarget.value})} />
 
@@ -159,7 +159,7 @@ const Checkout = ({checkout, updateCheckout, processCheckout}) => {
 
                     <Card accent='#2b9bd2' style={{marginBottom: '1px'}} title="Postcode">
 
-                        <div className="footer" style={{background: 'rgba(0, 0, 0, .05)', padding: '10px'}}>
+                        <div className="footer" style={{background: 'rgba(0, 0, 0, .05)'}}>
 
                             <input type="text" value={checkout.fields.postcode.value} placeholder="Postcode" onChange={e => updateCheckout({type: 'postcode', value: e.currentTarget.value})} />
 

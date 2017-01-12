@@ -32,11 +32,11 @@
 
     function sml_redirect() {
 
-        if (is_page('checkout')) {
-
-            wp_redirect(site_url('/?checkout=true'));
-
-        }
+//        if (is_page('checkout')) {
+//
+//            wp_redirect(site_url('/?checkout=true'));
+//
+//        }
 
     }
 
@@ -51,6 +51,8 @@
         wp_enqueue_style('sml_order', untrailingslashit(plugin_dir_url(__FILE__)) . '/assets/css/sml-style.css');
         wp_register_script('sml_order', untrailingslashit(plugin_dir_url(__FILE__)) . '/assets/js/bundle.js');
 
+        wp_register_script( 'stripe', 'https://js.stripe.com/v2/', '', '1.0', true );
+
     }
 
     add_action('wp_enqueue_scripts', 'sml_enqueue');
@@ -64,13 +66,16 @@
     function sml_order() {
 
         wp_enqueue_script('sml_order');
+        wp_enqueue_script('stripe');
 
         wp_localize_script('sml_order', 'sml', [
             'ajax_url' => admin_url('admin-ajax.php'),
             'products' => get_sml_products(),
             'gettingStarted' => get_page_by_title('Getting Started'),
             'checkout' => get_sml_checkout_defaults(),
-            'isLoggedIn' => is_user_logged_in() ? 'true' : 'false'
+            'isLoggedIn' => is_user_logged_in() ? 'true' : 'false',
+//            'stripePublishableKey' => 'yes' === get_option( 'testmode' ) ? get_option( 'test_publishable_key' ) : get_option( 'publishable_key' )
+            'stipePublishableKey' => 'pk_test_2wIawfCbJ3eYi9auAgzyzvs6'
         ]);
 
         return '<div id="mount"></div>';
@@ -262,15 +267,17 @@
 
         }
 
-        update_post_meta($order->id, 'origin', $_order['addresses']['origin']['val']);
-        update_post_meta($order->id, 'destination', $_order['addresses']['destination']['val']);
+        update_post_meta($order->id, 'origin', $_order['addresses']['origin']);
+        update_post_meta($order->id, 'destination', $_order['addresses']['destination']);
+        update_post_meta($order->id, 'delivery_date', $_order['date']);
+        update_post_meta($order->id, 'shipping_method', $_order['delivery']);
 
         $order->set_address($billing, 'billing');
 
         $order->calculate_totals();
 
         $available_gateways = WC()->payment_gateways->get_available_payment_gateways();
-        $result = $available_gateways[ 'cheque' ]->process_payment( $order->id );
+        $result = $available_gateways[ 'stripe' ]->process_payment( $order->id );
 
         if ($result['result'] === 'fail') {
 
@@ -286,6 +293,22 @@
 
     add_action('wp_ajax_sml_checkout', 'sml_ajax_checkout');
     add_action('wp_ajax_nopriv_sml_checkout', 'sml_ajax_checkout');
+
+    function sml_update_user_billing($billing) {
+
+        $user_id = get_current_user_id();
+
+        foreach($billing as $key => $value) {
+
+            if ($key === 'credit_card')
+                continue;
+
+            update_user_meta($user_id, $key, $value);
+        }
+
+    }
+
+    add_action('sml_update_user_billing', 'sml_update_user_billing');
 
     /*
      *  sml_new_user() - Input new user meta into database
@@ -377,9 +400,6 @@
         if (! $user_id)
             return [];
 
-        $user = get_user_by('ID', $user_id);
-        $user_meta = get_user_meta($user_id);
-
         foreach($billing as $key => $val) {
 
             $value = get_user_meta($user_id, $key, true);
@@ -391,20 +411,6 @@
             }
 
         }
-
-//        return [
-//            'first_name' => 'Lance',
-//            'last_name' => 'Jernigan',
-//            'email' => 'lance.t.jernigan@gmail.com',
-//            'phone' => '8653041322',
-//            'address_1' => '5800 Central Avenue Pike',
-//            'address_2' => 'Apt 5402',
-//            'city' => 'Knoxville',
-//            'state' => 'Tennessee',
-//            'postcode' => '37912',
-//            'country' => 'United States',
-//            '_active' => isset($_GET['checkout']) && $_GET['checkout'] === 'true' ? 'true' : 'false'
-//        ];
 
         return $billing;
 
@@ -493,7 +499,7 @@
                 'Address' => [
                     'StreetLines' => [
                         $addresses['destination']['address_1'],
-                        $addresses['destination']['address_2']
+                        isset($addresses['destination']['address_2']) ? $addresses['destination']['address_2'] : ''
                     ],
                     'City' => $addresses['destination']['city'],
                     'State' => $addresses['destination']['state'],
@@ -534,6 +540,10 @@
         } catch (SoapFault $exception) {
 
             _log($exception, $client);
+
+            return [
+                'errors' => 'There was an error retrieving the products.'
+            ];
 
         }
 
@@ -596,5 +606,15 @@
             error_log("*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*");
         }
     }
+
+    function sml_delete_this_function($request, $api) {
+
+        _log($request, $api);
+
+        return $request;
+
+    }
+
+    add_filter('woocommerce_stripe_request_body', 'sml_delete_this_function', 10, 2)
 
 ?>

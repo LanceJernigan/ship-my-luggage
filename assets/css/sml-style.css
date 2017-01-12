@@ -157,6 +157,7 @@
     }
 
         .sml_card .footer .action {
+            margin: 5px;
             padding: 10px 15px;
             transition: background .2s ease-in-out;
             cursor: pointer;
@@ -190,8 +191,11 @@
         font-size: 1em;
         outline: none;
         padding: 10px;
-        border-bottom: solid 1px rgba(0, 0, 0, .1);
     }
+
+        .sml_card .footer input:nth-child(n+2) {
+            border-top: solid 1px rgba(0, 0, 0, .1);
+        }
 
 .sml_product .thumbnail {
     position: absolute;

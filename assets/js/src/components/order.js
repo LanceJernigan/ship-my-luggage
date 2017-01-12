@@ -13,25 +13,45 @@ import moment from 'moment'
 
 require('../../../css/react-datepicker.css')
 
-const AfterCalc = ({fetching, rates, children}) => {
+const AfterCalc = ({fetching, rates, children, deliveryDate}) => {
 
     if (! fetching && rates) {
 
-        return (
+        if (deliveryDate) {
 
-            <div>
+            return (
 
-                {children}
+                <div style={{width: '100%'}}>
 
-            </div>
+                    {children}
 
-        )
+                </div>
+
+            )
+
+        } else {
+
+            return (
+
+                <Card accent='#2b9bd2' title='Delivery Options' onClick="toggle" style={{marginTop: '10px'}}>
+
+                    <Content>
+
+                        <p>Please choose a delivery date to proceed.</p>
+
+                    </Content>
+
+                </Card>
+
+            )
+
+        }
 
     } else if (fetching) {
 
         return (
 
-            <Card accent='#fff' title="Calculating..." className="sml_center" style={{background: '#2b9bd2', marginTop: '10px'}}>
+            <Card accent='#fff' title="Searching for lowest prices..." className="sml_center" style={{background: '#2b9bd2', marginTop: '10px'}}>
 
             </Card>
 
@@ -144,13 +164,13 @@ const Order = ({addresses = {origin: {val: ''}, destination: {val: ''}}, deliver
 
                         <div className="footer" style={{background: 'rgba(0, 0, 0, .05)'}}>
 
-                            <DatePicker selected={deliveryDate} dateFormat={'dddd, MMMM D YYYY'} minDate={moment().add(1, 'days')} onChange={updateDeliveryDate} />
+                            <DatePicker placeholderText='Date' withPortal selected={deliveryDate === null ? null : moment(deliveryDate)} dateFormat={'dddd, MMMM D YYYY'} minDate={moment().add(1, 'days')} onChange={updateDeliveryDate} />
 
                         </div>
 
                     </Card>
 
-                    <AfterCalc fetching={fetching} rates={rates}>
+                    <AfterCalc fetching={fetching} rates={rates} deliveryDate={deliveryDate}>
 
                         <DeliveryOptions products={products} calculateTotal={calculateTotal} deliveryType={deliveryType} updateDelivery={updateDelivery} deliveryDate={deliveryDate} />
 

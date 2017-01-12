@@ -27653,7 +27653,7 @@ var App = function (_React$Component) {
         _this.state = {
             lead: true,
             order: {
-                date: (0, _moment2.default)().add(7, 'days'),
+                date: null,
                 addresses: {
                     origin: {},
                     destination: {}
@@ -27913,8 +27913,6 @@ var _initialiseProps = function _initialiseProps() {
 
     this.updateCheckout = function (props) {
 
-        console.log(props);
-
         var actions = {
             address: function address(props) {
                 return _extends({}, _this2.state.checkout.address, _defineProperty({}, 'line' + props.line, props.value));
@@ -27938,7 +27936,7 @@ var _initialiseProps = function _initialiseProps() {
 
     this.submit = function () {
 
-        window.history.pushState(_this2.state, null, 'checkout');
+        window.history.pushState(JSON.stringify(_this2.state), null, 'checkout');
 
         _this2.sml_ajax({
             data: {
@@ -27951,7 +27949,9 @@ var _initialiseProps = function _initialiseProps() {
 
                 if (errors && errors.length) {
 
-                    _this2.setState({ errors: errors });
+                    _this2.setState(_extends({}, _this2.state, {
+                        errors: errors
+                    }));
                 } else {
 
                     if (_this2.state.quickPay === true) {
@@ -27959,11 +27959,11 @@ var _initialiseProps = function _initialiseProps() {
                         _this2.processCheckout();
                     } else {
 
-                        _this2.setState({
+                        _this2.setState(_extends({}, _this2.state, {
                             checkout: _extends({}, _this2.state.checkout, {
                                 active: true
                             })
-                        });
+                        }));
                     }
                 }
             }
@@ -27979,13 +27979,51 @@ var _initialiseProps = function _initialiseProps() {
         setTimeout(_this2.submit, 0);
     };
 
+    this.createStripeToken = function () {
+
+        Stripe.setPublishableKey(window.sml.stripePublishableKey);
+
+        Stripe.createToken({
+            number: 4242424242424242,
+            cvc: 123,
+            exp_month: 10,
+            exp_year: 20
+        }, _this2.updateStripeToken);
+    };
+
+    this.updateStripeToken = function (status, response) {
+
+        if (response.error) {
+
+            _this2.setState(_extends({}, _this2.state, {
+                errors: response.error
+            }));
+        } else {
+
+            _this2.setState(_extends({}, _this2.state, {
+                order: _extends({}, _this2.state.order, {
+                    stripeToken: response.id
+                })
+            }));
+
+            setTimeout(_this2.processCheckout, 0);
+        }
+    };
+
     this.processCheckout = function () {
+
+        if (!_this2.state.order.stripeToken) {
+
+            _this2.createStripeToken();
+            return;
+        }
 
         _this2.sml_ajax({
             data: {
                 action: 'sml_checkout',
                 checkout: _this2.state.checkout,
-                order: _this2.state.order
+                order: _this2.state.order,
+                stripe_token: _this2.state.order.stripeToken
             },
             success: function success(_ref3) {
                 var errors = _ref3.errors;
@@ -28051,7 +28089,7 @@ var _initialiseProps = function _initialiseProps() {
 
         _this2.setState(_extends({}, _this2.state, {
             order: _extends({}, _this2.state.order, {
-                date: val
+                date: val.toISOString()
             })
         }));
     };
@@ -28147,7 +28185,7 @@ var Checkout = function Checkout(_ref) {
                     { accent: '#2b9bd2', style: { marginBottom: '1px' }, title: 'First Name' },
                     _react2.default.createElement(
                         'div',
-                        { className: 'footer', style: { background: 'rgba(0, 0, 0, .05)', padding: '10px' } },
+                        { className: 'footer', style: { background: 'rgba(0, 0, 0, .05)' } },
                         _react2.default.createElement('input', { type: 'text', value: checkout.fields.first_name.value, placeholder: 'First Name', onChange: function onChange(e) {
                                 return updateCheckout({ type: 'first_name', value: e.currentTarget.value });
                             } })
@@ -28162,7 +28200,7 @@ var Checkout = function Checkout(_ref) {
                     { accent: '#2b9bd2', style: { marginBottom: '1px' }, title: 'Last Name' },
                     _react2.default.createElement(
                         'div',
-                        { className: 'footer', style: { background: 'rgba(0, 0, 0, .05)', padding: '10px' } },
+                        { className: 'footer', style: { background: 'rgba(0, 0, 0, .05)' } },
                         _react2.default.createElement('input', { type: 'text', value: checkout.fields.last_name.value, placeholder: 'Last Name', onChange: function onChange(e) {
                                 return updateCheckout({ type: 'last_name', value: e.currentTarget.value });
                             } })
@@ -28181,7 +28219,7 @@ var Checkout = function Checkout(_ref) {
                     { accent: '#2b9bd2', style: { marginBottom: '1px' }, title: 'Email' },
                     _react2.default.createElement(
                         'div',
-                        { className: 'footer', style: { background: 'rgba(0, 0, 0, .05)', padding: '10px' } },
+                        { className: 'footer', style: { background: 'rgba(0, 0, 0, .05)' } },
                         _react2.default.createElement('input', { type: 'text', value: checkout.fields.email.value, placeholder: 'Email', onChange: function onChange(e) {
                                 return updateCheckout({ type: 'email', value: e.currentTarget.value });
                             } })
@@ -28196,7 +28234,7 @@ var Checkout = function Checkout(_ref) {
                     { accent: '#2b9bd2', style: { marginBottom: '1px' }, title: 'Phone' },
                     _react2.default.createElement(
                         'div',
-                        { className: 'footer', style: { background: 'rgba(0, 0, 0, .05)', padding: '10px' } },
+                        { className: 'footer', style: { background: 'rgba(0, 0, 0, .05)' } },
                         _react2.default.createElement('input', { type: 'text', value: checkout.fields.phone.value, placeholder: 'Phone', onChange: function onChange(e) {
                                 return updateCheckout({ type: 'phone', value: e.currentTarget.value });
                             } })
@@ -28215,7 +28253,7 @@ var Checkout = function Checkout(_ref) {
                     { accent: '#2b9bd2', style: { marginBottom: '1px' }, title: 'Address' },
                     _react2.default.createElement(
                         'div',
-                        { className: 'footer', style: { background: 'rgba(0, 0, 0, .05)', padding: '10px' } },
+                        { className: 'footer', style: { background: 'rgba(0, 0, 0, .05)' } },
                         _react2.default.createElement('input', { type: 'text', value: checkout.fields.address_1.value, placeholder: 'Address', onChange: function onChange(e) {
                                 return updateCheckout({ type: 'address_1', value: e.currentTarget.value });
                             } })
@@ -28230,7 +28268,7 @@ var Checkout = function Checkout(_ref) {
                     { accent: '#2b9bd2', style: { marginBottom: '1px' }, title: 'Apartment, suite, unit, etc.' },
                     _react2.default.createElement(
                         'div',
-                        { className: 'footer', style: { background: 'rgba(0, 0, 0, .05)', padding: '10px' } },
+                        { className: 'footer', style: { background: 'rgba(0, 0, 0, .05)' } },
                         _react2.default.createElement('input', { type: 'text', value: checkout.fields.address_2.value, placeholder: 'Apartment, suite, unit, etc', onChange: function onChange(e) {
                                 return updateCheckout({ type: 'address_2', value: e.currentTarget.value });
                             } })
@@ -28249,7 +28287,7 @@ var Checkout = function Checkout(_ref) {
                     { accent: '#2b9bd2', style: { marginBottom: '1px' }, title: 'Country' },
                     _react2.default.createElement(
                         'div',
-                        { className: 'footer', style: { background: 'rgba(0, 0, 0, .05)', padding: '10px' } },
+                        { className: 'footer', style: { background: 'rgba(0, 0, 0, .05)' } },
                         _react2.default.createElement('input', { type: 'text', value: checkout.fields.country.value, placeholder: 'Country', onChange: function onChange(e) {
                                 return updateCheckout({ type: 'country', value: e.currentTarget.value });
                             } })
@@ -28264,7 +28302,7 @@ var Checkout = function Checkout(_ref) {
                     { accent: '#2b9bd2', style: { marginBottom: '1px' }, title: 'City' },
                     _react2.default.createElement(
                         'div',
-                        { className: 'footer', style: { background: 'rgba(0, 0, 0, .05)', padding: '10px' } },
+                        { className: 'footer', style: { background: 'rgba(0, 0, 0, .05)' } },
                         _react2.default.createElement('input', { type: 'text', value: checkout.fields.city.value, placeholder: 'City', onChange: function onChange(e) {
                                 return updateCheckout({ type: 'city', value: e.currentTarget.value });
                             } })
@@ -28283,7 +28321,7 @@ var Checkout = function Checkout(_ref) {
                     { accent: '#2b9bd2', style: { marginBottom: '1px' }, title: 'State' },
                     _react2.default.createElement(
                         'div',
-                        { className: 'footer', style: { background: 'rgba(0, 0, 0, .05)', padding: '10px' } },
+                        { className: 'footer', style: { background: 'rgba(0, 0, 0, .05)' } },
                         _react2.default.createElement('input', { type: 'text', value: checkout.fields.state.value, placeholder: 'State', onChange: function onChange(e) {
                                 return updateCheckout({ type: 'state', value: e.currentTarget.value });
                             } })
@@ -28298,7 +28336,7 @@ var Checkout = function Checkout(_ref) {
                     { accent: '#2b9bd2', style: { marginBottom: '1px' }, title: 'Postcode' },
                     _react2.default.createElement(
                         'div',
-                        { className: 'footer', style: { background: 'rgba(0, 0, 0, .05)', padding: '10px' } },
+                        { className: 'footer', style: { background: 'rgba(0, 0, 0, .05)' } },
                         _react2.default.createElement('input', { type: 'text', value: checkout.fields.postcode.value, placeholder: 'Postcode', onChange: function onChange(e) {
                                 return updateCheckout({ type: 'postcode', value: e.currentTarget.value });
                             } })
@@ -28676,19 +28714,38 @@ __webpack_require__(603);
 var AfterCalc = function AfterCalc(_ref) {
     var fetching = _ref.fetching,
         rates = _ref.rates,
-        children = _ref.children;
+        children = _ref.children,
+        deliveryDate = _ref.deliveryDate;
 
 
     if (!fetching && rates) {
 
-        return _react2.default.createElement(
-            'div',
-            null,
-            children
-        );
+        if (deliveryDate) {
+
+            return _react2.default.createElement(
+                'div',
+                { style: { width: '100%' } },
+                children
+            );
+        } else {
+
+            return _react2.default.createElement(
+                _card2.default,
+                { accent: '#2b9bd2', title: 'Delivery Options', onClick: 'toggle', style: { marginTop: '10px' } },
+                _react2.default.createElement(
+                    _content2.default,
+                    null,
+                    _react2.default.createElement(
+                        'p',
+                        null,
+                        'Please choose a delivery date to proceed.'
+                    )
+                )
+            );
+        }
     } else if (fetching) {
 
-        return _react2.default.createElement(_card2.default, { accent: '#fff', title: 'Calculating...', className: 'sml_center', style: { background: '#2b9bd2', marginTop: '10px' } });
+        return _react2.default.createElement(_card2.default, { accent: '#fff', title: 'Searching for lowest prices...', className: 'sml_center', style: { background: '#2b9bd2', marginTop: '10px' } });
     }
 
     return null;
@@ -28824,12 +28881,12 @@ var Order = function Order(_ref4) {
                     _react2.default.createElement(
                         'div',
                         { className: 'footer', style: { background: 'rgba(0, 0, 0, .05)' } },
-                        _react2.default.createElement(_reactDatepicker2.default, { selected: deliveryDate, dateFormat: 'dddd, MMMM D YYYY', minDate: (0, _moment2.default)().add(1, 'days'), onChange: updateDeliveryDate })
+                        _react2.default.createElement(_reactDatepicker2.default, { placeholderText: 'Date', withPortal: true, selected: deliveryDate === null ? null : (0, _moment2.default)(deliveryDate), dateFormat: 'dddd, MMMM D YYYY', minDate: (0, _moment2.default)().add(1, 'days'), onChange: updateDeliveryDate })
                     )
                 ),
                 _react2.default.createElement(
                     AfterCalc,
-                    { fetching: fetching, rates: rates },
+                    { fetching: fetching, rates: rates, deliveryDate: deliveryDate },
                     _react2.default.createElement(_deliveryOptions2.default, { products: products, calculateTotal: calculateTotal, deliveryType: deliveryType, updateDelivery: updateDelivery, deliveryDate: deliveryDate }),
                     _react2.default.createElement(Continue, { onClick: submit }),
                     _react2.default.createElement(Quickpay, { checkout: checkout, quickPay: quickPay })

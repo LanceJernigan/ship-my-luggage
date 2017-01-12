@@ -18,7 +18,7 @@ class App extends React.Component {
         this.state = {
             lead: true,
             order: {
-                date: moment().add(7, 'days'),
+                date: null,
                 addresses: {
                     origin: {},
                     destination: {}
@@ -285,8 +285,6 @@ class App extends React.Component {
 
     updateCheckout = props => {
 
-        console.log(props)
-
         const actions = {
             address: props => {
                 return {
@@ -323,7 +321,7 @@ class App extends React.Component {
 
     submit = () => {
 
-        window.history.pushState(this.state, null, 'checkout')
+        window.history.pushState(JSON.stringify(this.state), null, 'checkout')
 
         this.sml_ajax({
             data: {
@@ -334,7 +332,10 @@ class App extends React.Component {
 
                 if (errors && errors.length) {
 
-                    this.setState({errors: errors})
+                    this.setState({
+                        ...this.state,
+                        errors: errors
+                    })
 
                 } else {
 
@@ -345,6 +346,7 @@ class App extends React.Component {
                     } else {
 
                         this.setState({
+                            ...this.state,
                             checkout: {
                                 ...this.state.checkout,
                                 active: true
@@ -370,13 +372,59 @@ class App extends React.Component {
 
     }
 
+    createStripeToken = () => {
+
+        Stripe.setPublishableKey(window.sml.stripePublishableKey)
+
+        Stripe.createToken({
+            number: 4242424242424242,
+            cvc: 123,
+            exp_month: 10,
+            exp_year: 20
+        }, this.updateStripeToken)
+
+    }
+
+    updateStripeToken = (status, response) => {
+
+        if (response.error) {
+
+            this.setState({
+                ...this.state,
+                errors: response.error
+            })
+
+        } else {
+
+            this.setState({
+                ...this.state,
+                order: {
+                    ...this.state.order,
+                    stripeToken: response.id
+                }
+            })
+
+            setTimeout(this.processCheckout, 0)
+
+        }
+
+    }
+
     processCheckout = () => {
+
+        if (! this.state.order.stripeToken) {
+
+            this.createStripeToken()
+            return
+
+        }
 
         this.sml_ajax({
             data: {
                 action: 'sml_checkout',
                 checkout: this.state.checkout,
-                order: this.state.order
+                order: this.state.order,
+                stripe_token: this.state.order.stripeToken
             },
             success: ({errors}) => {
 
@@ -455,7 +503,7 @@ class App extends React.Component {
             ...this.state,
             order: {
                 ...this.state.order,
-                date: val
+                date: val.toISOString()
             }
         })
 
