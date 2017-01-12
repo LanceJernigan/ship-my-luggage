@@ -190,7 +190,7 @@
         font-size: 1em;
         outline: none;
         padding: 10px;
-        border-bottom: solid 1px rgba(0, 0, 0, .2);
+        border-bottom: solid 1px rgba(0, 0, 0, .1);
     }
 
 .sml_product .thumbnail {
@@ -247,12 +247,17 @@
     }
 
 .sml_product .footer {
-    padding: 5px;
 }
 
     .sml_product .footer p {
-        padding: 5px;
+        padding: 10px;
+        align-self: center;
     }
+
+        .sml_product .footer input {
+            border: none;
+            text-align: right;
+        }
 
 .sml_card.checkout h4 {
     text-align: center;

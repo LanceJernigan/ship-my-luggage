@@ -5,6 +5,8 @@ import Card from './card'
 import Column from './column'
 import Content from './content'
 
+import moment from 'moment'
+
 const timeString = date => {
 
     const hours = date.getHours() % 12
@@ -15,17 +17,15 @@ const timeString = date => {
 
 }
 
-const DateLine = ({rate = {}}) => {
+const DateLine = ({rate = {}, date}) => {
 
-    if (rate.delivery !== null) {
-
-        const date = new Date(rate.delivery)
+    if (date !== false) {
 
         return (
 
             <Content>
 
-                <p><strong>{date.toDateString()}</strong> - {timeString(date)}</p>
+                <p>{date.format('dddd, MMMM D YYYY - h:mm a')}</p>
 
             </Content>
 
@@ -37,7 +37,7 @@ const DateLine = ({rate = {}}) => {
 
 }
 
-const DeliveryOptions = ({products, calculateTotal, updateDelivery, deliveryType}) => {
+const DeliveryOptions = ({products, calculateTotal, updateDelivery, deliveryType, deliveryDate}) => {
 
     if (products[0].hasOwnProperty('rates')) {
 
@@ -58,30 +58,36 @@ const DeliveryOptions = ({products, calculateTotal, updateDelivery, deliveryType
                     {Object.keys(rates).map( key => {
 
                         const rate = rates[key]
+                        const date = rate.delivery !== null ? moment(rate.delivery) : false
 
-                        return (
+                        if (key == 'FEDEX_GROUND' || date.isBefore(deliveryDate)) {
 
-                            <Row className={'delivery_option ' + (rate.type === deliveryType ? 'active' : 'deactive')} style={{background: '#eeeff0', borderTop: 'solid 1px rgba(0, 0, 0, .1)'}} key={key}>
+                            return (
 
-                                <Column columns={6} width={5} minWidth={0} style={{flexWrap: 'wrap'}} >
+                                <Row className={'delivery_option ' + (rate.type === deliveryType ? 'active' : 'deactive')} style={{background: '#eeeff0', borderTop: 'solid 1px rgba(0, 0, 0, .1)'}} key={key}>
 
-                                    <Card accent="#2b9bd2" title={rate.title} style={{background: '#eeeff0'}} onClick={() => updateDelivery(rate.type)}>
+                                    <Column columns={6} width={5} minWidth={0} style={{flexWrap: 'wrap'}} >
 
-                                        <DateLine rate={rate} />
+                                        <Card accent="#2b9bd2" title={rate.title} style={{background: '#eeeff0'}} onClick={() => updateDelivery(rate.type)}>
 
-                                    </Card>
+                                            <DateLine rate={rate} date={date} />
 
-                                </Column>
+                                        </Card>
 
-                                <Column columns={6} width={1} minWidth={0} className='delivery_option--price' style={{background: (rate.type === deliveryType ? '#2b9bd2' : 'rgba(0, 0, 0, .05)'), display: 'flex', alignItems: 'center', justifyContent: 'center'}}>
+                                    </Column>
 
-                                    <h4 onClick={() => updateDelivery(rate.type)}>${calculateTotal(rate.type)}</h4>
+                                    <Column columns={6} width={1} minWidth={0} className='delivery_option--price' style={{background: (rate.type === deliveryType ? '#2b9bd2' : 'rgba(0, 0, 0, .05)'), display: 'flex', alignItems: 'center', justifyContent: 'center'}}>
 
-                                </Column>
+                                        <h4 onClick={() => updateDelivery(rate.type)}>${calculateTotal(rate.type)}</h4>
 
-                            </Row>
+                                    </Column>
 
-                        )
+                                </Row>
+
+                            )
+                        }
+
+                        return null
 
                     })}
 

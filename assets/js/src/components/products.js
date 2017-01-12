@@ -30,22 +30,15 @@ const Footer = ({product, updateQuantity}) => {
 
         <Row>
 
-            <Column columns={12} width={9} minWidth={0}>
+            <Column columns={10} width={8} minWidth={0}>
 
                 <p><strong>Quantity:</strong></p>
 
             </Column>
 
-            <Column columns={12} width={1} minWidth={0}>
+            <Column columns={10} width={2} minWidth={0}>
 
-                <p>{product.quantity}</p>
-
-            </Column>
-
-            <Column columns={12} width={2} minWidth={0}>
-
-                <p onClick={e => updateQuantity(product.id, (product.quantity > 0 ? product.quantity - 1 : product.quantity))}>-</p>
-                <p onClick={e => updateQuantity(product.id, (product.quantity + 1))}>+</p>
+                <input value={product.quantity} min='0' type="number" onChange={e => updateQuantity(product.id, e.currentTarget.value)} />
 
             </Column>
 

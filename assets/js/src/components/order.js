@@ -152,7 +152,7 @@ const Order = ({addresses = {origin: {val: ''}, destination: {val: ''}}, deliver
 
                     <AfterCalc fetching={fetching} rates={rates}>
 
-                        <DeliveryOptions products={products} calculateTotal={calculateTotal} deliveryType={deliveryType} updateDelivery={updateDelivery} />
+                        <DeliveryOptions products={products} calculateTotal={calculateTotal} deliveryType={deliveryType} updateDelivery={updateDelivery} deliveryDate={deliveryDate} />
 
                         <Continue onClick={submit} />
 

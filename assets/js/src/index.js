@@ -18,7 +18,7 @@ class App extends React.Component {
         this.state = {
             lead: true,
             order: {
-                date: moment(),
+                date: moment().add(7, 'days'),
                 addresses: {
                     origin: {},
                     destination: {}
