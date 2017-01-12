@@ -7,6 +7,8 @@ import Lead from './components/lead'
 import Order from './components/order'
 import Checkout from './components/checkout'
 
+import moment from 'moment'
+
 class App extends React.Component {
 
     constructor(props) {
@@ -16,7 +18,7 @@ class App extends React.Component {
         this.state = {
             lead: true,
             order: {
-                date: new Date(),
+                date: moment(),
                 addresses: {
                     origin: {
                         val: '',
@@ -67,10 +69,8 @@ class App extends React.Component {
 
     popState = e => {
 
-        console.log(e)
-
         this.setState({
-            ...e.state
+            ...JSON.parse(e.state)
         })
 
     }
@@ -448,9 +448,21 @@ class App extends React.Component {
 
     }
 
+    updateDeliveryDate = val => {
+
+        this.setState({
+            ...this.state,
+            order: {
+                ...this.state.order,
+                date: val
+            }
+        })
+
+    }
+
     render() {
 
-        window.history.replaceState(this.state, null, '')
+        window.history.replaceState(JSON.stringify(this.state), null, '')
 
         return (
 
@@ -462,7 +474,7 @@ class App extends React.Component {
 
                 <Lead dismiss={this.dismissLead} active={this.state.lead} />
 
-                {this.state.checkout.active && ! this.state.fetching && this.state.rates ? <Checkout checkout={this.state.checkout} updateCheckout={this.updateCheckout} processCheckout={this.processCheckout} /> : <Order updateAddress={this.updateAddress} validateAddresses={this.validateAddresses} updateQuantity={this.updateQuantity} processCheckout={this.processCheckout} submit={this.submit} addresses={this.state.order.addresses} products={this.state.order.products} date={this.state.order.date} checkout={this.state.checkout} calculateTotal={this.calculateTotal} updateDelivery={this.updateDelivery} deliveryType={this.state.order.delivery} quickPay={this.quickPay} fetching={this.state.fetching} rates={this.state.rates} leadActive={this.state.lead} />}
+                {this.state.checkout.active && ! this.state.fetching && this.state.rates ? <Checkout checkout={this.state.checkout} updateCheckout={this.updateCheckout} processCheckout={this.processCheckout} /> : <Order updateAddress={this.updateAddress} validateAddresses={this.validateAddresses} updateQuantity={this.updateQuantity} processCheckout={this.processCheckout} submit={this.submit} addresses={this.state.order.addresses} products={this.state.order.products} deliveryDate={this.state.order.date} checkout={this.state.checkout} calculateTotal={this.calculateTotal} updateDelivery={this.updateDelivery} deliveryType={this.state.order.delivery} quickPay={this.quickPay} fetching={this.state.fetching} rates={this.state.rates} leadActive={this.state.lead} updateDeliveryDate={this.updateDeliveryDate} />}
 
             </div>
 

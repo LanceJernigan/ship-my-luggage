@@ -7,7 +7,10 @@ import Card from './card'
 import Products from './products'
 import DeliveryOptions from './deliveryOptions'
 
-import Autocomplete from 'react-google-autocomplete'
+import DatePicker from 'react-datepicker'
+import moment from 'moment'
+
+require('../../../css/react-datepicker.css')
 
 const AfterCalc = ({fetching, rates, children}) => {
 
@@ -80,7 +83,7 @@ const Continue = ({onClick}) => {
 
 }
 
-const Order = ({addresses = {origin: {val: ''}, destination: {val: ''}}, date = new Date(), checkout = {}, products = [], deliveryType = 'FEDEX_GROUND', updateAddress, validateAddresses, updateQuantity, submit, quickPay, calculateTotal, updateDelivery, fetching = false, rates = false}) => {
+const Order = ({addresses = {origin: {val: ''}, destination: {val: ''}}, deliveryDate, checkout = {}, products = [], deliveryType = 'FEDEX_GROUND', updateAddress, validateAddresses, updateQuantity, submit, quickPay, calculateTotal, updateDelivery, updateDeliveryDate, fetching = false, rates = false}) => {
 
     return (
 
@@ -138,7 +141,9 @@ const Order = ({addresses = {origin: {val: ''}, destination: {val: ''}}, date = 
 
                         <div className="footer" style={{background: 'rgba(0, 0, 0, .05)', padding: '10px'}}>
 
-                            <input type="text" placeholder="Date" value={date.toDateString()} onChange={e => updateAddress('origin', e.currentTarget.value)} />
+                            {/*<input type="text" placeholder="Date" value={date.toDateString()} onChange={e => updateAddress('origin', e.currentTarget.value)} />*/}
+
+                            <DatePicker selected={deliveryDate} dateFormat={'dddd, MMMM D YYYY'} minDate={moment().add(1, 'days')} onChange={updateDeliveryDate} />
 
                         </div>
 
