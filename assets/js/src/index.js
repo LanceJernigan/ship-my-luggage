@@ -20,26 +20,8 @@ class App extends React.Component {
             order: {
                 date: moment(),
                 addresses: {
-                    origin: {
-                        val: '',
-                        address_1: '5800 Central Avenue Pike',
-                        address_2: 'Apt 5402',
-                        city: 'Knoxville',
-                        state: 'Tennessee',
-                        postcode: '37912',
-                        country: 'United States',
-                        countryCode: 'US'
-                    },
-                    destination: {
-                        val: '',
-                        address_1: '1630 Downtown West Blvd',
-                        address_2: 'Suite 116',
-                        city: 'Knoxville',
-                        state: 'Tennessee',
-                        postcode: '37919',
-                        country: 'United States',
-                        countryCode: 'US'
-                    }
+                    origin: {},
+                    destination: {}
                 },
                 products: window.sml.products.map( product => {
 
@@ -160,7 +142,7 @@ class App extends React.Component {
                         ...this.state.order.addresses,
                         [target]: {
                             ...this.state.order.addresses[target],
-                            val: value
+                            ...this.formatAddress(value)
                         }
                     }
                 }
@@ -168,12 +150,31 @@ class App extends React.Component {
 
         }
 
+        setTimeout(this.validateAddresses, 0)
+
+    }
+
+    formatAddress = value => {
+
+        if (typeof value === 'string')
+            return {address_2: value}
+
+        const getValueByType = type => value.address_components.filter( ac => ac.types.indexOf(type) > -1).shift()
+
+        return {
+            address_1: getValueByType('street_number').long_name + ' ' + getValueByType('route').long_name,
+            city: getValueByType('locality').long_name,
+            state: getValueByType('administrative_area_level_1').long_name,
+            postcode: getValueByType('postal_code').long_name,
+            country: getValueByType('country').long_name,
+            countryCode: getValueByType('country').short_name
+        }
+
     }
 
     validateAddresses = () => {
 
-        const addresses = Object.assign(this.state.order.addresses)
-        const validated = Object.keys(addresses).filter( key => addresses[key].val.length > 0).length === 2
+        const validated = Object.keys(this.state.order.addresses.origin).length > 2 && Object.keys(this.state.order.addresses.destination).length > 2
 
         if (validated)
             this.requestProductRates()

@@ -3239,7 +3239,7 @@ react-dom@^15.3.2:
     loose-envify "^1.1.0"
     object-assign "^4.1.0"
 
-react-google-autocomplete@^1.0.11:
+react-google-autocomplete@^1.0.12:
   version "1.0.12"
   resolved "https://registry.yarnpkg.com/react-google-autocomplete/-/react-google-autocomplete-1.0.12.tgz#1c165e5f4659425279e0789dd72492ac4c2ebd4f"
 

@@ -434,11 +434,11 @@
 
     function sml_request_rates($products, $addresses) {
 
-        return array_map(function($product)use($addresses) {
+        return apply_filters('sml_filter_product_rates', array_map(function($product)use($addresses) {
 
             return sml_request_rate($product, $addresses);
 
-        }, $products);
+        }, $products));
 
     }
 
@@ -481,7 +481,7 @@
                 'Address' => [
                     'StreetLines' => [
                         $addresses['origin']['address_1'],
-                        $addresses['origin']['address_2']
+                        isset($addresses['origin']['address_2']) ? $addresses['origin']['address_2'] : ''
                     ],
                     'City' => $addresses['origin']['city'],
                     'State' => $addresses['origin']['state'],
@@ -574,6 +574,14 @@
 
 
     add_filter('sml_product_rate', 'sml_product_rate_filter', 10, 1);
+
+    function sml_filter_product_rates($products) {
+
+        return $products;
+
+    }
+
+    add_filter('sml_filter_product_rates', 'sml_filter_product_rates', 10, 1);
 
     function _log( $message ) {
         if( WP_DEBUG === true ){

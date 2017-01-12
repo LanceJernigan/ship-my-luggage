@@ -7,6 +7,7 @@ import Card from './card'
 import Products from './products'
 import DeliveryOptions from './deliveryOptions'
 
+import Autocomplete from 'react-google-autocomplete'
 import DatePicker from 'react-datepicker'
 import moment from 'moment'
 
@@ -95,9 +96,10 @@ const Order = ({addresses = {origin: {val: ''}, destination: {val: ''}}, deliver
 
                         <Card accent='#2b9bd2' style={{marginBottom: '1px'}} title="Origin" content={<p>Where your shipment will begin.</p>}>
 
-                            <div className="footer" style={{background: 'rgba(0, 0, 0, .05)', padding: '10px'}}>
+                            <div className="footer" style={{background: 'rgba(0, 0, 0, .05)'}}>
 
-                                <input type="text" value={addresses.origin.val} placeholder="Address" onChange={e => updateAddress('origin', e.currentTarget.value)} onBlur={validateAddresses} />
+                                <Autocomplete placeholder='Address' types={['geocode']} onPlaceSelected={place => updateAddress('origin', place)} />
+                                <input type="text" value={addresses.origin.address_2} onChange={e => updateAddress('origin', e.currentTarget.value)} placeholder="Apt, suite, etc."  />
 
                             </div>
 
@@ -109,9 +111,10 @@ const Order = ({addresses = {origin: {val: ''}, destination: {val: ''}}, deliver
 
                     <Card accent='#2b9bd2' style={{marginBottom: '1px'}} title="Destination" content={<p>Where your shipment will end.</p>}>
 
-                        <div className="footer" style={{background: 'rgba(0, 0, 0, .05)', padding: '10px'}}>
+                        <div className="footer" style={{background: 'rgba(0, 0, 0, .05)'}}>
 
-                            <input type="text" value={addresses.destination.val} placeholder="Address" onChange={e => updateAddress('destination', e.currentTarget.value)} onBlur={validateAddresses} />
+                            <Autocomplete placeholder='Address' types={['geocode']} onPlaceSelected={place => updateAddress('destination', place)} />
+                            <input type="text" value={addresses.destination.address_2} onChange={e => updateAddress('destination', e.currentTarget.value)} placeholder="Apt, suite, etc."  />
 
                         </div>
 
@@ -139,9 +142,7 @@ const Order = ({addresses = {origin: {val: ''}, destination: {val: ''}}, deliver
 
                         </Content>
 
-                        <div className="footer" style={{background: 'rgba(0, 0, 0, .05)', padding: '10px'}}>
-
-                            {/*<input type="text" placeholder="Date" value={date.toDateString()} onChange={e => updateAddress('origin', e.currentTarget.value)} />*/}
+                        <div className="footer" style={{background: 'rgba(0, 0, 0, .05)'}}>
 
                             <DatePicker selected={deliveryDate} dateFormat={'dddd, MMMM D YYYY'} minDate={moment().add(1, 'days')} onChange={updateDeliveryDate} />
 
