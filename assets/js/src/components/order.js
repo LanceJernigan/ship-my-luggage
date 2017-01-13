@@ -51,7 +51,7 @@ const AfterCalc = ({fetching, rates, children, deliveryDate}) => {
 
         return (
 
-            <Card accent='#fff' title="Searching for lowest prices..." className="sml_center" style={{background: '#2b9bd2', marginTop: '10px'}}>
+            <Card accent='#fff' title="Calculating lowest prices..." className="sml_center" style={{background: '#2b9bd2', marginTop: '10px'}}>
 
             </Card>
 

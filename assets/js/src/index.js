@@ -34,6 +34,9 @@ class App extends React.Component {
                 delivery: 'FEDEX_GROUND',
                 total: 0,
             },
+            stripe: {
+                publishableKey: window.sml.stripePublishableKey || false
+            },
             displayTotal: false,
             checkout: this.prePopulateDefaults('checkout'),
             errors: [],
@@ -60,6 +63,7 @@ class App extends React.Component {
     prePopulateDefaults = key => {
 
         const _defaults = {
+            card: {},
             checkout: {
                 active: false,
                 fields: {
@@ -102,6 +106,26 @@ class App extends React.Component {
                     country: {
                         value: '',
                         required: true
+                    },
+                    creditCard: {
+                        value: '',
+                        required: true,
+                        removeBeforeSend: true
+                    },
+                    cvc: {
+                        value: '',
+                        required: true,
+                        removeBeforeSend: true
+                    },
+                    expMonth: {
+                        value: '',
+                        required: true,
+                        removeBeforeSend: true
+                    },
+                    expYear: {
+                        value: '',
+                        required: true,
+                        removeBeforeSend: true
                     }
                 }
             }
@@ -285,24 +309,6 @@ class App extends React.Component {
 
     updateCheckout = props => {
 
-        const actions = {
-            address: props => {
-                return {
-                    ...this.state.checkout.address,
-                    ['line' + props.line]: props.value
-                }
-            },
-            name: props => {
-                return {
-                    ...this.state.checkout.name,
-                    [props.name]: props.value
-                }
-            },
-            default: props => {
-                return props.value
-            }
-        }
-
         this.setState({
             ...this.state,
             checkout: {
@@ -311,7 +317,7 @@ class App extends React.Component {
                     ...this.state.checkout.fields,
                     [props.type]: {
                         ...this.state.checkout.fields[props.type],
-                        value: props.value
+                        ...props
                     }
                 }
             }
@@ -372,15 +378,49 @@ class App extends React.Component {
 
     }
 
+    setupStripe = () => {
+
+        Stripe.setPublishableKey(this.state.stripe.publishableKey)
+
+        this.setState({
+            ...this.state,
+            stripe: {
+                ...this.state.stripe,
+                setup: true
+            }
+        })
+
+        setTimeout(this.createStripeToken, 0)
+
+    }
+
     createStripeToken = () => {
 
-        Stripe.setPublishableKey(window.sml.stripePublishableKey)
+        if (this.state.stripe.setup !== true) {
+
+            if (this.state.stripe.publishableKey === false) {
+
+                this.setState({
+                    ...this.state,
+                    errors: [
+                        'There was an error with Stripe, please try again and contact us if the problem persists.'
+                    ]
+                })
+
+                return
+
+            }
+
+            this.setupStripe()
+            return
+
+        }
 
         Stripe.createToken({
-            number: 4242424242424242,
-            cvc: 123,
-            exp_month: 10,
-            exp_year: 20
+            number: this.state.checkout.fields.creditCard.value,
+            cvc: this.state.checkout.fields.cvc.value,
+            exp_month: this.state.checkout.fields.expMonth.value,
+            exp_year: this.state.checkout.fields.expYear.value
         }, this.updateStripeToken)
 
     }
@@ -422,7 +462,7 @@ class App extends React.Component {
         this.sml_ajax({
             data: {
                 action: 'sml_checkout',
-                checkout: this.state.checkout,
+                checkout: this.filterCheckoutBeforeSend(),
                 order: this.state.order,
                 stripe_token: this.state.order.stripeToken
             },
@@ -432,7 +472,7 @@ class App extends React.Component {
 
                 if (errors && errors.length) {
 
-                    console.log('errors')
+                    console.log(errors)
 
                 } else {
 
@@ -442,6 +482,12 @@ class App extends React.Component {
 
             }
         })
+
+    }
+
+    filterCheckoutBeforeSend = () => {
+
+        return this.state.checkout
 
     }
 
@@ -503,7 +549,7 @@ class App extends React.Component {
             ...this.state,
             order: {
                 ...this.state.order,
-                date: val.toISOString()
+                date: val !== null ? val.toISOString() : null
             }
         })
 

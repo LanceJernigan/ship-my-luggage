@@ -171,6 +171,70 @@ const Checkout = ({checkout, updateCheckout, processCheckout}) => {
 
             </Row>
 
+            <Row style={{alignItems: 'flex-start', marginTop: '10px'}}>
+
+                <Column>
+
+                    <Card accent='#2b9bd2' style={{marginBottom: '1px'}} title="Credit Card">
+
+                        <div className="footer" style={{background: 'rgba(0, 0, 0, .05)'}}>
+
+                            <input type="text" value={checkout.fields.creditCard.value} placeholder="Card Number" onChange={e => updateCheckout({type: 'creditCard', value: e.currentTarget.value})} />
+
+                        </div>
+
+                    </Card>
+
+                </Column>
+
+            </Row>
+
+            <Row style={{alignItems: 'flex-start'}}>
+
+                <Column columns={3} width={1}>
+
+                    <Card accent='#2b9bd2' style={{marginBottom: '1px'}} title="CVC">
+
+                        <div className="footer" style={{background: 'rgba(0, 0, 0, .05)'}}>
+
+                            <input type="text" value={checkout.fields.cvc.value} placeholder="CVC" onChange={e => updateCheckout({type: 'cvc', value: e.currentTarget.value})} />
+
+                        </div>
+
+                    </Card>
+
+                </Column>
+
+                <Column columns={3} width={1}>
+
+                    <Card accent='#2b9bd2' style={{marginBottom: '1px'}} title="Expiration Month">
+
+                        <div className="footer" style={{background: 'rgba(0, 0, 0, .05)'}}>
+
+                            <input type="text" value={checkout.fields.expMonth.value} placeholder="00" onChange={e => updateCheckout({type: 'expMonth', value: e.currentTarget.value})} />
+
+                        </div>
+
+                    </Card>
+
+                </Column>
+
+                <Column columns={3} width={1}>
+
+                    <Card accent='#2b9bd2' style={{marginBottom: '1px'}} title="Expiration Year">
+
+                        <div className="footer" style={{background: 'rgba(0, 0, 0, .05)'}}>
+
+                            <input type="text" value={checkout.fields.expYear.value} placeholder="00" onChange={e => updateCheckout({type: 'expYear', value: e.currentTarget.value})} />
+
+                        </div>
+
+                    </Card>
+
+                </Column>
+
+            </Row>
+
             <Row style={{alignItems: 'flex-start'}}>
 
                 <Column>

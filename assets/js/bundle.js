@@ -27667,6 +27667,9 @@ var App = function (_React$Component) {
                 delivery: 'FEDEX_GROUND',
                 total: 0
             },
+            stripe: {
+                publishableKey: window.sml.stripePublishableKey || false
+            },
             displayTotal: false,
             checkout: _this.prePopulateDefaults('checkout'),
             errors: [],
@@ -27714,6 +27717,7 @@ var _initialiseProps = function _initialiseProps() {
     this.prePopulateDefaults = function (key) {
 
         var _defaults = {
+            card: {},
             checkout: {
                 active: false,
                 fields: {
@@ -27756,6 +27760,26 @@ var _initialiseProps = function _initialiseProps() {
                     country: {
                         value: '',
                         required: true
+                    },
+                    creditCard: {
+                        value: '',
+                        required: true,
+                        removeBeforeSend: true
+                    },
+                    cvc: {
+                        value: '',
+                        required: true,
+                        removeBeforeSend: true
+                    },
+                    expMonth: {
+                        value: '',
+                        required: true,
+                        removeBeforeSend: true
+                    },
+                    expYear: {
+                        value: '',
+                        required: true,
+                        removeBeforeSend: true
                     }
                 }
             }
@@ -27913,23 +27937,9 @@ var _initialiseProps = function _initialiseProps() {
 
     this.updateCheckout = function (props) {
 
-        var actions = {
-            address: function address(props) {
-                return _extends({}, _this2.state.checkout.address, _defineProperty({}, 'line' + props.line, props.value));
-            },
-            name: function name(props) {
-                return _extends({}, _this2.state.checkout.name, _defineProperty({}, props.name, props.value));
-            },
-            default: function _default(props) {
-                return props.value;
-            }
-        };
-
         _this2.setState(_extends({}, _this2.state, {
             checkout: _extends({}, _this2.state.checkout, {
-                fields: _extends({}, _this2.state.checkout.fields, _defineProperty({}, props.type, _extends({}, _this2.state.checkout.fields[props.type], {
-                    value: props.value
-                })))
+                fields: _extends({}, _this2.state.checkout.fields, _defineProperty({}, props.type, _extends({}, _this2.state.checkout.fields[props.type], props)))
             })
         }));
     };
@@ -27979,15 +27989,41 @@ var _initialiseProps = function _initialiseProps() {
         setTimeout(_this2.submit, 0);
     };
 
+    this.setupStripe = function () {
+
+        Stripe.setPublishableKey(_this2.state.stripe.publishableKey);
+
+        _this2.setState(_extends({}, _this2.state, {
+            stripe: _extends({}, _this2.state.stripe, {
+                setup: true
+            })
+        }));
+
+        setTimeout(_this2.createStripeToken, 0);
+    };
+
     this.createStripeToken = function () {
 
-        Stripe.setPublishableKey(window.sml.stripePublishableKey);
+        if (_this2.state.stripe.setup !== true) {
+
+            if (_this2.state.stripe.publishableKey === false) {
+
+                _this2.setState(_extends({}, _this2.state, {
+                    errors: ['There was an error with Stripe, please try again and contact us if the problem persists.']
+                }));
+
+                return;
+            }
+
+            _this2.setupStripe();
+            return;
+        }
 
         Stripe.createToken({
-            number: 4242424242424242,
-            cvc: 123,
-            exp_month: 10,
-            exp_year: 20
+            number: _this2.state.checkout.fields.creditCard.value,
+            cvc: _this2.state.checkout.fields.cvc.value,
+            exp_month: _this2.state.checkout.fields.expMonth.value,
+            exp_year: _this2.state.checkout.fields.expYear.value
         }, _this2.updateStripeToken);
     };
 
@@ -28021,7 +28057,7 @@ var _initialiseProps = function _initialiseProps() {
         _this2.sml_ajax({
             data: {
                 action: 'sml_checkout',
-                checkout: _this2.state.checkout,
+                checkout: _this2.filterCheckoutBeforeSend(),
                 order: _this2.state.order,
                 stripe_token: _this2.state.order.stripeToken
             },
@@ -28033,13 +28069,18 @@ var _initialiseProps = function _initialiseProps() {
 
                 if (errors && errors.length) {
 
-                    console.log('errors');
+                    console.log(errors);
                 } else {
 
                     window.location = '/my-account/orders/';
                 }
             }
         });
+    };
+
+    this.filterCheckoutBeforeSend = function () {
+
+        return _this2.state.checkout;
     };
 
     this.sml_ajax = function (props) {
@@ -28089,7 +28130,7 @@ var _initialiseProps = function _initialiseProps() {
 
         _this2.setState(_extends({}, _this2.state, {
             order: _extends({}, _this2.state.order, {
-                date: val.toISOString()
+                date: val !== null ? val.toISOString() : null
             })
         }));
     };
@@ -28339,6 +28380,74 @@ var Checkout = function Checkout(_ref) {
                         { className: 'footer', style: { background: 'rgba(0, 0, 0, .05)' } },
                         _react2.default.createElement('input', { type: 'text', value: checkout.fields.postcode.value, placeholder: 'Postcode', onChange: function onChange(e) {
                                 return updateCheckout({ type: 'postcode', value: e.currentTarget.value });
+                            } })
+                    )
+                )
+            )
+        ),
+        _react2.default.createElement(
+            _row2.default,
+            { style: { alignItems: 'flex-start', marginTop: '10px' } },
+            _react2.default.createElement(
+                _column2.default,
+                null,
+                _react2.default.createElement(
+                    _card2.default,
+                    { accent: '#2b9bd2', style: { marginBottom: '1px' }, title: 'Credit Card' },
+                    _react2.default.createElement(
+                        'div',
+                        { className: 'footer', style: { background: 'rgba(0, 0, 0, .05)' } },
+                        _react2.default.createElement('input', { type: 'text', value: checkout.fields.creditCard.value, placeholder: 'Card Number', onChange: function onChange(e) {
+                                return updateCheckout({ type: 'creditCard', value: e.currentTarget.value });
+                            } })
+                    )
+                )
+            )
+        ),
+        _react2.default.createElement(
+            _row2.default,
+            { style: { alignItems: 'flex-start' } },
+            _react2.default.createElement(
+                _column2.default,
+                { columns: 3, width: 1 },
+                _react2.default.createElement(
+                    _card2.default,
+                    { accent: '#2b9bd2', style: { marginBottom: '1px' }, title: 'CVC' },
+                    _react2.default.createElement(
+                        'div',
+                        { className: 'footer', style: { background: 'rgba(0, 0, 0, .05)' } },
+                        _react2.default.createElement('input', { type: 'text', value: checkout.fields.cvc.value, placeholder: 'CVC', onChange: function onChange(e) {
+                                return updateCheckout({ type: 'cvc', value: e.currentTarget.value });
+                            } })
+                    )
+                )
+            ),
+            _react2.default.createElement(
+                _column2.default,
+                { columns: 3, width: 1 },
+                _react2.default.createElement(
+                    _card2.default,
+                    { accent: '#2b9bd2', style: { marginBottom: '1px' }, title: 'Expiration Month' },
+                    _react2.default.createElement(
+                        'div',
+                        { className: 'footer', style: { background: 'rgba(0, 0, 0, .05)' } },
+                        _react2.default.createElement('input', { type: 'text', value: checkout.fields.expMonth.value, placeholder: '00', onChange: function onChange(e) {
+                                return updateCheckout({ type: 'expMonth', value: e.currentTarget.value });
+                            } })
+                    )
+                )
+            ),
+            _react2.default.createElement(
+                _column2.default,
+                { columns: 3, width: 1 },
+                _react2.default.createElement(
+                    _card2.default,
+                    { accent: '#2b9bd2', style: { marginBottom: '1px' }, title: 'Expiration Year' },
+                    _react2.default.createElement(
+                        'div',
+                        { className: 'footer', style: { background: 'rgba(0, 0, 0, .05)' } },
+                        _react2.default.createElement('input', { type: 'text', value: checkout.fields.expYear.value, placeholder: '00', onChange: function onChange(e) {
+                                return updateCheckout({ type: 'expYear', value: e.currentTarget.value });
                             } })
                     )
                 )
@@ -28745,7 +28854,7 @@ var AfterCalc = function AfterCalc(_ref) {
         }
     } else if (fetching) {
 
-        return _react2.default.createElement(_card2.default, { accent: '#fff', title: 'Searching for lowest prices...', className: 'sml_center', style: { background: '#2b9bd2', marginTop: '10px' } });
+        return _react2.default.createElement(_card2.default, { accent: '#fff', title: 'Calculating lowest prices...', className: 'sml_center', style: { background: '#2b9bd2', marginTop: '10px' } });
     }
 
     return null;

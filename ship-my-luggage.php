@@ -32,11 +32,11 @@
 
     function sml_redirect() {
 
-//        if (is_page('checkout')) {
-//
-//            wp_redirect(site_url('/?checkout=true'));
-//
-//        }
+        if (is_page('checkout')) {
+
+            wp_redirect(site_url('/?checkout=true'));
+
+        }
 
     }
 
@@ -75,7 +75,7 @@
             'checkout' => get_sml_checkout_defaults(),
             'isLoggedIn' => is_user_logged_in() ? 'true' : 'false',
 //            'stripePublishableKey' => 'yes' === get_option( 'testmode' ) ? get_option( 'test_publishable_key' ) : get_option( 'publishable_key' )
-            'stipePublishableKey' => 'pk_test_2wIawfCbJ3eYi9auAgzyzvs6'
+            'stripePublishableKey' => 'pk_test_2wIawfCbJ3eYi9auAgzyzvs6'
         ]);
 
         return '<div id="mount"></div>';
@@ -531,10 +531,13 @@
 
             $response = $client->getRates($request);
 
-            if ($response->HighestSeverity !== 'ERROR') {
+            if ($response->HighestSeverity !== 'ERROR' && isset($response->RateReplyDetails)) {
 
                 return apply_filters('sml_product_rate', $response->RateReplyDetails);
 
+            } else {
+
+                return;
             }
 
         } catch (SoapFault $exception) {
@@ -606,15 +609,5 @@
             error_log("*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*");
         }
     }
-
-    function sml_delete_this_function($request, $api) {
-
-        _log($request, $api);
-
-        return $request;
-
-    }
-
-    add_filter('woocommerce_stripe_request_body', 'sml_delete_this_function', 10, 2)
 
 ?>
