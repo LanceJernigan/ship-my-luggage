@@ -576,7 +576,7 @@ class App extends React.Component {
 
     validateCheckout = (key, value) => {
 
-        const ret = Object.keys(this.state.checkout.fields).filter( k => {
+        return Object.keys(this.state.checkout.fields).filter( k => {
 
                 const field = this.state.checkout.fields[k]
 
@@ -586,11 +586,7 @@ class App extends React.Component {
 
                 return (field.hasOwnProperty('required') && field.required === true) ? field.value.length === 0 : false
 
-            })
-
-        console.log(ret)
-
-        return ret.length === 0
+            }).length === 0
 
     }
 

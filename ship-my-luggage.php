@@ -68,14 +68,16 @@
         wp_enqueue_script('sml_order');
         wp_enqueue_script('stripe');
 
+        $stripeSettings = get_option('woocommerce_stripe_settings');
+
         wp_localize_script('sml_order', 'sml', [
             'ajax_url' => admin_url('admin-ajax.php'),
             'products' => get_sml_products(),
             'gettingStarted' => get_page_by_title('Getting Started'),
             'checkout' => get_sml_checkout_defaults(),
             'isLoggedIn' => is_user_logged_in() ? 'true' : 'false',
-//            'stripePublishableKey' => 'yes' === get_option( 'testmode' ) ? get_option( 'test_publishable_key' ) : get_option( 'publishable_key' )
-            'stripePublishableKey' => 'pk_test_2wIawfCbJ3eYi9auAgzyzvs6'
+            'productMarkup' => '10',
+            'stripePublishableKey' => 'yes' === $stripeSettings['testmode'] ? $stripeSettings['test_publishable_key'] : $stripeSettings['publishable_key']
         ]);
 
         return '<div id="mount"></div>';
@@ -188,8 +190,6 @@
         $_checkout = isset($_POST['checkout']) ? $_POST['checkout'] : false;
         $_order = isset($_POST['order']) ? $_POST['order'] : false;
 
-        _log($_checkout);
-
         if ($_checkout === false || $_order === false) {
 
             wp_send_json([
@@ -218,17 +218,7 @@
             } else {
 
                 $username = $_checkout['fields']['first_name']['value'] . $_checkout['fields']['last_name']['value'];
-                $password = wp_generate_password($length = 12, true);
-                $user_id = wp_create_user($username, $password, $email);\
-
-                do_action('sml_new_user', $user_id, [
-                    'first_name' => $_checkout['fields']['first_name']['value'],
-                    'last_name' => $_checkout['fields']['last_name']['value'],
-                    'phone' => $_checkout['fields']['phone']['value'],
-                    'email' => $_checkout['fields']['email']['value'],
-                    'username' => $username,
-                    'password' => $password
-                ]);
+                $user_id = wc_create_new_customer($email, $username);
 
                 wp_set_auth_cookie($user_id);
 
@@ -237,6 +227,8 @@
             }
 
         }
+
+        do_action('sml_new_user', $current_user->ID, $_checkout['fields']);
 
         global $woocommerce;
 
@@ -325,28 +317,13 @@
 
         foreach ($user_data as $key => $val) {
 
-            update_user_meta($user_id, $key, $val);
+            update_user_meta($user_id, $key, $val['value']);
 
         }
 
     }
 
     add_action('sml_new_user', 'sml_input_new_user_meta', 10, 2);
-
-    /*
-     *  sml_new_user_email() - Send a user their new username and password
-     *
-     *      args - $user_id - id of user
-     *             $user_data - array of user data
-     */
-
-    function sml_new_user_email($user_id, $user_data) {
-
-        wp_mail($user_data['email'], 'Account Details', 'Hello ' . $user_data['username'] . ', your password is ' . $user_data['password'] . '.  You may change this password anytime by visiting your Ship My Luggage account.');
-
-    }
-
-    add_action('sml_new_user', 'sml_new_user_email', 10, 2);
 
     /*
      * sml_before_calculate_totals() - adjust product prices based on item data
@@ -423,11 +400,7 @@
 
             $value = get_user_meta($user_id, $key, true);
 
-            if (count($value) > 0) {
-
-                $billing[$key] = $value;
-
-            }
+            $billing[$key] = $value;
 
         }
 

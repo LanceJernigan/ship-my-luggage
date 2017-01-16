@@ -72,7 +72,7 @@
 .sml_card {
     width: 100%;
     box-shadow: 0px 2px 3px rgba(0, 0, 0, .2);
-    background: #fafbfc;
+    background: #f7fafc;
     overflow: hidden;
     z-index: 1;
     position: relative;

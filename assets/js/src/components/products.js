@@ -6,7 +6,8 @@ import Card from './card'
 
 const Content = ({product, deliveryType}) => {
 
-    const {price} = product.hasOwnProperty('rates') && Object.keys(product.rates).length > 0 && product.rates.hasOwnProperty(deliveryType) ? product.rates[deliveryType] : product
+    const price = product.hasOwnProperty('rates') && Object.keys(product.rates).length > 0 && product.rates.hasOwnProperty(deliveryType) ? parseFloat(product.rates[deliveryType].price) : parseFloat(product.price)
+    const markup = price * (window.sml.productMarkup ? (parseInt(window.sml.productMarkup) / 100) : 0)
 
     return (
 
@@ -14,7 +15,7 @@ const Content = ({product, deliveryType}) => {
 
             <Column>
 
-                <p><strong>{product.price ? 'Price:' : 'Starting:'}</strong> ${Math.round(price)}</p>
+                <p><strong>{product.price ? 'Price:' : 'Starting:'}</strong> ${Math.round(price + markup)}</p>
 
             </Column>
 

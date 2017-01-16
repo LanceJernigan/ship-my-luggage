@@ -28155,7 +28155,7 @@ var _initialiseProps = function _initialiseProps() {
 
     this.validateCheckout = function (key, value) {
 
-        var ret = Object.keys(_this2.state.checkout.fields).filter(function (k) {
+        return Object.keys(_this2.state.checkout.fields).filter(function (k) {
 
             var field = _this2.state.checkout.fields[k];
 
@@ -28164,11 +28164,7 @@ var _initialiseProps = function _initialiseProps() {
             }
 
             return field.hasOwnProperty('required') && field.required === true ? field.value.length === 0 : false;
-        });
-
-        console.log(ret);
-
-        return ret.length === 0;
+        }).length === 0;
     };
 };
 
@@ -29012,7 +29008,7 @@ var Order = function Order(_ref4) {
                                 return updateAddress('destination', place);
                             } }),
                         _react2.default.createElement('input', { type: 'text', value: addresses.destination.address_2, onChange: function onChange(e) {
-                                return updateAddress('destination', e.currentTarget.value);
+                                return updateAddress('destination', e.currentTarget.value, 'address_2');
                             }, placeholder: 'Apt, suite, etc.' })
                     )
                 )
@@ -29093,8 +29089,9 @@ var Content = function Content(_ref) {
     var product = _ref.product,
         deliveryType = _ref.deliveryType;
 
-    var _ref2 = product.hasOwnProperty('rates') && Object.keys(product.rates).length > 0 && product.rates.hasOwnProperty(deliveryType) ? product.rates[deliveryType] : product,
-        price = _ref2.price;
+
+    var price = product.hasOwnProperty('rates') && Object.keys(product.rates).length > 0 && product.rates.hasOwnProperty(deliveryType) ? parseFloat(product.rates[deliveryType].price) : parseFloat(product.price);
+    var markup = price * (window.sml.productMarkup ? parseInt(window.sml.productMarkup) / 100 : 0);
 
     return _react2.default.createElement(
         _row2.default,
@@ -29111,15 +29108,15 @@ var Content = function Content(_ref) {
                     product.price ? 'Price:' : 'Starting:'
                 ),
                 ' $',
-                Math.round(price)
+                Math.round(price + markup)
             )
         )
     );
 };
 
-var Footer = function Footer(_ref3) {
-    var product = _ref3.product,
-        updateQuantity = _ref3.updateQuantity;
+var Footer = function Footer(_ref2) {
+    var product = _ref2.product,
+        updateQuantity = _ref2.updateQuantity;
 
 
     return _react2.default.createElement(
@@ -29148,11 +29145,11 @@ var Footer = function Footer(_ref3) {
     );
 };
 
-var Products = function Products(_ref4) {
-    var _ref4$products = _ref4.products,
-        products = _ref4$products === undefined ? [] : _ref4$products,
-        updateQuantity = _ref4.updateQuantity,
-        deliveryType = _ref4.deliveryType;
+var Products = function Products(_ref3) {
+    var _ref3$products = _ref3.products,
+        products = _ref3$products === undefined ? [] : _ref3$products,
+        updateQuantity = _ref3.updateQuantity,
+        deliveryType = _ref3.deliveryType;
 
 
     return _react2.default.createElement(

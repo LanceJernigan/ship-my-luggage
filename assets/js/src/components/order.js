@@ -134,7 +134,7 @@ const Order = ({addresses = {origin: {val: ''}, destination: {val: ''}}, deliver
                         <div className="footer" style={{background: 'rgba(0, 0, 0, .05)'}}>
 
                             <Autocomplete value={addresses.destination.value} placeholder='Address' types={['geocode']} onPlaceSelected={place => updateAddress('destination', place)} />
-                            <input type="text" value={addresses.destination.address_2} onChange={e => updateAddress('destination', e.currentTarget.value)} placeholder="Apt, suite, etc."  />
+                            <input type="text" value={addresses.destination.address_2} onChange={e => updateAddress('destination', e.currentTarget.value, 'address_2')} placeholder="Apt, suite, etc."  />
 
                         </div>
 
