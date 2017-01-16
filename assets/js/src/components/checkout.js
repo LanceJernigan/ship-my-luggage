@@ -5,7 +5,33 @@ import Column from './column'
 import Content from './content'
 import Card from './card'
 
-const Checkout = ({checkout, updateCheckout, processCheckout}) => {
+const CheckoutButton = ({checkoutValid = false, processCheckout}) => {
+
+    if (checkoutValid === true) {
+
+        return (
+
+            <Row style={{alignItems: 'flex-start'}}>
+
+                <Column>
+
+                    <Card onClick={processCheckout} accent='#fff' title="Checkout" className="sml_center" style={{background: '#2b9bd2', marginTop: '10px'}}>
+
+                    </Card>
+
+                </Column>
+
+            </Row>
+
+        )
+
+    }
+
+    return null
+
+}
+
+const Checkout = ({checkout, updateCheckout, processCheckout, checkoutValid = false}) => {
 
     return (
 
@@ -235,17 +261,7 @@ const Checkout = ({checkout, updateCheckout, processCheckout}) => {
 
             </Row>
 
-            <Row style={{alignItems: 'flex-start'}}>
-
-                <Column>
-
-                    <Card onClick={processCheckout} accent='#fff' title="Checkout" className="sml_center" style={{background: '#2b9bd2', marginTop: '10px'}}>
-
-                    </Card>
-
-                </Column>
-
-            </Row>
+            <CheckoutButton checkoutValid={checkoutValid} processCheckout={processCheckout} />
 
         </Row>
 

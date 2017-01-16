@@ -63,9 +63,9 @@ class App extends React.Component {
     prePopulateDefaults = key => {
 
         const _defaults = {
-            card: {},
             checkout: {
                 active: false,
+                valid: false,
                 fields: {
                     first_name: {
                         value: '',
@@ -155,7 +155,7 @@ class App extends React.Component {
 
     }
 
-    updateAddress = (target, value) => {
+    updateAddress = (target, value, key) => {
 
         if (this.state.order.addresses[target].val !== value) {
 
@@ -166,7 +166,7 @@ class App extends React.Component {
                         ...this.state.order.addresses,
                         [target]: {
                             ...this.state.order.addresses[target],
-                            ...this.formatAddress(value)
+                            ...this.formatAddress(value, key)
                         }
                     }
                 }
@@ -178,14 +178,15 @@ class App extends React.Component {
 
     }
 
-    formatAddress = value => {
+    formatAddress = (value, key = 'value') => {
 
         if (typeof value === 'string')
-            return {address_2: value}
+            return {[key]: value}
 
         const getValueByType = type => value.address_components.filter( ac => ac.types.indexOf(type) > -1).shift()
 
         return {
+            value: value.formatted_address,
             address_1: getValueByType('street_number').long_name + ' ' + getValueByType('route').long_name,
             city: getValueByType('locality').long_name,
             state: getValueByType('administrative_area_level_1').long_name,
@@ -319,9 +320,12 @@ class App extends React.Component {
                         ...this.state.checkout.fields[props.type],
                         ...props
                     }
-                }
+                },
+                valid: this.validateCheckout(props.type, props.value)
             }
         })
+
+        setTimeout(this.validateCheckout, 0)
 
     }
 
@@ -487,7 +491,22 @@ class App extends React.Component {
 
     filterCheckoutBeforeSend = () => {
 
-        return this.state.checkout
+        return {
+            ...this.state.checkout,
+            fields: Object.keys(this.state.checkout.fields).reduce( (pre, key) => {
+
+                const field = this.state.checkout.fields[key]
+
+                if (! field.hasOwnProperty('removeBeforeSend')) {
+
+                    pre[key] = field
+
+                }
+
+                return pre
+
+            }, {})
+        }
 
     }
 
@@ -555,6 +574,26 @@ class App extends React.Component {
 
     }
 
+    validateCheckout = (key, value) => {
+
+        const ret = Object.keys(this.state.checkout.fields).filter( k => {
+
+                const field = this.state.checkout.fields[k]
+
+                if (key === k) {
+                    field.value = value
+                }
+
+                return (field.hasOwnProperty('required') && field.required === true) ? field.value.length === 0 : false
+
+            })
+
+        console.log(ret)
+
+        return ret.length === 0
+
+    }
+
     render() {
 
         window.history.replaceState(JSON.stringify(this.state), null, '')
@@ -569,7 +608,7 @@ class App extends React.Component {
 
                 <Lead dismiss={this.dismissLead} active={this.state.lead} />
 
-                {this.state.checkout.active && ! this.state.fetching && this.state.rates ? <Checkout checkout={this.state.checkout} updateCheckout={this.updateCheckout} processCheckout={this.processCheckout} /> : <Order updateAddress={this.updateAddress} validateAddresses={this.validateAddresses} updateQuantity={this.updateQuantity} processCheckout={this.processCheckout} submit={this.submit} addresses={this.state.order.addresses} products={this.state.order.products} deliveryDate={this.state.order.date} checkout={this.state.checkout} calculateTotal={this.calculateTotal} updateDelivery={this.updateDelivery} deliveryType={this.state.order.delivery} quickPay={this.quickPay} fetching={this.state.fetching} rates={this.state.rates} leadActive={this.state.lead} updateDeliveryDate={this.updateDeliveryDate} />}
+                {this.state.checkout.active && ! this.state.fetching && this.state.rates ? <Checkout checkout={this.state.checkout} updateCheckout={this.updateCheckout} processCheckout={this.processCheckout} checkoutValid={this.state.checkout.valid} /> : <Order updateAddress={this.updateAddress} validateAddresses={this.validateAddresses} updateQuantity={this.updateQuantity} processCheckout={this.processCheckout} submit={this.submit} addresses={this.state.order.addresses} products={this.state.order.products} deliveryDate={this.state.order.date} checkout={this.state.checkout} calculateTotal={this.calculateTotal} updateDelivery={this.updateDelivery} deliveryType={this.state.order.delivery} quickPay={this.quickPay} fetching={this.state.fetching} rates={this.state.rates} leadActive={this.state.lead} updateDeliveryDate={this.updateDeliveryDate} checkoutValid={this.state.checkout.valid} />}
 
             </div>
 

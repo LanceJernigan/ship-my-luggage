@@ -188,6 +188,8 @@
         $_checkout = isset($_POST['checkout']) ? $_POST['checkout'] : false;
         $_order = isset($_POST['order']) ? $_POST['order'] : false;
 
+        _log($_checkout);
+
         if ($_checkout === false || $_order === false) {
 
             wp_send_json([
@@ -223,7 +225,9 @@
                     'first_name' => $_checkout['fields']['first_name']['value'],
                     'last_name' => $_checkout['fields']['last_name']['value'],
                     'phone' => $_checkout['fields']['phone']['value'],
-                    'email' => $_checkout['fields']['email']['value']
+                    'email' => $_checkout['fields']['email']['value'],
+                    'username' => $username,
+                    'password' => $password
                 ]);
 
                 wp_set_auth_cookie($user_id);
@@ -311,15 +315,15 @@
     add_action('sml_update_user_billing', 'sml_update_user_billing');
 
     /*
-     *  sml_new_user() - Input new user meta into database
+     *  sml_input_new_user_meta() - Input new user meta into database
      *
      *      args - $user_id - id of user
      *             $user_data - array of user data
      */
 
-    function sml_new_user($user_id, $user_meta) {
+    function sml_input_new_user_meta($user_id, $user_data) {
 
-        foreach ($user_meta as $key => $val) {
+        foreach ($user_data as $key => $val) {
 
             update_user_meta($user_id, $key, $val);
 
@@ -327,7 +331,22 @@
 
     }
 
-    add_action('sml_new_user', 'sml_new_user', 10, 2);
+    add_action('sml_new_user', 'sml_input_new_user_meta', 10, 2);
+
+    /*
+     *  sml_new_user_email() - Send a user their new username and password
+     *
+     *      args - $user_id - id of user
+     *             $user_data - array of user data
+     */
+
+    function sml_new_user_email($user_id, $user_data) {
+
+        wp_mail($user_data['email'], 'Account Details', 'Hello ' . $user_data['username'] . ', your password is ' . $user_data['password'] . '.  You may change this password anytime by visiting your Ship My Luggage account.');
+
+    }
+
+    add_action('sml_new_user', 'sml_new_user_email', 10, 2);
 
     /*
      * sml_before_calculate_totals() - adjust product prices based on item data

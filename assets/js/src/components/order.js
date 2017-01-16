@@ -118,8 +118,8 @@ const Order = ({addresses = {origin: {val: ''}, destination: {val: ''}}, deliver
 
                             <div className="footer" style={{background: 'rgba(0, 0, 0, .05)'}}>
 
-                                <Autocomplete placeholder='Address' types={['geocode']} onPlaceSelected={place => updateAddress('origin', place)} />
-                                <input type="text" value={addresses.origin.address_2} onChange={e => updateAddress('origin', e.currentTarget.value)} placeholder="Apt, suite, etc."  />
+                                <Autocomplete value={addresses.origin.value} onChange={e => updateAddress('origin', e.currentTarget.value, 'value')} placeholder='Address' types={['geocode']} onPlaceSelected={place => updateAddress('origin', place)} />
+                                <input type="text" value={addresses.origin.address_2} onChange={e => updateAddress('origin', e.currentTarget.value, 'address_2')} placeholder="Apt, suite, etc."  />
 
                             </div>
 
@@ -133,7 +133,7 @@ const Order = ({addresses = {origin: {val: ''}, destination: {val: ''}}, deliver
 
                         <div className="footer" style={{background: 'rgba(0, 0, 0, .05)'}}>
 
-                            <Autocomplete placeholder='Address' types={['geocode']} onPlaceSelected={place => updateAddress('destination', place)} />
+                            <Autocomplete value={addresses.destination.value} placeholder='Address' types={['geocode']} onPlaceSelected={place => updateAddress('destination', place)} />
                             <input type="text" value={addresses.destination.address_2} onChange={e => updateAddress('destination', e.currentTarget.value)} placeholder="Apt, suite, etc."  />
 
                         </div>
@@ -176,7 +176,7 @@ const Order = ({addresses = {origin: {val: ''}, destination: {val: ''}}, deliver
 
                         <Continue onClick={submit} />
 
-                        <Quickpay checkout={checkout} quickPay={quickPay} />
+                        {/*<Quickpay checkout={checkout} quickPay={quickPay} />*/}
 
                     </AfterCalc>
 

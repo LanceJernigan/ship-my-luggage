@@ -12,7 +12,7 @@ const Content = ({content}) => content ? <Row className="content">{content}</Row
 
 const Footer = ({footer}) => footer ? <Row className="footer">{footer}</Row> : null
 
-const slugger = str => str.replace(' ', '_').toLowerCase()
+const slugger = str => str.replace(/ /g, '_').toLowerCase()
 
 class Card extends React.Component {
 

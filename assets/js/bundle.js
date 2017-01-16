@@ -8583,7 +8583,7 @@ var Footer = function Footer(_ref3) {
 };
 
 var slugger = function slugger(str) {
-    return str.replace(' ', '_').toLowerCase();
+    return str.replace(/ /g, '_').toLowerCase();
 };
 
 var Card = function (_React$Component) {
@@ -27698,7 +27698,7 @@ var App = function (_React$Component) {
                 _react2.default.createElement(_total2.default, { display: this.state.displayTotal, total: this.state.order.total }),
                 _react2.default.createElement(_errors2.default, { errors: this.state.errors }),
                 _react2.default.createElement(_lead2.default, { dismiss: this.dismissLead, active: this.state.lead }),
-                this.state.checkout.active && !this.state.fetching && this.state.rates ? _react2.default.createElement(_checkout2.default, { checkout: this.state.checkout, updateCheckout: this.updateCheckout, processCheckout: this.processCheckout }) : _react2.default.createElement(_order2.default, { updateAddress: this.updateAddress, validateAddresses: this.validateAddresses, updateQuantity: this.updateQuantity, processCheckout: this.processCheckout, submit: this.submit, addresses: this.state.order.addresses, products: this.state.order.products, deliveryDate: this.state.order.date, checkout: this.state.checkout, calculateTotal: this.calculateTotal, updateDelivery: this.updateDelivery, deliveryType: this.state.order.delivery, quickPay: this.quickPay, fetching: this.state.fetching, rates: this.state.rates, leadActive: this.state.lead, updateDeliveryDate: this.updateDeliveryDate })
+                this.state.checkout.active && !this.state.fetching && this.state.rates ? _react2.default.createElement(_checkout2.default, { checkout: this.state.checkout, updateCheckout: this.updateCheckout, processCheckout: this.processCheckout, checkoutValid: this.state.checkout.valid }) : _react2.default.createElement(_order2.default, { updateAddress: this.updateAddress, validateAddresses: this.validateAddresses, updateQuantity: this.updateQuantity, processCheckout: this.processCheckout, submit: this.submit, addresses: this.state.order.addresses, products: this.state.order.products, deliveryDate: this.state.order.date, checkout: this.state.checkout, calculateTotal: this.calculateTotal, updateDelivery: this.updateDelivery, deliveryType: this.state.order.delivery, quickPay: this.quickPay, fetching: this.state.fetching, rates: this.state.rates, leadActive: this.state.lead, updateDeliveryDate: this.updateDeliveryDate, checkoutValid: this.state.checkout.valid })
             );
         }
     }]);
@@ -27717,9 +27717,9 @@ var _initialiseProps = function _initialiseProps() {
     this.prePopulateDefaults = function (key) {
 
         var _defaults = {
-            card: {},
             checkout: {
                 active: false,
+                valid: false,
                 fields: {
                     first_name: {
                         value: '',
@@ -27806,13 +27806,13 @@ var _initialiseProps = function _initialiseProps() {
         return defaults;
     };
 
-    this.updateAddress = function (target, value) {
+    this.updateAddress = function (target, value, key) {
 
         if (_this2.state.order.addresses[target].val !== value) {
 
             _this2.setState({
                 order: _extends({}, _this2.state.order, {
-                    addresses: _extends({}, _this2.state.order.addresses, _defineProperty({}, target, _extends({}, _this2.state.order.addresses[target], _this2.formatAddress(value))))
+                    addresses: _extends({}, _this2.state.order.addresses, _defineProperty({}, target, _extends({}, _this2.state.order.addresses[target], _this2.formatAddress(value, key))))
                 })
             });
         }
@@ -27821,8 +27821,10 @@ var _initialiseProps = function _initialiseProps() {
     };
 
     this.formatAddress = function (value) {
+        var key = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 'value';
 
-        if (typeof value === 'string') return { address_2: value };
+
+        if (typeof value === 'string') return _defineProperty({}, key, value);
 
         var getValueByType = function getValueByType(type) {
             return value.address_components.filter(function (ac) {
@@ -27831,6 +27833,7 @@ var _initialiseProps = function _initialiseProps() {
         };
 
         return {
+            value: value.formatted_address,
             address_1: getValueByType('street_number').long_name + ' ' + getValueByType('route').long_name,
             city: getValueByType('locality').long_name,
             state: getValueByType('administrative_area_level_1').long_name,
@@ -27860,8 +27863,8 @@ var _initialiseProps = function _initialiseProps() {
                 products: _this2.state.order.products,
                 addresses: _this2.state.order.addresses
             },
-            success: function success(_ref) {
-                var rates = _ref.rates;
+            success: function success(_ref2) {
+                var rates = _ref2.rates;
 
 
                 _this2.setState(_extends({}, _this2.state, {
@@ -27939,9 +27942,12 @@ var _initialiseProps = function _initialiseProps() {
 
         _this2.setState(_extends({}, _this2.state, {
             checkout: _extends({}, _this2.state.checkout, {
-                fields: _extends({}, _this2.state.checkout.fields, _defineProperty({}, props.type, _extends({}, _this2.state.checkout.fields[props.type], props)))
+                fields: _extends({}, _this2.state.checkout.fields, _defineProperty({}, props.type, _extends({}, _this2.state.checkout.fields[props.type], props))),
+                valid: _this2.validateCheckout(props.type, props.value)
             })
         }));
+
+        setTimeout(_this2.validateCheckout, 0);
     };
 
     this.submit = function () {
@@ -27953,8 +27959,8 @@ var _initialiseProps = function _initialiseProps() {
                 action: 'sml_order',
                 order: _this2.state.order
             },
-            success: function success(_ref2) {
-                var errors = _ref2.errors;
+            success: function success(_ref3) {
+                var errors = _ref3.errors;
 
 
                 if (errors && errors.length) {
@@ -28061,8 +28067,8 @@ var _initialiseProps = function _initialiseProps() {
                 order: _this2.state.order,
                 stripe_token: _this2.state.order.stripeToken
             },
-            success: function success(_ref3) {
-                var errors = _ref3.errors;
+            success: function success(_ref4) {
+                var errors = _ref4.errors;
 
 
                 _this2.setState({ errors: errors });
@@ -28080,7 +28086,19 @@ var _initialiseProps = function _initialiseProps() {
 
     this.filterCheckoutBeforeSend = function () {
 
-        return _this2.state.checkout;
+        return _extends({}, _this2.state.checkout, {
+            fields: Object.keys(_this2.state.checkout.fields).reduce(function (pre, key) {
+
+                var field = _this2.state.checkout.fields[key];
+
+                if (!field.hasOwnProperty('removeBeforeSend')) {
+
+                    pre[key] = field;
+                }
+
+                return pre;
+            }, {})
+        });
     };
 
     this.sml_ajax = function (props) {
@@ -28133,6 +28151,24 @@ var _initialiseProps = function _initialiseProps() {
                 date: val !== null ? val.toISOString() : null
             })
         }));
+    };
+
+    this.validateCheckout = function (key, value) {
+
+        var ret = Object.keys(_this2.state.checkout.fields).filter(function (k) {
+
+            var field = _this2.state.checkout.fields[k];
+
+            if (key === k) {
+                field.value = value;
+            }
+
+            return field.hasOwnProperty('required') && field.required === true ? field.value.length === 0 : false;
+        });
+
+        console.log(ret);
+
+        return ret.length === 0;
     };
 };
 
@@ -28206,10 +28242,34 @@ var _card2 = _interopRequireDefault(_card);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-var Checkout = function Checkout(_ref) {
-    var checkout = _ref.checkout,
-        updateCheckout = _ref.updateCheckout,
+var CheckoutButton = function CheckoutButton(_ref) {
+    var _ref$checkoutValid = _ref.checkoutValid,
+        checkoutValid = _ref$checkoutValid === undefined ? false : _ref$checkoutValid,
         processCheckout = _ref.processCheckout;
+
+
+    if (checkoutValid === true) {
+
+        return _react2.default.createElement(
+            _row2.default,
+            { style: { alignItems: 'flex-start' } },
+            _react2.default.createElement(
+                _column2.default,
+                null,
+                _react2.default.createElement(_card2.default, { onClick: processCheckout, accent: '#fff', title: 'Checkout', className: 'sml_center', style: { background: '#2b9bd2', marginTop: '10px' } })
+            )
+        );
+    }
+
+    return null;
+};
+
+var Checkout = function Checkout(_ref2) {
+    var checkout = _ref2.checkout,
+        updateCheckout = _ref2.updateCheckout,
+        processCheckout = _ref2.processCheckout,
+        _ref2$checkoutValid = _ref2.checkoutValid,
+        checkoutValid = _ref2$checkoutValid === undefined ? false : _ref2$checkoutValid;
 
 
     return _react2.default.createElement(
@@ -28453,15 +28513,7 @@ var Checkout = function Checkout(_ref) {
                 )
             )
         ),
-        _react2.default.createElement(
-            _row2.default,
-            { style: { alignItems: 'flex-start' } },
-            _react2.default.createElement(
-                _column2.default,
-                null,
-                _react2.default.createElement(_card2.default, { onClick: processCheckout, accent: '#fff', title: 'Checkout', className: 'sml_center', style: { background: '#2b9bd2', marginTop: '10px' } })
-            )
-        )
+        _react2.default.createElement(CheckoutButton, { checkoutValid: checkoutValid, processCheckout: processCheckout })
     );
 };
 
@@ -28932,11 +28984,13 @@ var Order = function Order(_ref4) {
                     _react2.default.createElement(
                         'div',
                         { className: 'footer', style: { background: 'rgba(0, 0, 0, .05)' } },
-                        _react2.default.createElement(_reactGoogleAutocomplete2.default, { placeholder: 'Address', types: ['geocode'], onPlaceSelected: function onPlaceSelected(place) {
+                        _react2.default.createElement(_reactGoogleAutocomplete2.default, { value: addresses.origin.value, onChange: function onChange(e) {
+                                return updateAddress('origin', e.currentTarget.value, 'value');
+                            }, placeholder: 'Address', types: ['geocode'], onPlaceSelected: function onPlaceSelected(place) {
                                 return updateAddress('origin', place);
                             } }),
                         _react2.default.createElement('input', { type: 'text', value: addresses.origin.address_2, onChange: function onChange(e) {
-                                return updateAddress('origin', e.currentTarget.value);
+                                return updateAddress('origin', e.currentTarget.value, 'address_2');
                             }, placeholder: 'Apt, suite, etc.' })
                     )
                 )
@@ -28954,7 +29008,7 @@ var Order = function Order(_ref4) {
                     _react2.default.createElement(
                         'div',
                         { className: 'footer', style: { background: 'rgba(0, 0, 0, .05)' } },
-                        _react2.default.createElement(_reactGoogleAutocomplete2.default, { placeholder: 'Address', types: ['geocode'], onPlaceSelected: function onPlaceSelected(place) {
+                        _react2.default.createElement(_reactGoogleAutocomplete2.default, { value: addresses.destination.value, placeholder: 'Address', types: ['geocode'], onPlaceSelected: function onPlaceSelected(place) {
                                 return updateAddress('destination', place);
                             } }),
                         _react2.default.createElement('input', { type: 'text', value: addresses.destination.address_2, onChange: function onChange(e) {
@@ -28997,8 +29051,7 @@ var Order = function Order(_ref4) {
                     AfterCalc,
                     { fetching: fetching, rates: rates, deliveryDate: deliveryDate },
                     _react2.default.createElement(_deliveryOptions2.default, { products: products, calculateTotal: calculateTotal, deliveryType: deliveryType, updateDelivery: updateDelivery, deliveryDate: deliveryDate }),
-                    _react2.default.createElement(Continue, { onClick: submit }),
-                    _react2.default.createElement(Quickpay, { checkout: checkout, quickPay: quickPay })
+                    _react2.default.createElement(Continue, { onClick: submit })
                 )
             )
         )
