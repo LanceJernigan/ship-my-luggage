@@ -19,7 +19,7 @@ const DateLine = ({rate = {}, date}) => {
 
         <Content>
 
-            <p>{date.format('dddd, MMMM D YYYY - h:mm a')}</p>
+            <p>{date.format('dddd, MMMM D, YYYY - h:mm a')}</p>
 
         </Content>
 

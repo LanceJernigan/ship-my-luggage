@@ -641,6 +641,37 @@
 
     add_filter('woocommerce_get_settings_products', 'sml_product_settings', 10, 2);
 
+    /*
+     * sml_order_customer_details () - Custom Customer Details on Order
+     *
+     *     @params - $order - Order Data
+     */
+
+    function sml_order_customer_details($order) {
+
+        $origin = get_post_meta($order->id, 'origin', true);
+        $destination = get_post_meta($order->id, 'destination', true);
+        $delivery_date = get_post_meta($order->id, 'delivery_date', true);
+
+        include(untrailingslashit(plugin_dir_path(__FILE__)) . '/templates/order/customer-details.php');
+
+    }
+
+    add_action('woocommerce_order_details_after_customer_details', 'sml_order_customer_details');
+
+    function sml_admin_order_details($order) {
+
+        $origin = get_post_meta($order->id, 'origin', true);
+        $destination = get_post_meta($order->id, 'destination', true);
+        $delivery_date = get_post_meta($order->id, 'delivery_date', true);
+        $shipping_method = get_post_meta($order->id, 'shipping_method', true);
+
+        include(untrailingslashit(plugin_dir_path(__FILE__)) . '/templates/order/customer-details-admin.php');
+
+    }
+
+    add_action('woocommerce_admin_order_data_after_shipping_address', 'sml_admin_order_details');
+
     function _log( $message ) {
         if( WP_DEBUG === true ){
             error_log("*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*");

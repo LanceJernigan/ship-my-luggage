@@ -28579,7 +28579,7 @@ var DateLine = function DateLine(_ref) {
         _react2.default.createElement(
             'p',
             null,
-            date.format('dddd, MMMM D YYYY - h:mm a')
+            date.format('dddd, MMMM D, YYYY - h:mm a')
         )
     );
 };
