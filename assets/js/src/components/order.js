@@ -110,7 +110,7 @@ const Order = ({addresses = {origin: {val: ''}, destination: {val: ''}}, deliver
 
         <Row>
 
-            <Row style={{paddingTop: '15px'}}>
+            <Row style={{paddingTop: '45px'}}>
 
                 <Column columns={2} width={1} gutter={.2}>
 

@@ -31,6 +31,18 @@ class App extends React.Component {
                     return product
 
                 }),
+                shipping: [
+                    {
+                        name: 'Fedex Ground',
+                        type: 'FEDEX_GROUND',
+                        products: [
+                            {
+                                id: 126,
+                                price: 100
+                            }
+                        ]
+                    }
+                ],
                 delivery: 'FEDEX_GROUND',
                 total: 0,
             },

@@ -76,7 +76,7 @@
             'gettingStarted' => get_page_by_title('Getting Started'),
             'checkout' => get_sml_checkout_defaults(),
             'isLoggedIn' => is_user_logged_in() ? 'true' : 'false',
-            'productMarkup' => '10',
+            'productMarkup' => get_option('sml_product_markup'),
             'stripePublishableKey' => 'yes' === $stripeSettings['testmode'] ? $stripeSettings['test_publishable_key'] : $stripeSettings['publishable_key']
         ]);
 
@@ -580,6 +580,10 @@
 
     add_filter('sml_product_rate', 'sml_product_rate_filter', 10, 1);
 
+    /*
+     * sml_filter_product_rates() - Filter product rates before returned to the Ajax request
+     */
+
     function sml_filter_product_rates($products) {
 
         return $products;
@@ -587,6 +591,55 @@
     }
 
     add_filter('sml_filter_product_rates', 'sml_filter_product_rates', 10, 1);
+
+    /*
+     *  sml_product_settings() - Add a section to the Products tab in WooCommerce Settings
+     *
+     *      @params - $sections - $sections within the tab
+     */
+
+    function sml_product_section($sections) {
+
+        $sections['sml'] = 'Ship My Luggage';
+
+        return $sections;
+
+    }
+
+    add_filter( 'woocommerce_get_sections_products', 'sml_product_section' );
+
+    function sml_product_settings($settings, $current_section) {
+
+        if ($current_section === 'sml') {
+
+            $settings = [
+                [
+                    'name' => 'Ship My Luggage',
+                    'type' => 'title',
+                    'desc' => 'The following options are used to configure Ship My Luggage',
+                    'id' => 'sml_title'
+                ]
+            ];
+
+            $settings[] = [
+                'name' => 'Product Markup (percentage)',
+                'desc_tip' => 'This will add a markup fee to each product before a user sees the price.',
+                'id' => 'sml_product_markup',
+                'type' => 'number'
+            ];
+
+            $settings[] = [
+                'type' => 'sectionend',
+                'id' => 'sml'
+            ];
+
+        }
+
+        return $settings;
+
+    }
+
+    add_filter('woocommerce_get_settings_products', 'sml_product_settings', 10, 2);
 
     function _log( $message ) {
         if( WP_DEBUG === true ){

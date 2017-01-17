@@ -7,33 +7,23 @@ import Content from './content'
 
 import moment from 'moment'
 
-const timeString = date => {
-
-    const hours = date.getHours() % 12
-    const minutes = date.getMinutes()
-    const meridiem = date.getHours() < 12 ? 'am' : 'pm'
-
-    return (hours < 10 ? '0' + hours : hours) + ':' + (minutes < 10 ? '0' + minutes : minutes) + ' ' + meridiem
-
-}
-
 const DateLine = ({rate = {}, date}) => {
 
-    if (date !== false) {
+    if (date == false) {
 
-        return (
-
-            <Content>
-
-                <p>{date.format('dddd, MMMM D YYYY - h:mm a')}</p>
-
-            </Content>
-
-        )
+        date = moment().add(7, 'days')
 
     }
 
-    return <Content><p>Unknown</p></Content>
+    return (
+
+        <Content>
+
+            <p>{date.format('dddd, MMMM D YYYY - h:mm a')}</p>
+
+        </Content>
+
+    )
 
 }
 

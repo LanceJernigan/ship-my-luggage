@@ -27664,6 +27664,14 @@ var App = function (_React$Component) {
 
                     return product;
                 }),
+                shipping: [{
+                    name: 'Fedex Ground',
+                    type: 'FEDEX_GROUND',
+                    products: [{
+                        id: 126,
+                        price: 100
+                    }]
+                }],
                 delivery: 'FEDEX_GROUND',
                 total: 0
             },
@@ -28270,7 +28278,7 @@ var Checkout = function Checkout(_ref2) {
 
     return _react2.default.createElement(
         _row2.default,
-        { style: { marginTop: '35px' } },
+        { style: { marginTop: '45px' } },
         _react2.default.createElement(
             _row2.default,
             { style: { alignItems: 'flex-start' } },
@@ -28554,32 +28562,15 @@ var _moment2 = _interopRequireDefault(_moment);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-var timeString = function timeString(date) {
-
-    var hours = date.getHours() % 12;
-    var minutes = date.getMinutes();
-    var meridiem = date.getHours() < 12 ? 'am' : 'pm';
-
-    return (hours < 10 ? '0' + hours : hours) + ':' + (minutes < 10 ? '0' + minutes : minutes) + ' ' + meridiem;
-};
-
 var DateLine = function DateLine(_ref) {
     var _ref$rate = _ref.rate,
         rate = _ref$rate === undefined ? {} : _ref$rate,
         date = _ref.date;
 
 
-    if (date !== false) {
+    if (date == false) {
 
-        return _react2.default.createElement(
-            _content2.default,
-            null,
-            _react2.default.createElement(
-                'p',
-                null,
-                date.format('dddd, MMMM D YYYY - h:mm a')
-            )
-        );
+        date = (0, _moment2.default)().add(7, 'days');
     }
 
     return _react2.default.createElement(
@@ -28588,7 +28579,7 @@ var DateLine = function DateLine(_ref) {
         _react2.default.createElement(
             'p',
             null,
-            'Unknown'
+            date.format('dddd, MMMM D YYYY - h:mm a')
         )
     );
 };
@@ -28760,7 +28751,7 @@ var Lead = function Lead(_ref) {
         active = _ref$active === undefined ? true : _ref$active;
 
 
-    if (!active) return null;
+    if (!active || window.sml.isLoggedIn === 'true') return null;
 
     return _react2.default.createElement(
         _row2.default,
@@ -28966,7 +28957,7 @@ var Order = function Order(_ref4) {
         null,
         _react2.default.createElement(
             _row2.default,
-            { style: { paddingTop: '15px' } },
+            { style: { paddingTop: '45px' } },
             _react2.default.createElement(
                 _column2.default,
                 { columns: 2, width: 1, gutter: .2 },

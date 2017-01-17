@@ -6,7 +6,7 @@ import Card from './card'
 
 const Lead = ({dismiss, active = true}) => {
 
-    if (!active)
+    if (!active || window.sml.isLoggedIn === 'true')
         return null
 
     return (

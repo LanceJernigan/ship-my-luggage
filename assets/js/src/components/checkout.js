@@ -35,7 +35,7 @@ const Checkout = ({checkout, updateCheckout, processCheckout, checkoutValid = fa
 
     return (
 
-        <Row style={{marginTop: '35px'}}>
+        <Row style={{marginTop: '45px'}}>
 
             <Row style={{alignItems: 'flex-start'}}>
 
