@@ -533,7 +533,13 @@
 
                     if ($international) {
 
-                        _log($rate);
+                        _log($rate->RatedShipmentDetails->ShipmentRateDetail->TotalNetFedExCharge->Amount);
+
+                        $rates[] = [
+                            'deliveryDate' => isset($rate->DeliveryTimestamp) ? $rate->DeliveryTimestamp : date("Y-m-d h:i:s", mktime(0, 0, 0, date("m"), date("d")+7,   date("Y"))),
+                            'type' => $rate->ServiceType,
+                            'price' => $rate->RatedShipmentDetails->ShipmentRateDetail->TotalNetFedExCharge->Amount
+                        ];
 
                     } else {
 
