@@ -133,7 +133,7 @@ const Order = ({shipping = [], addresses = {origin: {val: ''}, destination: {val
 
                         <div className="footer" style={{background: 'rgba(0, 0, 0, .05)'}}>
 
-                            <Autocomplete value={addresses.destination.value} placeholder='Address' types={['geocode']} onPlaceSelected={place => updateAddress('destination', place)} />
+                            <Autocomplete value={addresses.destination.value} onChange={e => updateAddress('destination', e.currentTarget.value, 'value')} placeholder='Address' types={['geocode']} onPlaceSelected={place => updateAddress('destination', place)} />
                             <input type="text" value={addresses.destination.address_2} onChange={e => updateAddress('destination', e.currentTarget.value, 'address_2')} placeholder="Apt, suite, etc."  />
 
                         </div>
@@ -164,7 +164,7 @@ const Order = ({shipping = [], addresses = {origin: {val: ''}, destination: {val
 
                         <div className="footer" style={{background: 'rgba(0, 0, 0, .05)'}}>
 
-                            <DatePicker placeholderText='Date' withPortal selected={deliveryDate === null ? null : moment(deliveryDate)} dateFormat={'dddd, MMMM D YYYY'} minDate={moment().add(1, 'days')} onChange={updateDeliveryDate} />
+                            <DatePicker placeholderText='Date' withPortal selected={deliveryDate === null ? null : moment(deliveryDate)} dateFormat={'dddd, MMMM D, YYYY'} minDate={moment().add(1, 'days')} onChange={updateDeliveryDate} />
 
                         </div>
 

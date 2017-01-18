@@ -3,7 +3,7 @@
     /*
      *  Plugin Name:  Ship My Luggage
      *  Description:  Functionality for Ship My Luggage
-     *  Version:      0.0.3
+     *  Version:      0.0.29
      *  Author:       Lance Jernigan
      *  Author URI:   http://www.LanceJernigan.com
      */
@@ -599,7 +599,17 @@
 
         }
 
-        return $shipping;
+        $maxShipping = array_reduce($shipping, function ($max, $rate) {
+
+            return count($rate['products']) > $max ? count($rate['products']) : $max;
+
+        }, 0);
+
+        return array_filter($shipping, function ($rate)use($maxShipping) {
+
+            return count($rate['products']) === $maxShipping;
+
+        });
 
     }
 

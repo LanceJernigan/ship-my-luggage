@@ -28984,7 +28984,9 @@ var Order = function Order(_ref4) {
                     _react2.default.createElement(
                         'div',
                         { className: 'footer', style: { background: 'rgba(0, 0, 0, .05)' } },
-                        _react2.default.createElement(_reactGoogleAutocomplete2.default, { value: addresses.destination.value, placeholder: 'Address', types: ['geocode'], onPlaceSelected: function onPlaceSelected(place) {
+                        _react2.default.createElement(_reactGoogleAutocomplete2.default, { value: addresses.destination.value, onChange: function onChange(e) {
+                                return updateAddress('destination', e.currentTarget.value, 'value');
+                            }, placeholder: 'Address', types: ['geocode'], onPlaceSelected: function onPlaceSelected(place) {
                                 return updateAddress('destination', place);
                             } }),
                         _react2.default.createElement('input', { type: 'text', value: addresses.destination.address_2, onChange: function onChange(e) {
@@ -29020,7 +29022,7 @@ var Order = function Order(_ref4) {
                     _react2.default.createElement(
                         'div',
                         { className: 'footer', style: { background: 'rgba(0, 0, 0, .05)' } },
-                        _react2.default.createElement(_reactDatepicker2.default, { placeholderText: 'Date', withPortal: true, selected: deliveryDate === null ? null : (0, _moment2.default)(deliveryDate), dateFormat: 'dddd, MMMM D YYYY', minDate: (0, _moment2.default)().add(1, 'days'), onChange: updateDeliveryDate })
+                        _react2.default.createElement(_reactDatepicker2.default, { placeholderText: 'Date', withPortal: true, selected: deliveryDate === null ? null : (0, _moment2.default)(deliveryDate), dateFormat: 'dddd, MMMM D, YYYY', minDate: (0, _moment2.default)().add(1, 'days'), onChange: updateDeliveryDate })
                     )
                 ),
                 _react2.default.createElement(
