@@ -13,9 +13,9 @@ import moment from 'moment'
 
 require('../../../css/react-datepicker.css')
 
-const AfterCalc = ({fetching, rates, children, deliveryDate}) => {
+const AfterCalc = ({fetching, shipping, children, deliveryDate}) => {
 
-    if (! fetching && rates) {
+    if (! fetching && shipping.length) {
 
         if (deliveryDate) {
 
@@ -104,7 +104,7 @@ const Continue = ({onClick}) => {
 
 }
 
-const Order = ({addresses = {origin: {val: ''}, destination: {val: ''}}, deliveryDate, checkout = {}, products = [], deliveryType = 'FEDEX_GROUND', updateAddress, validateAddresses, updateQuantity, submit, quickPay, calculateTotal, updateDelivery, updateDeliveryDate, fetching = false, rates = false}) => {
+const Order = ({shipping = [], addresses = {origin: {val: ''}, destination: {val: ''}}, deliveryDate, checkout = {}, products = [], deliveryType = false, updateAddress, validateAddresses, updateQuantity, submit, quickPay, calculateTotal, updateDelivery, updateDeliveryDate, fetching = false, rates = false}) => {
 
     return (
 
@@ -148,7 +148,7 @@ const Order = ({addresses = {origin: {val: ''}, destination: {val: ''}}, deliver
 
                 <Column style={{marginTop: '10px'}} columns={2} width={1} gutter={.2}>
 
-                    <Products updateQuantity={updateQuantity} products={products} deliveryType={deliveryType} />
+                    <Products updateQuantity={updateQuantity} products={products} shipping={shipping} />
 
                 </Column>
 
@@ -170,9 +170,9 @@ const Order = ({addresses = {origin: {val: ''}, destination: {val: ''}}, deliver
 
                     </Card>
 
-                    <AfterCalc fetching={fetching} rates={rates} deliveryDate={deliveryDate}>
+                    <AfterCalc fetching={fetching} shipping={shipping} deliveryDate={deliveryDate}>
 
-                        <DeliveryOptions products={products} calculateTotal={calculateTotal} deliveryType={deliveryType} updateDelivery={updateDelivery} deliveryDate={deliveryDate} />
+                        <DeliveryOptions calculateTotal={calculateTotal} shipping={shipping} updateDelivery={updateDelivery} deliveryDate={deliveryDate} />
 
                         <Continue onClick={submit} />
 

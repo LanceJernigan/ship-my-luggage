@@ -27664,15 +27664,7 @@ var App = function (_React$Component) {
 
                     return product;
                 }),
-                shipping: [{
-                    name: 'Fedex Ground',
-                    type: 'FEDEX_GROUND',
-                    products: [{
-                        id: 126,
-                        price: 100
-                    }]
-                }],
-                delivery: 'FEDEX_GROUND',
+                shipping: [],
                 total: 0
             },
             stripe: {
@@ -27706,7 +27698,7 @@ var App = function (_React$Component) {
                 _react2.default.createElement(_total2.default, { display: this.state.displayTotal, total: this.state.order.total }),
                 _react2.default.createElement(_errors2.default, { errors: this.state.errors }),
                 _react2.default.createElement(_lead2.default, { dismiss: this.dismissLead, active: this.state.lead }),
-                this.state.checkout.active && !this.state.fetching && this.state.rates ? _react2.default.createElement(_checkout2.default, { checkout: this.state.checkout, updateCheckout: this.updateCheckout, processCheckout: this.processCheckout, checkoutValid: this.state.checkout.valid }) : _react2.default.createElement(_order2.default, { updateAddress: this.updateAddress, validateAddresses: this.validateAddresses, updateQuantity: this.updateQuantity, processCheckout: this.processCheckout, submit: this.submit, addresses: this.state.order.addresses, products: this.state.order.products, deliveryDate: this.state.order.date, checkout: this.state.checkout, calculateTotal: this.calculateTotal, updateDelivery: this.updateDelivery, deliveryType: this.state.order.delivery, quickPay: this.quickPay, fetching: this.state.fetching, rates: this.state.rates, leadActive: this.state.lead, updateDeliveryDate: this.updateDeliveryDate, checkoutValid: this.state.checkout.valid })
+                this.state.checkout.active && !this.state.fetching && this.state.rates ? _react2.default.createElement(_checkout2.default, { checkout: this.state.checkout, updateCheckout: this.updateCheckout, processCheckout: this.processCheckout, checkoutValid: this.state.checkout.valid }) : _react2.default.createElement(_order2.default, { shipping: this.state.order.shipping, updateAddress: this.updateAddress, validateAddresses: this.validateAddresses, updateQuantity: this.updateQuantity, processCheckout: this.processCheckout, submit: this.submit, addresses: this.state.order.addresses, products: this.state.order.products, deliveryDate: this.state.order.date, checkout: this.state.checkout, calculateTotal: this.calculateTotal, updateDelivery: this.updateDelivery, deliveryType: this.state.order.delivery, quickPay: this.quickPay, fetching: this.state.fetching, leadActive: this.state.lead, updateDeliveryDate: this.updateDeliveryDate, checkoutValid: this.state.checkout.valid })
             );
         }
     }]);
@@ -27861,7 +27853,6 @@ var _initialiseProps = function _initialiseProps() {
     this.requestProductRates = function () {
 
         _this2.setState(_extends({}, _this2.state, {
-            rates: false,
             fetching: true
         }));
 
@@ -27872,18 +27863,16 @@ var _initialiseProps = function _initialiseProps() {
                 addresses: _this2.state.order.addresses
             },
             success: function success(_ref2) {
-                var rates = _ref2.rates;
+                var shipping = _ref2.shipping;
 
+
+                console.log(shipping);
 
                 _this2.setState(_extends({}, _this2.state, {
                     fetching: false,
-                    rates: true,
                     order: _extends({}, _this2.state.order, {
-                        products: _this2.state.order.products.map(function (product, i) {
-
-                            product.rates = rates[i];
-
-                            return product;
+                        shipping: Object.keys(shipping).map(function (type) {
+                            return shipping[type];
                         })
                     })
                 }));
@@ -27921,25 +27910,49 @@ var _initialiseProps = function _initialiseProps() {
     };
 
     this.calculateTotal = function () {
-        var delivery = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 'FEDEX_GROUND';
+        var type = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : false;
 
 
-        return Math.round(_this2.state.order.products.reduce(function (tot, product) {
+        var rates = _this2.state.order.shipping.filter(function (rate) {
+            return type !== false ? rate.type === type : rate.hasOwnProperty('active') && rate.active === true;
+        }).shift();
 
-            var price = product.hasOwnProperty('rates') ? product.rates[delivery].price : product.price;
-            var quantity = product.quantity;
+        if (_this2.state.order.shipping.length && rates) {
 
-            tot += parseFloat(price) * quantity;
+            return Math.round(_this2.state.order.products.reduce(function (total, product) {
 
-            return tot;
-        }, 0));
+                var rate = rates.products.filter(function (_product) {
+                    return parseInt(_product.id) === parseInt(product.id);
+                }).shift();
+                var price = rate ? rate.price : 0;
+                var quantity = product.quantity;
+
+
+                total += parseFloat(price) * quantity;
+
+                return total;
+            }, 0));
+        } else {
+
+            return Math.round(_this2.state.order.products.reduce(function (total, product) {
+                var price = product.price;
+                var quantity = product.quantity;
+
+
+                total += parseFloat(price) * quantity;
+
+                return total;
+            }, 0));
+        }
     };
 
-    this.updateDelivery = function (delivery) {
+    this.updateDelivery = function (type) {
 
         _this2.setState(_extends({}, _this2.state, {
             order: _extends({}, _this2.state.order, {
-                delivery: delivery
+                shipping: _this2.state.order.shipping.map(function (rate) {
+                    return _extends({}, rate, { active: rate.type === type });
+                })
             })
         }));
 
@@ -28534,8 +28547,6 @@ Object.defineProperty(exports, "__esModule", {
     value: true
 });
 
-var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
-
 var _react = __webpack_require__(18);
 
 var _react2 = _interopRequireDefault(_react);
@@ -28562,101 +28573,77 @@ var _moment2 = _interopRequireDefault(_moment);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-var DateLine = function DateLine(_ref) {
-    var _ref$rate = _ref.rate,
-        rate = _ref$rate === undefined ? {} : _ref$rate,
-        date = _ref.date;
+var DeliveryOptions = function DeliveryOptions(_ref) {
+    var calculateTotal = _ref.calculateTotal,
+        updateDelivery = _ref.updateDelivery,
+        shipping = _ref.shipping,
+        deliveryDate = _ref.deliveryDate;
 
 
-    if (date == false) {
+    if (shipping.length) {
 
-        date = (0, _moment2.default)().add(7, 'days');
-    }
+        return _react2.default.createElement(
+            _card2.default,
+            { accent: '#2b9bd2', title: 'Delivery Options', onClick: 'toggle', style: { marginTop: '10px' }, toggle: 'toggle', active: true },
+            _react2.default.createElement(
+                _content2.default,
+                null,
+                _react2.default.createElement(
+                    'p',
+                    null,
+                    'Available shipping options.'
+                )
+            ),
+            _react2.default.createElement(
+                _row2.default,
+                null,
+                shipping.map(function (rate) {
 
-    return _react2.default.createElement(
-        _content2.default,
-        null,
-        _react2.default.createElement(
-            'p',
-            null,
-            date.format('dddd, MMMM D, YYYY - h:mm a')
-        )
-    );
-};
+                    var date = (0, _moment2.default)(rate.deliveryDate);
 
-var DeliveryOptions = function DeliveryOptions(_ref2) {
-    var products = _ref2.products,
-        calculateTotal = _ref2.calculateTotal,
-        updateDelivery = _ref2.updateDelivery,
-        deliveryType = _ref2.deliveryType,
-        deliveryDate = _ref2.deliveryDate;
+                    if (date.isBefore(deliveryDate)) {
 
-
-    if (products[0].hasOwnProperty('rates')) {
-        var _ret = function () {
-
-            var rates = products[0].rates;
-
-            return {
-                v: _react2.default.createElement(
-                    _card2.default,
-                    { accent: '#2b9bd2', title: 'Delivery Options', onClick: 'toggle', style: { marginTop: '10px' }, toggle: 'toggle', active: true },
-                    _react2.default.createElement(
-                        _content2.default,
-                        null,
-                        _react2.default.createElement(
-                            'p',
-                            null,
-                            'Available shipping options.'
-                        )
-                    ),
-                    _react2.default.createElement(
-                        _row2.default,
-                        null,
-                        Object.keys(rates).map(function (key) {
-
-                            var rate = rates[key];
-                            var date = rate.delivery !== null ? (0, _moment2.default)(rate.delivery) : false;
-
-                            if (key == 'FEDEX_GROUND' || date.isBefore(deliveryDate)) {
-
-                                return _react2.default.createElement(
-                                    _row2.default,
-                                    { className: 'delivery_option ' + (rate.type === deliveryType ? 'active' : 'deactive'), style: { background: '#eeeff0', borderTop: 'solid 1px rgba(0, 0, 0, .1)' }, key: key },
+                        return _react2.default.createElement(
+                            _row2.default,
+                            { className: 'delivery_option ' + (rate.active === true ? 'active' : 'deactive'), style: { background: '#eeeff0', borderTop: 'solid 1px rgba(0, 0, 0, .1)' }, key: rate.type },
+                            _react2.default.createElement(
+                                _column2.default,
+                                { columns: 6, width: 5, minWidth: 0, style: { flexWrap: 'wrap' } },
+                                _react2.default.createElement(
+                                    _card2.default,
+                                    { accent: '#2b9bd2', title: rate.name, style: { background: '#eeeff0' }, onClick: function onClick() {
+                                            return updateDelivery(rate.type);
+                                        } },
                                     _react2.default.createElement(
-                                        _column2.default,
-                                        { columns: 6, width: 5, minWidth: 0, style: { flexWrap: 'wrap' } },
+                                        _content2.default,
+                                        null,
                                         _react2.default.createElement(
-                                            _card2.default,
-                                            { accent: '#2b9bd2', title: rate.title, style: { background: '#eeeff0' }, onClick: function onClick() {
-                                                    return updateDelivery(rate.type);
-                                                } },
-                                            _react2.default.createElement(DateLine, { rate: rate, date: date })
-                                        )
-                                    ),
-                                    _react2.default.createElement(
-                                        _column2.default,
-                                        { columns: 6, width: 1, minWidth: 0, className: 'delivery_option--price', style: { background: rate.type === deliveryType ? '#2b9bd2' : 'rgba(0, 0, 0, .05)', display: 'flex', alignItems: 'center', justifyContent: 'center' } },
-                                        _react2.default.createElement(
-                                            'h4',
-                                            { onClick: function onClick() {
-                                                    return updateDelivery(rate.type);
-                                                } },
-                                            '$',
-                                            calculateTotal(rate.type)
+                                            'p',
+                                            null,
+                                            date.format('dddd, MMMM D, YYYY - h:mm a')
                                         )
                                     )
-                                );
-                            }
+                                )
+                            ),
+                            _react2.default.createElement(
+                                _column2.default,
+                                { columns: 6, width: 1, minWidth: 0, className: 'delivery_option--price', style: { background: rate.hasOwnProperty('active') && rate.active === true ? '#2b9bd2' : 'rgba(0, 0, 0, .05)', display: 'flex', alignItems: 'center', justifyContent: 'center' } },
+                                _react2.default.createElement(
+                                    'h4',
+                                    { onClick: function onClick() {
+                                            return updateDelivery(rate.type);
+                                        } },
+                                    '$',
+                                    calculateTotal(rate.type)
+                                )
+                            )
+                        );
+                    }
 
-                            return null;
-                        })
-                    )
-                )
-            };
-        }();
-
-        if ((typeof _ret === 'undefined' ? 'undefined' : _typeof(_ret)) === "object") return _ret.v;
+                    return null;
+                })
+            )
+        );
     }
 
     return null;
@@ -28861,12 +28848,12 @@ __webpack_require__(603);
 
 var AfterCalc = function AfterCalc(_ref) {
     var fetching = _ref.fetching,
-        rates = _ref.rates,
+        shipping = _ref.shipping,
         children = _ref.children,
         deliveryDate = _ref.deliveryDate;
 
 
-    if (!fetching && rates) {
+    if (!fetching && shipping.length) {
 
         if (deliveryDate) {
 
@@ -28929,7 +28916,9 @@ var Continue = function Continue(_ref3) {
 };
 
 var Order = function Order(_ref4) {
-    var _ref4$addresses = _ref4.addresses,
+    var _ref4$shipping = _ref4.shipping,
+        shipping = _ref4$shipping === undefined ? [] : _ref4$shipping,
+        _ref4$addresses = _ref4.addresses,
         addresses = _ref4$addresses === undefined ? { origin: { val: '' }, destination: { val: '' } } : _ref4$addresses,
         deliveryDate = _ref4.deliveryDate,
         _ref4$checkout = _ref4.checkout,
@@ -28937,7 +28926,7 @@ var Order = function Order(_ref4) {
         _ref4$products = _ref4.products,
         products = _ref4$products === undefined ? [] : _ref4$products,
         _ref4$deliveryType = _ref4.deliveryType,
-        deliveryType = _ref4$deliveryType === undefined ? 'FEDEX_GROUND' : _ref4$deliveryType,
+        deliveryType = _ref4$deliveryType === undefined ? false : _ref4$deliveryType,
         updateAddress = _ref4.updateAddress,
         validateAddresses = _ref4.validateAddresses,
         updateQuantity = _ref4.updateQuantity,
@@ -29011,7 +29000,7 @@ var Order = function Order(_ref4) {
             _react2.default.createElement(
                 _column2.default,
                 { style: { marginTop: '10px' }, columns: 2, width: 1, gutter: .2 },
-                _react2.default.createElement(_products2.default, { updateQuantity: updateQuantity, products: products, deliveryType: deliveryType })
+                _react2.default.createElement(_products2.default, { updateQuantity: updateQuantity, products: products, shipping: shipping })
             ),
             _react2.default.createElement(
                 _column2.default,
@@ -29036,8 +29025,8 @@ var Order = function Order(_ref4) {
                 ),
                 _react2.default.createElement(
                     AfterCalc,
-                    { fetching: fetching, rates: rates, deliveryDate: deliveryDate },
-                    _react2.default.createElement(_deliveryOptions2.default, { products: products, calculateTotal: calculateTotal, deliveryType: deliveryType, updateDelivery: updateDelivery, deliveryDate: deliveryDate }),
+                    { fetching: fetching, shipping: shipping, deliveryDate: deliveryDate },
+                    _react2.default.createElement(_deliveryOptions2.default, { calculateTotal: calculateTotal, shipping: shipping, updateDelivery: updateDelivery, deliveryDate: deliveryDate }),
                     _react2.default.createElement(Continue, { onClick: submit })
                 )
             )
@@ -29078,11 +29067,25 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 
 var Content = function Content(_ref) {
     var product = _ref.product,
-        deliveryType = _ref.deliveryType;
+        shipping = _ref.shipping;
 
 
-    var price = product.hasOwnProperty('rates') && Object.keys(product.rates).length > 0 && product.rates.hasOwnProperty(deliveryType) ? parseFloat(product.rates[deliveryType].price) : parseFloat(product.price);
-    var markup = price * (window.sml.productMarkup ? parseInt(window.sml.productMarkup) / 100 : 0);
+    var price = 0;
+
+    var deliveryMethod = shipping.filter(function (rate) {
+        return rate.hasOwnProperty('active') && rate.active === true;
+    }).shift();
+
+    if (deliveryMethod) {
+
+        var rate = deliveryMethod.products.filter(function (_product) {
+            return parseInt(_product.id) === parseInt(product.id);
+        }).shift();
+        price = rate.price;
+    } else {
+
+        price = parseFloat(product.price);
+    }
 
     return _react2.default.createElement(
         _row2.default,
@@ -29096,10 +29099,10 @@ var Content = function Content(_ref) {
                 _react2.default.createElement(
                     'strong',
                     null,
-                    product.price ? 'Price:' : 'Starting:'
+                    'Price: '
                 ),
                 ' $',
-                Math.round(price + markup)
+                Math.round(price)
             )
         )
     );
@@ -29140,7 +29143,8 @@ var Products = function Products(_ref3) {
     var _ref3$products = _ref3.products,
         products = _ref3$products === undefined ? [] : _ref3$products,
         updateQuantity = _ref3.updateQuantity,
-        deliveryType = _ref3.deliveryType;
+        _ref3$shipping = _ref3.shipping,
+        shipping = _ref3$shipping === undefined ? [] : _ref3$shipping;
 
 
     return _react2.default.createElement(
@@ -29150,7 +29154,7 @@ var Products = function Products(_ref3) {
 
             return _react2.default.createElement(
                 _card2.default,
-                { className: 'sml_product', accent: '#2b9bd2', title: product.title, content: _react2.default.createElement(Content, { product: product, deliveryType: deliveryType }), footer: _react2.default.createElement(Footer, { updateQuantity: updateQuantity, product: product }), style: { marginBottom: '1px' }, onClick: 'toggle', toggle: 'toggle', key: product.id },
+                { className: 'sml_product', accent: '#2b9bd2', title: product.title, content: _react2.default.createElement(Content, { product: product, shipping: shipping }), footer: _react2.default.createElement(Footer, { updateQuantity: updateQuantity, product: product }), style: { marginBottom: '1px' }, onClick: 'toggle', toggle: 'toggle', key: product.id },
                 _react2.default.createElement(
                     _row2.default,
                     { className: 'thumbnail' },

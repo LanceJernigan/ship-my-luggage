@@ -141,10 +141,10 @@
 
         };
 
-        $rates = sml_request_rates($products, $addresses);
+        $shipping = sml_request_rates($products, $addresses);
 
         wp_send_json([
-            'rates' => $rates
+            'shipping' => $shipping
         ]);
 
     }
@@ -432,15 +432,19 @@
 
     function sml_request_rates($products, $addresses) {
 
-        return apply_filters('sml_filter_product_rates', array_map(function($product)use($addresses) {
+        $international = strtolower($addresses['origin']['countryCode']) !== 'us' || strtolower($addresses['destination']['countryCode']) !== 'us';
 
-            return sml_request_rate($product, $addresses);
+        return apply_filters('sml_filter_product_rates', array_map(function($product)use($addresses, $international) {
+
+            $product['shipping'] = apply_filters('sml_request_product_rates', [], $product, $addresses, $international);
+
+            return $product;
 
         }, $products));
 
     }
 
-    function sml_request_rate($product, $addresses) {
+    function sml_request_rate_fedex($rates, $product, $addresses, $international) {
 
         require_once(untrailingslashit(plugin_dir_path(__FILE__)) . '/lib/fedex/fedex-common.php5');
 
@@ -525,60 +529,39 @@
 
             if ($response->HighestSeverity !== 'ERROR' && isset($response->RateReplyDetails)) {
 
-                return apply_filters('sml_product_rate', $response->RateReplyDetails);
+                foreach ($response->RateReplyDetails as $rate) {
 
-            } else {
+                    if ($international) {
 
-                return;
+                        _log($rate);
+
+                    } else {
+
+                        $rates[] = [
+                            'deliveryDate' => isset($rate->DeliveryTimestamp) ? $rate->DeliveryTimestamp : date("Y-m-d h:i:s", mktime(0, 0, 0, date("m"), date("d")+7,   date("Y"))),
+                            'type' => $rate->ServiceType,
+                            'price' => $rate->RatedShipmentDetails->RatedPackages->PackageRateDetail->NetFedExCharge->Amount
+                        ];
+
+                    }
+
+                }
+
             }
+
+            return $rates;
 
         } catch (SoapFault $exception) {
 
             _log($exception, $client);
 
-            return [
-                'errors' => 'There was an error retrieving the products.'
-            ];
+            return $rates;
 
         }
 
     }
 
-    /*
-     *  sml_product_rate_filter() - Filter rates returned from FedEx
-     */
-
-    function sml_product_rate_filter($_rates) {
-
-        $rates = [];
-
-        $types = [
-            'FIRST_OVERNIGHT' => 'First Overnight',
-            'PRIORITY_OVERNIGHT' => 'Priority Overnight',
-            'STANDARD_OVERNIGHT' => 'Standard Overnight',
-            'FEDEX_2_DAY_AM' => 'Fedex 2 Day AM',
-            'FEDEX_2_DAY' => 'Fedex 2 Day',
-            'FEDEX_EXPRESS_SAVER' => 'Fedex Express Saver',
-            'FEDEX_GROUND' => 'Fedex Ground'
-        ];
-
-        foreach ($_rates as $rate) {
-
-            $rates[$rate->ServiceType] = [
-                'delivery' => isset($rate->DeliveryTimestamp) ? $rate->DeliveryTimestamp : null,
-                'type' => $rate->ServiceType,
-                'title' => isset($types[$rate->ServiceType]) ? $types[$rate->ServiceType] : $rate->ServiceType,
-                'price' => $rate->RatedShipmentDetails->RatedPackages->PackageRateDetail->NetFedExCharge->Amount
-            ];
-
-        }
-
-        return $rates;
-
-    }
-
-
-    add_filter('sml_product_rate', 'sml_product_rate_filter', 10, 1);
+    add_filter('sml_request_product_rates', 'sml_request_rate_fedex', 10, 4);
 
     /*
      * sml_filter_product_rates() - Filter product rates before returned to the Ajax request
@@ -586,11 +569,53 @@
 
     function sml_filter_product_rates($products) {
 
-        return $products;
+        $shipping = [];
+
+        foreach ($products as $product) {
+
+            foreach ($product['shipping'] as $rate) {
+
+                if (isset($rate['type']) && isset($rate['deliveryDate']) && isset($rate['price'])) {
+
+                    if (!isset($shipping[$rate['type']])) {
+
+                        $shipping[$rate['type']] = [
+                            'name' => apply_filters('sml_rename_rate', $rate['type'], $rate),
+                            'type' => $rate['type'],
+                            'deliveryDate' => $rate['deliveryDate'],
+                            'products' => []
+                        ];
+
+                    }
+
+                    $shipping[$rate['type']]['products'][] = [
+                        'id' => $product['id'],
+                        'price' => $rate['price']
+                    ];
+
+                }
+
+            }
+
+        }
+
+        return $shipping;
 
     }
 
     add_filter('sml_filter_product_rates', 'sml_filter_product_rates', 10, 1);
+
+    function sml_rename_rate($name, $rate) {
+
+        $lookup = [
+            'FEDEX_GROUND' => 'Fedex Ground'
+        ];
+
+        return isset($lookup[$rate['type']]) ? $lookup[$rate['type']] : $name;
+
+    }
+
+    add_filter('sml_rename_rate', 'sml_rename_rate', 10, 2);
 
     /*
      *  sml_product_settings() - Add a section to the Products tab in WooCommerce Settings

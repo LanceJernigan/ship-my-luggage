@@ -31,19 +31,7 @@ class App extends React.Component {
                     return product
 
                 }),
-                shipping: [
-                    {
-                        name: 'Fedex Ground',
-                        type: 'FEDEX_GROUND',
-                        products: [
-                            {
-                                id: 126,
-                                price: 100
-                            }
-                        ]
-                    }
-                ],
-                delivery: 'FEDEX_GROUND',
+                shipping: [],
                 total: 0,
             },
             stripe: {
@@ -222,7 +210,6 @@ class App extends React.Component {
 
         this.setState({
             ...this.state,
-            rates: false,
             fetching: true
         })
 
@@ -232,21 +219,16 @@ class App extends React.Component {
                 products: this.state.order.products,
                 addresses: this.state.order.addresses
             },
-            success: ({rates}) => {
+            success: ({shipping}) => {
+
+                console.log(shipping)
 
                 this.setState({
                     ...this.state,
                     fetching: false,
-                    rates: true,
                     order: {
                         ...this.state.order,
-                        products: this.state.order.products.map( (product, i) => {
-
-                            product.rates = rates[i]
-
-                            return product
-
-                        })
+                        shipping: Object.keys(shipping).map( type => shipping[type])
                     }
                 })
 
@@ -291,28 +273,48 @@ class App extends React.Component {
 
     }
 
-    calculateTotal = (delivery = 'FEDEX_GROUND') => {
+    calculateTotal = (type = false) => {
 
-        return Math.round(this.state.order.products.reduce( (tot, product) => {
+        const rates = this.state.order.shipping.filter( rate => type !== false ? rate.type === type : rate.hasOwnProperty('active') && rate.active === true).shift()
 
-            const price = product.hasOwnProperty('rates') ? product.rates[delivery].price : product.price
-            const quantity = product.quantity
+        if (this.state.order.shipping.length && rates) {
 
-            tot += parseFloat(price) * quantity
+            return Math.round(this.state.order.products.reduce( (total, product) => {
 
-            return tot
+                const rate = rates.products.filter( _product => parseInt(_product.id) === parseInt(product.id)).shift()
+                const price = rate ? rate.price : 0
+                const {quantity} = product
 
-        }, 0))
+                total += parseFloat(price) * quantity
+
+                return total
+
+            }, 0))
+
+        } else {
+
+            return Math.round(this.state.order.products.reduce( (total, product) => {
+
+                const {price} = product
+                const {quantity} = product
+
+                total += parseFloat(price) * quantity
+
+                return total
+
+            }, 0))
+
+        }
 
     }
 
-    updateDelivery = (delivery) => {
+    updateDelivery = (type) => {
 
         this.setState({
             ...this.state,
             order: {
                 ...this.state.order,
-                delivery: delivery
+                shipping: this.state.order.shipping.map( rate => { return {...rate, active: rate.type === type}})
             }
         })
 
@@ -616,7 +618,7 @@ class App extends React.Component {
 
                 <Lead dismiss={this.dismissLead} active={this.state.lead} />
 
-                {this.state.checkout.active && ! this.state.fetching && this.state.rates ? <Checkout checkout={this.state.checkout} updateCheckout={this.updateCheckout} processCheckout={this.processCheckout} checkoutValid={this.state.checkout.valid} /> : <Order updateAddress={this.updateAddress} validateAddresses={this.validateAddresses} updateQuantity={this.updateQuantity} processCheckout={this.processCheckout} submit={this.submit} addresses={this.state.order.addresses} products={this.state.order.products} deliveryDate={this.state.order.date} checkout={this.state.checkout} calculateTotal={this.calculateTotal} updateDelivery={this.updateDelivery} deliveryType={this.state.order.delivery} quickPay={this.quickPay} fetching={this.state.fetching} rates={this.state.rates} leadActive={this.state.lead} updateDeliveryDate={this.updateDeliveryDate} checkoutValid={this.state.checkout.valid} />}
+                {this.state.checkout.active && ! this.state.fetching && this.state.rates ? <Checkout checkout={this.state.checkout} updateCheckout={this.updateCheckout} processCheckout={this.processCheckout} checkoutValid={this.state.checkout.valid} /> : <Order shipping={this.state.order.shipping} updateAddress={this.updateAddress} validateAddresses={this.validateAddresses} updateQuantity={this.updateQuantity} processCheckout={this.processCheckout} submit={this.submit} addresses={this.state.order.addresses} products={this.state.order.products} deliveryDate={this.state.order.date} checkout={this.state.checkout} calculateTotal={this.calculateTotal} updateDelivery={this.updateDelivery} deliveryType={this.state.order.delivery} quickPay={this.quickPay} fetching={this.state.fetching} leadActive={this.state.lead} updateDeliveryDate={this.updateDeliveryDate} checkoutValid={this.state.checkout.valid} />}
 
             </div>
 

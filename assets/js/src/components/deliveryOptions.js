@@ -7,31 +7,9 @@ import Content from './content'
 
 import moment from 'moment'
 
-const DateLine = ({rate = {}, date}) => {
+const DeliveryOptions = ({calculateTotal, updateDelivery, shipping, deliveryDate}) => {
 
-    if (date == false) {
-
-        date = moment().add(7, 'days')
-
-    }
-
-    return (
-
-        <Content>
-
-            <p>{date.format('dddd, MMMM D, YYYY - h:mm a')}</p>
-
-        </Content>
-
-    )
-
-}
-
-const DeliveryOptions = ({products, calculateTotal, updateDelivery, deliveryType, deliveryDate}) => {
-
-    if (products[0].hasOwnProperty('rates')) {
-
-        const rates = products[0].rates
+    if (shipping.length) {
 
         return (
 
@@ -45,28 +23,31 @@ const DeliveryOptions = ({products, calculateTotal, updateDelivery, deliveryType
 
                 <Row>
 
-                    {Object.keys(rates).map( key => {
+                    {shipping.map( rate => {
 
-                        const rate = rates[key]
-                        const date = rate.delivery !== null ? moment(rate.delivery) : false
+                        const date = moment(rate.deliveryDate)
 
-                        if (key == 'FEDEX_GROUND' || date.isBefore(deliveryDate)) {
+                        if (date.isBefore(deliveryDate)) {
 
                             return (
 
-                                <Row className={'delivery_option ' + (rate.type === deliveryType ? 'active' : 'deactive')} style={{background: '#eeeff0', borderTop: 'solid 1px rgba(0, 0, 0, .1)'}} key={key}>
+                                <Row className={'delivery_option ' + (rate.active === true ? 'active' : 'deactive')} style={{background: '#eeeff0', borderTop: 'solid 1px rgba(0, 0, 0, .1)'}} key={rate.type}>
 
                                     <Column columns={6} width={5} minWidth={0} style={{flexWrap: 'wrap'}} >
 
-                                        <Card accent="#2b9bd2" title={rate.title} style={{background: '#eeeff0'}} onClick={() => updateDelivery(rate.type)}>
+                                        <Card accent="#2b9bd2" title={rate.name} style={{background: '#eeeff0'}} onClick={() => updateDelivery(rate.type)}>
 
-                                            <DateLine rate={rate} date={date} />
+                                            <Content>
+
+                                                <p>{date.format('dddd, MMMM D, YYYY - h:mm a')}</p>
+
+                                            </Content>
 
                                         </Card>
 
                                     </Column>
 
-                                    <Column columns={6} width={1} minWidth={0} className='delivery_option--price' style={{background: (rate.type === deliveryType ? '#2b9bd2' : 'rgba(0, 0, 0, .05)'), display: 'flex', alignItems: 'center', justifyContent: 'center'}}>
+                                    <Column columns={6} width={1} minWidth={0} className='delivery_option--price' style={{background: (rate.hasOwnProperty('active') && rate.active === true ? '#2b9bd2' : 'rgba(0, 0, 0, .05)'), display: 'flex', alignItems: 'center', justifyContent: 'center'}}>
 
                                         <h4 onClick={() => updateDelivery(rate.type)}>${calculateTotal(rate.type)}</h4>
 

@@ -4,10 +4,22 @@ import Row from './row'
 import Column from './column'
 import Card from './card'
 
-const Content = ({product, deliveryType}) => {
+const Content = ({product, shipping}) => {
 
-    const price = product.hasOwnProperty('rates') && Object.keys(product.rates).length > 0 && product.rates.hasOwnProperty(deliveryType) ? parseFloat(product.rates[deliveryType].price) : parseFloat(product.price)
-    const markup = price * (window.sml.productMarkup ? (parseInt(window.sml.productMarkup) / 100) : 0)
+    let price = 0
+
+    const deliveryMethod = shipping.filter( rate => rate.hasOwnProperty('active') && rate.active === true).shift()
+
+    if (deliveryMethod) {
+
+        const rate = deliveryMethod.products.filter( _product => parseInt(_product.id) === parseInt(product.id)).shift()
+        price = rate.price
+
+    } else {
+
+        price = parseFloat(product.price)
+
+    }
 
     return (
 
@@ -15,7 +27,7 @@ const Content = ({product, deliveryType}) => {
 
             <Column>
 
-                <p><strong>{product.price ? 'Price:' : 'Starting:'}</strong> ${Math.round(price + markup)}</p>
+                <p><strong>Price: </strong> ${Math.round(price)}</p>
 
             </Column>
 
@@ -49,7 +61,7 @@ const Footer = ({product, updateQuantity}) => {
 
 }
 
-const Products = ({products = [], updateQuantity, deliveryType}) => {
+const Products = ({products = [], updateQuantity, shipping = []}) => {
 
     return (
 
@@ -59,7 +71,7 @@ const Products = ({products = [], updateQuantity, deliveryType}) => {
 
                 return (
 
-                    <Card className='sml_product' accent='#2b9bd2' title={product.title} content={<Content product={product} deliveryType={deliveryType} />} footer={<Footer updateQuantity={updateQuantity} product={product} />} style={{marginBottom: '1px'}} onClick={'toggle'} toggle="toggle" key={product.id}>
+                    <Card className='sml_product' accent='#2b9bd2' title={product.title} content={<Content product={product} shipping={shipping} />} footer={<Footer updateQuantity={updateQuantity} product={product} />} style={{marginBottom: '1px'}} onClick={'toggle'} toggle="toggle" key={product.id}>
 
                         <Row className="thumbnail">
 
