@@ -3,7 +3,7 @@
     /*
      *  Plugin Name:  Ship My Luggage
      *  Description:  Functionality for Ship My Luggage
-     *  Version:      0.0.29
+     *  Version:      0.0.31
      *  Author:       Lance Jernigan
      *  Author URI:   http://www.LanceJernigan.com
      */

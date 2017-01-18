@@ -1,6 +1,6 @@
 {
   "name": "ship-my-luggage",
-  "version": "0.0.29",
+  "version": "0.0.31",
   "description": "Functionality for Ship My Luggage",
   "main": "index.js",
   "scripts": {
