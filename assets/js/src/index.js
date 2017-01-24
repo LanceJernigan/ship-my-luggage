@@ -6,6 +6,7 @@ import Errors from './components/errors'
 import Lead from './components/lead'
 import Order from './components/order'
 import Checkout from './components/checkout'
+import SaveAddress from './components/saveAddress'
 
 import moment from 'moment'
 
@@ -40,7 +41,8 @@ class App extends React.Component {
             displayTotal: false,
             checkout: this.prePopulateDefaults('checkout'),
             errors: [],
-            quickPay: false
+            quickPay: false,
+            savedLocations: window.sml.savedLocations
         }
 
     }
@@ -157,7 +159,33 @@ class App extends React.Component {
 
     updateAddress = (target, value, key) => {
 
-        if (this.state.order.addresses[target].val !== value) {
+        if (value === '') {
+
+            this.setState({
+                order: {
+                    ...this.state.order,
+                    addresses: {
+                        ...this.state.order.addresses,
+                        [target]: {}
+                    }
+                }
+            })
+
+        } else if (key === 'all') {
+
+            this.setState({
+                order: {
+                    ...this.state.order,
+                    addresses: {
+                        ...this.state.order.addresses,
+                        [target]: {
+                            ...value
+                        }
+                    }
+                }
+            })
+
+        } else if (this.state.order.addresses[target].value !== value) {
 
             this.setState({
                 order: {
@@ -189,7 +217,7 @@ class App extends React.Component {
             value: value.formatted_address,
             address_1: getValueByType('street_number').long_name + ' ' + getValueByType('route').long_name,
             city: getValueByType('locality').long_name,
-            state: getValueByType('administrative_area_level_1').long_name,
+            state: getValueByType('administrative_area_level_1') ? getValueByType('administrative_area_level_1').long_name : getValueByType('locality').long_name,
             postcode: getValueByType('postal_code').long_name,
             country: getValueByType('country').long_name,
             countryCode: getValueByType('country').short_name
@@ -220,8 +248,6 @@ class App extends React.Component {
                 addresses: this.state.order.addresses
             },
             success: ({shipping}) => {
-
-                console.log(shipping)
 
                 this.setState({
                     ...this.state,
@@ -350,7 +376,7 @@ class App extends React.Component {
         this.sml_ajax({
             data: {
                 action: 'sml_order',
-                order: this.state.order
+                order: this.state.order,
             },
             success: ({errors}) => {
 
@@ -490,8 +516,6 @@ class App extends React.Component {
 
                 if (errors && errors.length) {
 
-                    console.log(errors)
-
                 } else {
 
                     window.location = '/my-account/orders/'
@@ -604,6 +628,27 @@ class App extends React.Component {
 
     }
 
+    saveLocation = (location, value = false, close = false) => {
+
+        const address = this.state.order.addresses[location] || false
+
+        this.setState({
+            ...this.state,
+            order: {
+                ...this.state.order,
+                addresses: {
+                    ...this.state.order.addresses,
+                    [location]: {
+                        ...this.state.order.addresses[location],
+                        name: value !== false ? value : this.state.order.addresses[location].name,
+                        retrieving: ! close
+                    }
+                }
+            }
+        })
+
+    }
+
     render() {
 
         window.history.replaceState(JSON.stringify(this.state), null, '')
@@ -618,7 +663,9 @@ class App extends React.Component {
 
                 <Lead dismiss={this.dismissLead} active={this.state.lead} />
 
-                {this.state.checkout.active && ! this.state.fetching && this.state.rates ? <Checkout checkout={this.state.checkout} updateCheckout={this.updateCheckout} processCheckout={this.processCheckout} checkoutValid={this.state.checkout.valid} /> : <Order shipping={this.state.order.shipping} updateAddress={this.updateAddress} validateAddresses={this.validateAddresses} updateQuantity={this.updateQuantity} processCheckout={this.processCheckout} submit={this.submit} addresses={this.state.order.addresses} products={this.state.order.products} deliveryDate={this.state.order.date} checkout={this.state.checkout} calculateTotal={this.calculateTotal} updateDelivery={this.updateDelivery} deliveryType={this.state.order.delivery} quickPay={this.quickPay} fetching={this.state.fetching} leadActive={this.state.lead} updateDeliveryDate={this.updateDeliveryDate} checkoutValid={this.state.checkout.valid} />}
+                <SaveAddress addresses={this.state.order.addresses} onChange={this.saveLocation} />
+
+                {this.state.checkout.active && ! this.state.fetching && this.state.order.shipping ? <Checkout checkout={this.state.checkout} updateCheckout={this.updateCheckout} processCheckout={this.processCheckout} checkoutValid={this.state.checkout.valid} /> : <Order shipping={this.state.order.shipping} updateAddress={this.updateAddress} validateAddresses={this.validateAddresses} updateQuantity={this.updateQuantity} processCheckout={this.processCheckout} submit={this.submit} addresses={this.state.order.addresses} products={this.state.order.products} deliveryDate={this.state.order.date} checkout={this.state.checkout} calculateTotal={this.calculateTotal} updateDelivery={this.updateDelivery} deliveryType={this.state.order.delivery} quickPay={this.quickPay} fetching={this.state.fetching} leadActive={this.state.lead} updateDeliveryDate={this.updateDeliveryDate} checkoutValid={this.state.checkout.valid} saveLocation={this.saveLocation} savedLocations={this.state.savedLocations} />}
 
             </div>
 

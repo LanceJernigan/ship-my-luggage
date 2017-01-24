@@ -87,6 +87,61 @@
         margin: 5px 0;
     }
 
+    .sml_card .options {
+        position: absolute;
+        top: 0;
+        right: 0;
+    }
+
+        .sml_card .options .icon {
+            padding: 10px;
+            cursor: pointer;
+        }
+
+        .sml_card .options .icon > div {
+            height: 4px;
+            width: 4px;
+            border-radius: 100%;
+            background: rgba(0, 0, 0, .7);
+            margin: 1px;
+        }
+
+        .sml_card .options .menu {
+            position: absolute;
+            right: 10px;
+            top: 35px;
+            width: 200px;
+            max-height: 0;
+            opacity: 0;
+            overflow: hidden;
+            background: #fff;
+            box-shadow: 0 1px 2px rgba(0, 0, 0, .4);
+            transition: all .2s ease-in-out;
+        }
+
+            .sml_card .options.options-active .close {
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+            }
+
+            .sml_card .options.options-active .menu {
+                max-height: 300px;
+                opacity: 1;
+                overflow: scroll;
+            }
+
+            .sml_card .options .menu .menu-item {
+                padding: 10px;
+                cursor: pointer;
+            }
+
+                .sml_card .options .menu .menu-item:hover {
+                    background: rgba(0, 0, 0, .05);
+                }
+
     .sml_card .title {
         padding: 10px;
     }
@@ -153,7 +208,6 @@
         background: rgba(0, 0, 0, .05);
         display: flex;
         flex-wrap: wrap;
-        /*padding: 5px;*/
     }
 
         .sml_card .footer .action {
@@ -183,6 +237,10 @@
             width: 100%;
         }
 
+    .sml_card .footer div {
+        position: relative;
+    }
+
     .sml_card .footer input {
         width: 100%;
         height: 100%;
@@ -196,6 +254,20 @@
         .sml_card .footer input:nth-child(n+2) {
             border-top: solid 1px rgba(0, 0, 0, .1);
         }
+
+        .sml_card .footer .send {
+            position: absolute;
+            bottom: 0px;
+            right: 0px;
+            font-size: 1em;
+            padding: 10px;
+            cursor: pointer;
+            z-index: 10;
+        }
+
+            .sml_card .footer .send p {
+                line-height: normal;
+            }
 
 .sml_product .thumbnail {
     position: absolute;
@@ -295,3 +367,14 @@
     .delivery_options .delivery_option .delivery_option--price {
         transition: all .2s ease-in-out;
     }
+
+.save_address {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, .1);
+    padding-top: 150px;
+    z-index: 10;
+}

@@ -16,7 +16,7 @@
      * sml_init() - Initialize Ship My Luggage Plugin
      */
 
-    function sml_init() {
+    function sml_plugins_loaded() {
 
         add_shortcode('sml_order', 'sml_order');
 
@@ -24,7 +24,7 @@
 
     }
 
-    add_action('plugins_loaded', 'sml_init');
+    add_action('plugins_loaded', 'sml_plugins_loaded');
 
     /*
      *  sml_redirect() - function for redirecting ship my luggage requests
@@ -77,7 +77,8 @@
             'checkout' => get_sml_checkout_defaults(),
             'isLoggedIn' => is_user_logged_in() ? 'true' : 'false',
             'productMarkup' => get_option('sml_product_markup'),
-            'stripePublishableKey' => 'yes' === $stripeSettings['testmode'] ? $stripeSettings['test_publishable_key'] : $stripeSettings['publishable_key']
+            'stripePublishableKey' => 'yes' === $stripeSettings['testmode'] ? $stripeSettings['test_publishable_key'] : $stripeSettings['publishable_key'],
+            'savedLocations' => sml_get_saved_locations()
         ]);
 
         return '<div id="mount"></div>';
@@ -97,16 +98,24 @@
         global $woocommerce;
 
         $errors = [];
-
         $order = apply_filters('pre_place_order', $_order);
-
         $woocommerce->cart->empty_cart();
+
+        $shipping = array_shift(array_filter($_order['shipping'], function ($ship) {
+
+            return isset($ship['active']) && $ship['active'] === 'true';
+
+        }));
 
         foreach ($order['products'] as $product) {
 
-            if (isset($product['id']) && isset($product['quantity']) && isset($product['rates'])) {
+            if (isset($product['id']) && isset($product['quantity'])) {
 
-                $rate = $product['rates'][$order['delivery']];
+                $rate = array_shift(array_filter($shipping['products'], function ($rate)use($product) {
+
+                    return $rate['id'] === $product['id'];
+
+                }));
 
                 $woocommerce->cart->add_to_cart($product['id'], $product['quantity'], 0, [], [
                     'sml_price' => $rate['price']
@@ -234,6 +243,12 @@
 
         $cart = $woocommerce->cart;
         $order = wc_create_order(['customer_id' => $current_user->ID]);
+        $savedLocations = sml_get_saved_locations();
+        $shipping = array_shift(array_filter($_order['shipping'], function ($ship) {
+
+            return isset($ship['active']) && $ship['active'] === 'true';
+
+        }));
 
         foreach ($cart->cart_contents as $key => $_product) {
 
@@ -263,10 +278,48 @@
 
         }
 
+        foreach($_order['addresses'] as $key => $address) {
+
+            if (isset($address['name']) && ! empty($address['name'])) {
+
+                $exists = array_filter($savedLocations, function ($location)use($address) {
+
+                    return strtolower($location['name']) === strtolower($address['name']);
+
+                });
+
+                if ($exists && count($savedLocations)) {
+
+                    array_map(function ($location)use($address) {
+
+                        if (strtolower($location['name']) === strtolower($address['name'])) {
+
+                            $location = $address;
+
+                        }
+
+                        return $location;
+
+                    }, $savedLocations);
+
+                } else {
+
+                    $savedLocations[] = $address;
+
+                }
+
+            }
+
+        }
+
+        _log($current_user->ID, $savedLocations);
+
+        update_user_meta($current_user->ID, 'saved_locations', $savedLocations);
+
         update_post_meta($order->id, 'origin', $_order['addresses']['origin']);
         update_post_meta($order->id, 'destination', $_order['addresses']['destination']);
         update_post_meta($order->id, 'delivery_date', $_order['date']);
-        update_post_meta($order->id, 'shipping_method', $_order['delivery']);
+        update_post_meta($order->id, 'shipping_method', $shipping['type']);
 
         $order->set_address($billing, 'billing');
 
@@ -533,8 +586,6 @@
 
                     if ($international) {
 
-                        _log($rate->RatedShipmentDetails->ShipmentRateDetail->TotalNetFedExCharge->Amount);
-
                         $rates[] = [
                             'deliveryDate' => isset($rate->DeliveryTimestamp) ? $rate->DeliveryTimestamp : date("Y-m-d h:i:s", mktime(0, 0, 0, date("m"), date("d")+7,   date("Y"))),
                             'type' => $rate->ServiceType,
@@ -568,6 +619,126 @@
     }
 
     add_filter('sml_request_product_rates', 'sml_request_rate_fedex', 10, 4);
+
+    function sml_request_rate_ups($rates, $product, $addresses, $international) {
+
+        if ($international) {
+
+            $wsdl = untrailingslashit(plugin_dir_path(__FILE__)) . '/lib/ups/FreightRate.wsdl';
+
+            $request = [
+                'Request' => [
+                    'RequestOption' => 'RateChecking Option'
+                ],
+                'ShipFrom' => [
+                    'Name' => 'Shipper',
+                    'Address' => [
+                        'AddressLine' => '5800 Central Avenue Pike',
+                        'City' => 'Knoxville',
+                        'StateProvidenceCode' => 'TN',
+                        'PostalCode' => '37912',
+                        'CountryCode' => 'US'
+                    ]
+                ],
+                'ShipTo' => [
+                    'Name' => 'Receiver',
+                    'Address' => [
+                        'AddressLine' => '1630 Downtown West Blvd Suite 116',
+                        'City' => 'Knoxville',
+                        'StateProvidenceCode' => 'TN',
+                        'PostalCode' => '37919',
+                        'CountryCode' => 'US'
+                    ]
+                ],
+                'Commodity' => [
+                    'NumberOfPieces' => '1',
+                    'Description' => 'No Description',
+                    'PackagingType' => [
+                        'Code' => 'Bag',
+                        'Description' => 'Bag'
+                    ],
+                    'Weight' => [
+                        'UnitOfMeasurement' => [
+                            'Code' => 'LBS',
+                            'Description' => 'Pounds'
+                        ],
+                        'Value' => '750'
+                    ],
+                    'Dimensions' => [
+                        'UnitOfMeasurement' => [
+                            'Code' => 'IN',
+                            'Description' => 'Inches'
+                        ],
+                        'Length' => '23',
+                        'Width' => '17',
+                        'Height' => '45'
+                    ]
+                ],
+                'PaymentInformation' => [
+                    'Payer' => [
+                        'Name' => 'Payer',
+                        'Address' => [
+                            'AddressLine' => '5800 Central Avenue Pike',
+                            'City' => 'Knoxville',
+                            'StateProvinceCode' => 'TN',
+                            'PostalCode' => '37912',
+                            'CountryCode' => 'US'
+                        ]
+                    ],
+                    'ShipmentBillingOption' => [
+                        'Code' => '10',
+                        'Description' => 'PREPAID'
+                    ]
+                ],
+                'Service' => [
+                    'Code' => '308',
+                    'Description' => 'UPS Freight LTL'
+                ],
+                'HandlingUnitOne' => [
+                    'Quantity' => '1',
+                    'Type' => [
+                        'Code' => 'PLT',
+                        'Description' => 'PALLET'
+                    ]
+                ]
+            ];
+
+            try {
+
+                $credentials = [
+                    'ServiceAccessToken' => [
+                        'AccessLicenseNumber' => '2D1F986100A2226E'
+                    ],
+                    'UsernameToken' => [
+                        'Username' => 'Lance-Jernigan',
+                        'Password' => 'm3UMBsnULBGD'
+                    ]
+                ];
+
+                $client = new SoapClient($wsdl, ['trace' => 1, 'soap_version' => 'SOAP_1_1']);
+                $client->__setLocation('https://wwwcie.ups.com/ups.app/xml/Rate');
+
+                $header = new SoapHeader('http://www.ups.com/XMLSchema/XOLTWS/UPSS/v1.0', 'UPSSecurity', $credentials);
+
+                $client->__setSoapHeaders($header);
+
+                $response = $client->__soapCall('ProcessFreightRate', [$request]);
+
+                _log(json_encode($response));
+
+            } catch (SoapFault $ex) {
+
+                _log($client->__getLastRequest(), $ex);
+
+            }
+
+        }
+
+        return $rates;
+
+    }
+
+    add_filter('sml_request_product_rates', 'sml_request_rate_ups', 10, 4);
 
     /*
      * sml_filter_product_rates() - Filter product rates before returned to the Ajax request
@@ -712,6 +883,27 @@
     }
 
     add_action('woocommerce_admin_order_data_after_shipping_address', 'sml_admin_order_details');
+
+    function sml_get_saved_locations($user_id = false) {
+
+        if (! $user_id) {
+
+            $current_user = wp_get_current_user();
+            $user_id = $current_user->ID;
+
+        }
+
+        $savedLocations = get_user_meta($user_id, 'saved_locations', true);
+
+        if (! is_array($savedLocations)) {
+
+            $savedLocations = [];
+
+        }
+
+        return $savedLocations;
+
+    }
 
     function _log( $message ) {
         if( WP_DEBUG === true ){

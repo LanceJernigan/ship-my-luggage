@@ -104,7 +104,50 @@ const Continue = ({onClick}) => {
 
 }
 
-const Order = ({shipping = [], addresses = {origin: {val: ''}, destination: {val: ''}}, deliveryDate, checkout = {}, products = [], deliveryType = false, updateAddress, validateAddresses, updateQuantity, submit, quickPay, calculateTotal, updateDelivery, updateDeliveryDate, fetching = false, rates = false}) => {
+const AddressFooter = ({address, savedLocations, addresses, updateAddress}) => {
+
+    return (
+
+        <div className="footer" style={{background: 'rgba(0, 0, 0, .05)'}}>
+
+            <div>
+
+                <div className="send"><SavedLocations savedLocations={savedLocations} target={address} address={addresses[address]} updateAddress={updateAddress} /></div>
+
+                <Autocomplete value={addresses[address].value} onChange={e => updateAddress(address, e.currentTarget.value, 'value')} placeholder='Address' types={['geocode']} onPlaceSelected={place => updateAddress(address, place)} />
+
+            </div>
+
+            <input type="text" value={addresses[address].address_2 || ''} onChange={e => updateAddress(address, e.currentTarget.value, 'address_2')} placeholder="Apt, suite, etc."  />
+
+        </div>
+
+    )
+
+}
+
+const SavedLocations = ({savedLocations = [], target, address = false, updateAddress}) => {
+
+    if (address.hasOwnProperty('name') && address.name)
+        return <p><strong>{address.name}</strong></p>
+
+    if (! savedLocations.length)
+        return null
+
+    if (! address.hasOwnProperty('value') || ! address.value)
+        return null
+
+    const filter = address.value.toLowerCase() || ''
+    const savedLocation = savedLocations.filter( location => location.value.toLowerCase().indexOf(filter) > -1 || location.name.toLowerCase().indexOf(filter) > -1).shift()
+
+    if (savedLocation)
+        return <p onClick={ e => updateAddress(target, savedLocation, 'all')}>Use <strong>{savedLocation.name}</strong></p>
+
+    return null
+
+}
+
+const Order = ({shipping = [], addresses = {origin: {val: ''}, destination: {val: ''}}, deliveryDate, checkout = {}, products = [], deliveryType = false, updateAddress, validateAddresses, updateQuantity, submit, quickPay, calculateTotal, updateDelivery, updateDeliveryDate, fetching = false, rates = false, saveLocation, savedLocations}) => {
 
     return (
 
@@ -114,14 +157,15 @@ const Order = ({shipping = [], addresses = {origin: {val: ''}, destination: {val
 
                 <Column columns={2} width={1} gutter={.2}>
 
-                        <Card accent='#2b9bd2' style={{marginBottom: '1px'}} title="Origin" content={<p>Where your shipment will begin.</p>}>
+                        <Card accent='#2b9bd2' style={{marginBottom: '1px'}} title="Origin" options={[{value: 'Save Location', onClick: () => saveLocation('origin')}]}>
 
-                            <div className="footer" style={{background: 'rgba(0, 0, 0, .05)'}}>
+                            <div className="content">
 
-                                <Autocomplete value={addresses.origin.value} onChange={e => updateAddress('origin', e.currentTarget.value, 'value')} placeholder='Address' types={['geocode']} onPlaceSelected={place => updateAddress('origin', place)} />
-                                <input type="text" value={addresses.origin.address_2} onChange={e => updateAddress('origin', e.currentTarget.value, 'address_2')} placeholder="Apt, suite, etc."  />
+                                <p>Where your shipment will begin</p>
 
                             </div>
+
+                            <AddressFooter address='origin' savedLocations={savedLocations} addresses={addresses} updateAddress={updateAddress} />
 
                         </Card>
 
@@ -129,14 +173,9 @@ const Order = ({shipping = [], addresses = {origin: {val: ''}, destination: {val
 
                 <Column columns={2} width={1} gutter={.2}>
 
-                    <Card accent='#2b9bd2' style={{marginBottom: '1px'}} title="Destination" content={<p>Where your shipment will end.</p>}>
+                    <Card accent='#2b9bd2' style={{marginBottom: '1px'}} title="Destination" content={<p>Where your shipment will end.</p>} options={[{value: 'Save Location', onClick: () => saveLocation('destination')}]}>
 
-                        <div className="footer" style={{background: 'rgba(0, 0, 0, .05)'}}>
-
-                            <Autocomplete value={addresses.destination.value} onChange={e => updateAddress('destination', e.currentTarget.value, 'value')} placeholder='Address' types={['geocode']} onPlaceSelected={place => updateAddress('destination', place)} />
-                            <input type="text" value={addresses.destination.address_2} onChange={e => updateAddress('destination', e.currentTarget.value, 'address_2')} placeholder="Apt, suite, etc."  />
-
-                        </div>
+                        <AddressFooter address='destination' savedLocations={savedLocations} addresses={addresses} updateAddress={updateAddress} />
 
                     </Card>
 
