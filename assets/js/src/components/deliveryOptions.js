@@ -19,6 +19,8 @@ const DeliveryOptions = ({calculateTotal, updateDelivery, shipping, deliveryDate
 
                     <p>Available shipping options.</p>
 
+                    <p style={{marginTop: '10px'}}>All dates are based on earliest date of arrival.  We will reach out to you about scheduling your pickup after your order is placed.</p>
+
                 </Content>
 
                 <Row>

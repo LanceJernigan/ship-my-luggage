@@ -29011,18 +29011,13 @@ var Order = function Order(_ref6) {
                 { columns: 2, width: 1, gutter: .2 },
                 _react2.default.createElement(
                     _card2.default,
-                    { accent: '#2b9bd2', style: { marginBottom: '1px' }, title: 'Origin', options: [{ value: 'Save Location', onClick: function onClick() {
-                                return saveLocation('origin');
-                            } }] },
-                    _react2.default.createElement(
-                        'div',
-                        { className: 'content' },
-                        _react2.default.createElement(
+                    { accent: '#2b9bd2', style: { marginBottom: '1px' }, title: 'Origin', content: _react2.default.createElement(
                             'p',
                             null,
-                            'Where your shipment will begin'
-                        )
-                    ),
+                            'Where your shipment will start.'
+                        ), options: [{ value: 'Save Location', onClick: function onClick() {
+                                return saveLocation('origin');
+                            } }] },
                     _react2.default.createElement(AddressFooter, { address: 'origin', savedLocations: savedLocations, addresses: addresses, updateAddress: updateAddress })
                 )
             ),
@@ -46555,6 +46550,11 @@ var DeliveryOptions = function DeliveryOptions(_ref) {
                     'p',
                     null,
                     'Available shipping options.'
+                ),
+                _react2.default.createElement(
+                    'p',
+                    { style: { marginTop: '10px' } },
+                    'All dates are based on earliest date of arrival.  We will reach out to you about scheduling your pickup after your order is placed.'
                 )
             ),
             _react2.default.createElement(

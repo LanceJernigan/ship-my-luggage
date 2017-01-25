@@ -157,13 +157,7 @@ const Order = ({shipping = [], addresses = {origin: {val: ''}, destination: {val
 
                 <Column columns={2} width={1} gutter={.2}>
 
-                        <Card accent='#2b9bd2' style={{marginBottom: '1px'}} title="Origin" options={[{value: 'Save Location', onClick: () => saveLocation('origin')}]}>
-
-                            <div className="content">
-
-                                <p>Where your shipment will begin</p>
-
-                            </div>
+                        <Card accent='#2b9bd2' style={{marginBottom: '1px'}} title="Origin" content={<p>Where your shipment will start.</p>} options={[{value: 'Save Location', onClick: () => saveLocation('origin')}]}>
 
                             <AddressFooter address='origin' savedLocations={savedLocations} addresses={addresses} updateAddress={updateAddress} />
 

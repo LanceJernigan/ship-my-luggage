@@ -312,8 +312,6 @@
 
         }
 
-        _log($current_user->ID, $savedLocations);
-
         update_user_meta($current_user->ID, 'saved_locations', $savedLocations);
 
         update_post_meta($order->id, 'origin', $_order['addresses']['origin']);
@@ -528,8 +526,9 @@
             'Minor' => '0'
         ];
 
-        $request['ReturnTransitAndCommit'] = true;
+        $request['ReturnTransitAndCommit'] = 'TRUE';
         $request['VariableOptionsServiceOptionType'] = 'SATURDAY_DELIVERY';
+
 
         $request['RequestedShipment'] = [
             'Shipper' => [
@@ -580,7 +579,7 @@
 
             $response = $client->getRates($request);
 
-            if ($response->HighestSeverity !== 'ERROR' && isset($response->RateReplyDetails)) {
+            if ($response->HighestSeverity !== 'ERROR' && isset($response->RateReplyDetails) && is_array($response->RateReplyDetails)) {
 
                 foreach ($response->RateReplyDetails as $rate) {
 
@@ -624,111 +623,101 @@
 
         if ($international) {
 
-            $wsdl = untrailingslashit(plugin_dir_path(__FILE__)) . '/lib/ups/FreightRate.wsdl';
-
-            $request = [
-                'Request' => [
-                    'RequestOption' => 'RateChecking Option'
-                ],
-                'ShipFrom' => [
-                    'Name' => 'Shipper',
-                    'Address' => [
-                        'AddressLine' => '5800 Central Avenue Pike',
-                        'City' => 'Knoxville',
-                        'StateProvidenceCode' => 'TN',
-                        'PostalCode' => '37912',
-                        'CountryCode' => 'US'
-                    ]
-                ],
-                'ShipTo' => [
-                    'Name' => 'Receiver',
-                    'Address' => [
-                        'AddressLine' => '1630 Downtown West Blvd Suite 116',
-                        'City' => 'Knoxville',
-                        'StateProvidenceCode' => 'TN',
-                        'PostalCode' => '37919',
-                        'CountryCode' => 'US'
-                    ]
-                ],
-                'Commodity' => [
-                    'NumberOfPieces' => '1',
-                    'Description' => 'No Description',
-                    'PackagingType' => [
-                        'Code' => 'Bag',
-                        'Description' => 'Bag'
-                    ],
-                    'Weight' => [
-                        'UnitOfMeasurement' => [
-                            'Code' => 'LBS',
-                            'Description' => 'Pounds'
-                        ],
-                        'Value' => '750'
-                    ],
-                    'Dimensions' => [
-                        'UnitOfMeasurement' => [
-                            'Code' => 'IN',
-                            'Description' => 'Inches'
-                        ],
-                        'Length' => '23',
-                        'Width' => '17',
-                        'Height' => '45'
-                    ]
-                ],
-                'PaymentInformation' => [
-                    'Payer' => [
-                        'Name' => 'Payer',
-                        'Address' => [
-                            'AddressLine' => '5800 Central Avenue Pike',
-                            'City' => 'Knoxville',
-                            'StateProvinceCode' => 'TN',
-                            'PostalCode' => '37912',
-                            'CountryCode' => 'US'
-                        ]
-                    ],
-                    'ShipmentBillingOption' => [
-                        'Code' => '10',
-                        'Description' => 'PREPAID'
-                    ]
-                ],
-                'Service' => [
-                    'Code' => '308',
-                    'Description' => 'UPS Freight LTL'
-                ],
-                'HandlingUnitOne' => [
-                    'Quantity' => '1',
-                    'Type' => [
-                        'Code' => 'PLT',
-                        'Description' => 'PALLET'
-                    ]
-                ]
-            ];
-
             try {
 
-                $credentials = [
-                    'ServiceAccessToken' => [
-                        'AccessLicenseNumber' => '2D1F986100A2226E'
-                    ],
-                    'UsernameToken' => [
-                        'Username' => 'Lance-Jernigan',
-                        'Password' => 'm3UMBsnULBGD'
-                    ]
-                ];
+                $access = "2D1F986100A2226E";
+                $userid = "Lance-Jernigan";
+                $passwd = "m3UMBsnULBGD";
 
-                $client = new SoapClient($wsdl, ['trace' => 1, 'soap_version' => 'SOAP_1_1']);
-                $client->__setLocation('https://wwwcie.ups.com/ups.app/xml/Rate');
+                $endpointurl = "https://wwwcie.ups.com/ups.app/xml/Rate";
 
-                $header = new SoapHeader('http://www.ups.com/XMLSchema/XOLTWS/UPSS/v1.0', 'UPSSecurity', $credentials);
+                $accessRequesttXML = new SimpleXMLElement ( "<AccessRequest></AccessRequest>" );
+                $rateRequestXML = new SimpleXMLElement ( "<RatingServiceSelectionRequest></RatingServiceSelectionRequest>" );
 
-                $client->__setSoapHeaders($header);
+                $accessRequesttXML->addChild ( "AccessLicenseNumber", $access );
+                $accessRequesttXML->addChild ( "UserId", $userid );
+                $accessRequesttXML->addChild ( "Password", $passwd );
 
-                $response = $client->__soapCall('ProcessFreightRate', [$request]);
+                $request = $rateRequestXML->addChild ( 'Request' );
+                $request->addChild ( "RequestAction", "Rate" );
+                $request->addChild ( "RequestOption", "Shop" );
 
-                _log(json_encode($response));
+                $shipment = $rateRequestXML->addChild ( 'Shipment' );
+                $shipper = $shipment->addChild ( 'Shipper' );
+                $shipper->addChild ( "Name", "Ship My Luggage" );
+//                $shipper->addChild ( "ShipperNumber", "" );
+                $shipperddress = $shipper->addChild ( 'Address' );
+                $shipperddress->addChild ( "AddressLine1", "5800 Central Avenue Pike" );
+                $shipperddress->addChild ( "City", "Knoxville" );
+                $shipperddress->addChild ( "PostalCode", "37912" );
+                $shipperddress->addChild ( "CountryCode", "US" );
 
-            } catch (SoapFault $ex) {
+                $shipTo = $shipment->addChild ( 'ShipTo' );
+                $shipToAddress = $shipTo->addChild ( 'Address' );
+                $shipToAddress->addChild ( "AddressLine1", $addresses['destination']['address_1'] );
+                $shipToAddress->addChild ( "City", $addresses['destination']['city'] );
+                $shipToAddress->addChild ( "PostalCode", $addresses['destination']['postcode'] );
+                $shipToAddress->addChild ( "CountryCode", $addresses['destination']['countryCode'] );
 
-                _log($client->__getLastRequest(), $ex);
+                $shipFrom = $shipment->addChild ( 'ShipFrom' );
+                $shipFrom->addChild ( "CompanyName", "Ship My Luggage" );
+                $shipFromAddress = $shipFrom->addChild ( 'Address' );
+                $shipFromAddress->addChild ( "AddressLine1", $addresses['origin']['address_1'] );
+                $shipFromAddress->addChild ( "City", $addresses['origin']['city'] );
+                $shipFromAddress->addChild ( "PostalCode", $addresses['origin']['postcode'] );
+                $shipFromAddress->addChild ( "CountryCode", $addresses['origin']['countryCode'] );
+
+                $package = $shipment->addChild ( 'Package' );
+                $packageType = $package->addChild ( 'PackagingType' );
+                $packageType->addChild ( "Code", "02" );
+
+                $packageWeight = $package->addChild ( 'PackageWeight' );
+                $unitOfMeasurement = $packageWeight->addChild ( 'UnitOfMeasurement' );
+                $unitOfMeasurement->addChild ( "Code", "LBS" );
+                $packageWeight->addChild ( "Weight", $product['dimensions']['weight'] );
+
+                $requestXML = $accessRequesttXML->asXML () . $rateRequestXML->asXML ();
+
+                // create Post request
+                $form = array (
+                    'http' => array (
+                        'method' => 'POST',
+                        'header' => 'Content-type: application/x-www-form-urlencoded',
+                        'content' => "$requestXML"
+                    )
+                );
+
+                $request = stream_context_create ( $form );
+                $client = fopen ( $endpointurl, 'rb', false, $request );
+                if (! $client) {
+                    throw new Exception ( "Connection failed." );
+                }
+
+                // get response
+                $response = new SimpleXMLElement( stream_get_contents ( $client ) );
+
+                fclose ( $client );
+
+                if ($response == false || intval($response->Response->ResponseStatusCode) !== 1) {
+
+                    return $rates;
+
+                } else {
+
+                    foreach ($response->RatedShipment as $rate) {
+
+                        $rates[] = [
+                            'deliveryDate' => isset($rate->GuaranteedDaysToDelivery) ? date("Y-m-d h:i:s", mktime(0, 0, 0, date("m"), date("d") + intval($rate->GuaranteedDaysToDelivery), date("Y"))) : date("Y-m-d h:i:s", mktime(0, 0, 0, date("m"), date("d") + 7, date("Y"))),
+                            'type' => $rate->Service->Code->__toString(),
+                            'price' => $rate->TotalCharges->MonetaryValue->__toString()
+                        ];
+
+                    }
+
+                }
+            } catch ( Exception $ex ) {
+
+                _log($ex);
 
             }
 
@@ -739,6 +728,20 @@
     }
 
     add_filter('sml_request_product_rates', 'sml_request_rate_ups', 10, 4);
+
+    function sml_request_rate_dhl($rates, $product, $addresses, $international) {
+
+        if ($international) {
+
+
+
+        }
+
+        return $rates;
+
+    }
+
+    add_filter('sml_request_product_rates', 'sml_request_rate_dhl', 10, 4);
 
     /*
      * sml_filter_product_rates() - Filter product rates before returned to the Ajax request
@@ -784,7 +787,7 @@
 
         return array_filter($shipping, function ($rate)use($maxShipping) {
 
-            return count($rate['products']) === $maxShipping;
+            return (count($rate['products']) === $maxShipping && $rate['type'] !== $rate['name']);
 
         });
 
@@ -795,7 +798,11 @@
     function sml_rename_rate($name, $rate) {
 
         $lookup = [
-            'FEDEX_GROUND' => 'Fedex Ground'
+            'STANDARD_OVERNIGHT' => 'Overnight',
+            'FEDEX_2_DAY_AM' => '2nd Day AM',
+            'FEDEX_2_DAY' => '2nd Day',
+            'FEDEX_EXPRESS_SAVER' => '3 Day',
+            'FEDEX_GROUND' => '5 Day'
         ];
 
         return isset($lookup[$rate['type']]) ? $lookup[$rate['type']] : $name;
@@ -904,6 +911,13 @@
         return $savedLocations;
 
     }
+
+    function sml_empty_cart_redirect_url() {
+
+        return '/';
+
+    }
+    add_filter( 'woocommerce_return_to_shop_redirect', 'sml_empty_cart_redirect_url' );
 
     function _log( $message ) {
         if( WP_DEBUG === true ){
