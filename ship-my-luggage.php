@@ -919,6 +919,14 @@
     }
     add_filter( 'woocommerce_return_to_shop_redirect', 'sml_empty_cart_redirect_url' );
 
+    function sml_admin_order_item_types($item_id, $item, $product) {
+
+        echo $product->get_dimensions();
+
+    }
+
+    add_action('woocommerce_before_order_itemmeta', 'sml_admin_order_item_types', 10, 3);
+
     function _log( $message ) {
         if( WP_DEBUG === true ){
             error_log("*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*");

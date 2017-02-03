@@ -11,6 +11,15 @@ const DeliveryOptions = ({calculateTotal, updateDelivery, shipping, deliveryDate
 
     if (shipping.length) {
 
+        const today = moment(new Date()).startOf('day')
+        const delivery = moment(deliveryDate)
+
+        if (today.day() === 5) {
+            today.add(2, 'days')
+        } else if (today.day() === 6) {
+            today.add(1, 'days')
+        }
+
         return (
 
             <Card accent='#2b9bd2' title='Delivery Options' onClick="toggle" style={{marginTop: '10px'}} toggle='toggle' active={true}>
@@ -19,8 +28,6 @@ const DeliveryOptions = ({calculateTotal, updateDelivery, shipping, deliveryDate
 
                     <p>Available shipping options.</p>
 
-                    <p style={{marginTop: '10px'}}>All dates are based on earliest date of arrival.  We will reach out to you about scheduling your pickup after your order is placed.</p>
-
                 </Content>
 
                 <Row>
@@ -28,8 +35,10 @@ const DeliveryOptions = ({calculateTotal, updateDelivery, shipping, deliveryDate
                     {shipping.map( rate => {
 
                         const date = moment(rate.deliveryDate)
+                        const duration = Math.ceil(moment.duration(date.diff(today)).asDays())
+                        const pickup = moment(delivery).subtract(duration, 'days')
 
-                        if (date.isBefore(deliveryDate)) {
+                        if (! pickup.isBefore(today)) {
 
                             return (
 
@@ -41,7 +50,7 @@ const DeliveryOptions = ({calculateTotal, updateDelivery, shipping, deliveryDate
 
                                             <Content>
 
-                                                <p>{date.format('dddd, MMMM D, YYYY - h:mm a')}</p>
+                                                <p><strong>Estimated Pickup: </strong>{pickup.format('dddd, MMMM D')}</p>
 
                                             </Content>
 

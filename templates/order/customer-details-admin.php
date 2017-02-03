@@ -2,7 +2,11 @@
 
     <?php if ($origin) : ?>
 
-        <p><strong>Origin:</strong><?php echo $origin['value']; ?></td></p>
+        <div style="background: rgba(255, 0, 0, .65); padding: 10px; border-radius: 3px;">
+
+            <p style="color: #fff;"><strong>Origin:</strong><?php echo $origin['value']; ?></td></p>
+
+        </div>
 
     <?php endif; ?>
 
