@@ -8,10 +8,6 @@
      *  Author URI:   http://www.LanceJernigan.com
      */
 
-?>
-
-<?php
-
     /*
      * sml_init() - Initialize Ship My Luggage Plugin
      */
